@@ -409,127 +409,152 @@ function App() {
         <main className="flex-1 overflow-hidden bg-slate-50">
           {currentTab === 'dashboard' && (
             <div className="p-6 space-y-6">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Dashboard</h2>
-                <p className="text-gray-600">Visão geral do sistema CRM</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-3xl font-bold text-slate-900 mb-2">Dashboard</h2>
+                  <p className="text-slate-600">Visão geral do sistema CRM da Empresas Web</p>
+                </div>
+                <div className="flex items-center space-x-2 bg-white px-4 py-2 rounded-lg shadow-sm border border-slate-200">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-sm text-slate-600">Sistema Online</span>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card>
+                <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:shadow-lg transition-shadow duration-200">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-600">Total de Contatos</p>
-                        <p className="text-2xl font-bold text-gray-900">{stats.total_contacts}</p>
+                        <p className="text-sm font-medium text-blue-700">Total de Contatos</p>
+                        <p className="text-3xl font-bold text-blue-900">{stats.total_contacts}</p>
+                        <p className="text-xs text-blue-600 mt-1">↗ +12% este mês</p>
                       </div>
-                      <Users className="w-8 h-8 text-blue-500" />
+                      <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
+                        <Users className="w-6 h-6 text-white" />
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:shadow-lg transition-shadow duration-200">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-600">Conversas</p>
-                        <p className="text-2xl font-bold text-gray-900">{stats.total_conversations}</p>
+                        <p className="text-sm font-medium text-green-700">Conversas</p>
+                        <p className="text-3xl font-bold text-green-900">{stats.total_conversations}</p>
+                        <p className="text-xs text-green-600 mt-1">↗ +8% esta semana</p>
                       </div>
-                      <MessageCircle className="w-8 h-8 text-green-500" />
+                      <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
+                        <MessageCircle className="w-6 h-6 text-white" />
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:shadow-lg transition-shadow duration-200">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-600">Mensagens Hoje</p>
-                        <p className="text-2xl font-bold text-gray-900">{stats.today_messages}</p>
+                        <p className="text-sm font-medium text-purple-700">Mensagens Hoje</p>
+                        <p className="text-3xl font-bold text-purple-900">{stats.today_messages}</p>
+                        <p className="text-xs text-purple-600 mt-1">📈 Crescendo</p>
                       </div>
-                      <Send className="w-8 h-8 text-purple-500" />
+                      <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center">
+                        <Send className="w-6 h-6 text-white" />
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 hover:shadow-lg transition-shadow duration-200">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-600">IA Status</p>
-                        <p className="text-2xl font-bold text-gray-900">Ativo</p>
+                        <p className="text-sm font-medium text-orange-700">IA Status</p>
+                        <p className="text-3xl font-bold text-orange-900">Ativo</p>
+                        <p className="text-xs text-orange-600 mt-1">🤖 Respondendo</p>
                       </div>
-                      <Bot className="w-8 h-8 text-orange-500" />
+                      <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center">
+                        <Bot className="w-6 h-6 text-white" />
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
+                <Card className="shadow-lg border-slate-200">
+                  <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b border-slate-200">
                     <CardTitle className="flex items-center space-x-2">
                       <Zap className="w-5 h-5 text-yellow-500" />
-                      <span>Recursos Principais</span>
+                      <span className="text-slate-900">Recursos Principais</span>
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
-                      <MessageCircle className="w-5 h-5 text-blue-500" />
+                  <CardContent className="space-y-4 p-6">
+                    <div className="flex items-center space-x-4 p-4 bg-blue-50 rounded-xl border border-blue-200 hover:bg-blue-100 transition-colors duration-200">
+                      <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                        <MessageCircle className="w-5 h-5 text-white" />
+                      </div>
                       <div>
-                        <p className="font-medium text-gray-900">WhatsApp Web</p>
-                        <p className="text-sm text-gray-600">Integração completa com QR Code</p>
+                        <p className="font-semibold text-slate-900">WhatsApp Web</p>
+                        <p className="text-sm text-slate-600">Integração completa com QR Code</p>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
-                      <Bot className="w-5 h-5 text-green-500" />
+                    <div className="flex items-center space-x-4 p-4 bg-green-50 rounded-xl border border-green-200 hover:bg-green-100 transition-colors duration-200">
+                      <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
+                        <Bot className="w-5 h-5 text-white" />
+                      </div>
                       <div>
-                        <p className="font-medium text-gray-900">IA Assistant</p>
-                        <p className="text-sm text-gray-600">ChatGPT + Gemini integrados</p>
+                        <p className="font-semibold text-slate-900">IA Assistant</p>
+                        <p className="text-sm text-slate-600">ChatGPT + Gemini integrados</p>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-3 p-3 bg-purple-50 rounded-lg">
-                      <Users className="w-5 h-5 text-purple-500" />
+                    <div className="flex items-center space-x-4 p-4 bg-purple-50 rounded-xl border border-purple-200 hover:bg-purple-100 transition-colors duration-200">
+                      <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
+                        <Users className="w-5 h-5 text-white" />
+                      </div>
                       <div>
-                        <p className="font-medium text-gray-900">CRM Completo</p>
-                        <p className="text-sm text-gray-600">Gestão avançada de clientes</p>
+                        <p className="font-semibold text-slate-900">CRM Completo</p>
+                        <p className="text-sm text-slate-600">Gestão avançada de clientes</p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardHeader>
+                <Card className="shadow-lg border-slate-200">
+                  <CardHeader className="bg-gradient-to-r from-green-50 to-blue-50 border-b border-slate-200">
                     <CardTitle className="flex items-center space-x-2">
                       <Globe className="w-5 h-5 text-blue-500" />
-                      <span>Status do Sistema</span>
+                      <span className="text-slate-900">Status do Sistema</span>
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-center space-x-2">
-                        <CheckCircle className="w-4 h-4 text-green-500" />
-                        <span className="text-sm">API Backend</span>
+                  <CardContent className="space-y-4 p-6">
+                    <div className="flex items-center justify-between p-4 bg-green-50 rounded-xl border border-green-200">
+                      <div className="flex items-center space-x-3">
+                        <CheckCircle className="w-5 h-5 text-green-500" />
+                        <span className="font-medium text-slate-900">API Backend</span>
                       </div>
-                      <Badge variant="default">Online</Badge>
+                      <Badge variant="default" className="bg-green-500 hover:bg-green-600">Online</Badge>
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-center space-x-2">
+                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
+                      <div className="flex items-center space-x-3">
                         {whatsappStatus === 'connected' ? 
-                          <CheckCircle className="w-4 h-4 text-green-500" /> : 
-                          <AlertCircle className="w-4 h-4 text-red-500" />
+                          <CheckCircle className="w-5 h-5 text-green-500" /> : 
+                          <AlertCircle className="w-5 h-5 text-red-500" />
                         }
-                        <span className="text-sm">WhatsApp</span>
+                        <span className="font-medium text-slate-900">WhatsApp</span>
                       </div>
-                      <Badge variant={whatsappStatus === 'connected' ? 'default' : 'destructive'}>
+                      <Badge variant={whatsappStatus === 'connected' ? 'default' : 'destructive'} 
+                             className={whatsappStatus === 'connected' ? 'bg-green-500 hover:bg-green-600' : ''}>
                         {whatsappStatus === 'connected' ? 'Conectado' : 'Desconectado'}
                       </Badge>
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-center space-x-2">
-                        <CheckCircle className="w-4 h-4 text-green-500" />
-                        <span className="text-sm">IA Assistant</span>
+                    <div className="flex items-center justify-between p-4 bg-orange-50 rounded-xl border border-orange-200">
+                      <div className="flex items-center space-x-3">
+                        <CheckCircle className="w-5 h-5 text-orange-500" />
+                        <span className="font-medium text-slate-900">IA Assistant</span>
                       </div>
-                      <Badge variant="default">Pronto</Badge>
+                      <Badge variant="default" className="bg-orange-500 hover:bg-orange-600">Pronto</Badge>
                     </div>
                   </CardContent>
                 </Card>
