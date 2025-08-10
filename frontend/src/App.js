@@ -591,6 +591,19 @@ function App() {
               <Button
                 variant="ghost"
                 className={`w-full transition-all duration-200 ${
+                  currentTab === 'assistants' 
+                    ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg hover:shadow-xl' 
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                } ${sidebarCollapsed ? 'justify-center p-3' : 'justify-start'}`}
+                onClick={() => setCurrentTab('assistants')}
+              >
+                <UserCog className="w-5 h-5" />
+                {!sidebarCollapsed && <span className="ml-3">Gestão de IAs</span>}
+              </Button>
+              
+              <Button
+                variant="ghost"
+                className={`w-full transition-all duration-200 ${
                   currentTab === 'departments' 
                     ? 'bg-gradient-to-r from-indigo-500 to-blue-600 text-white shadow-lg hover:shadow-xl' 
                     : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
