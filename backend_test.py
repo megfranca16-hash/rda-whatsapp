@@ -753,6 +753,7 @@ class BackendTester:
                 
             # Test all systems
             await self.test_departments_system()
+            await self.test_enhanced_department_management()
             await self.test_department_signatures()
             await self.test_transfers_system()
             await self.test_ai_integration()
