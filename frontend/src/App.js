@@ -25,7 +25,16 @@ import {
   Globe,
   Crown,
   ArrowRight,
-  Clock
+  Clock,
+  Menu,
+  Search,
+  User,
+  ChevronLeft,
+  ChevronRight,
+  Home,
+  MessageSquare,
+  UserCog,
+  Briefcase
 } from 'lucide-react';
 
 function App() {
