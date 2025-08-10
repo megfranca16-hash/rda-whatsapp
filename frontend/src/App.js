@@ -133,6 +133,36 @@ function App() {
     }
   };
 
+  const fetchDepartments = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE}/api/departments`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setDepartments(data);
+      }
+    } catch (error) {
+      console.error('Error fetching departments:', error);
+    }
+  };
+
+  const fetchTransfers = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE}/api/transfers`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setTransfers(data);
+      }
+    } catch (error) {
+      console.error('Error fetching transfers:', error);
+    }
+  };
+
   const checkWhatsAppStatus = async () => {
     try {
       const response = await fetch(`${API_BASE}/api/whatsapp/status`);
