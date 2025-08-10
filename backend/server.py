@@ -683,11 +683,13 @@ async def update_department(
     name: Optional[str] = None,
     description: Optional[str] = None,
     signature: Optional[str] = None,
+    avatar_url: Optional[str] = None,
+    manual_instructions: Optional[str] = None,
     active: Optional[bool] = None,
     current_user: str = Depends(get_current_user),
     db=Depends(get_database)
 ):
-    """Update department information including signature"""
+    """Update department information including signature, avatar and manual instructions"""
     update_data = {}
     if name is not None:
         update_data["name"] = name
@@ -695,6 +697,10 @@ async def update_department(
         update_data["description"] = description
     if signature is not None:
         update_data["signature"] = signature
+    if avatar_url is not None:
+        update_data["avatar_url"] = avatar_url
+    if manual_instructions is not None:
+        update_data["manual_instructions"] = manual_instructions
     if active is not None:
         update_data["active"] = active
     
