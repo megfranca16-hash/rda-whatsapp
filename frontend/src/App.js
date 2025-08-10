@@ -43,6 +43,8 @@ function App() {
   });
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [departments, setDepartments] = useState([]);
+  const [transfers, setTransfers] = useState([]);
 
   const API_BASE = process.env.REACT_APP_BACKEND_URL;
 
