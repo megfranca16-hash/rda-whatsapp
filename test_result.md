@@ -257,7 +257,10 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "User registration endpoint"
+    - "Landing page authentication modal integration"
+    - "Demo page routing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
