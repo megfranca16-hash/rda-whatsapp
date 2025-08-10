@@ -88,8 +88,21 @@ function App() {
     manual_instructions: '',
     signature_template: '',
     phone_number: '',
-    enabled: true
+    department_id: '',
+    enabled: true,
+    supports_pdf: true,
+    supports_image: true,
+    supports_audio: true,
+    message_limit: 100
   });
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [newDepartment, setNewDepartment] = useState({
+    name: '',
+    description: '',
+    whatsapp_number: '',
+    integration_mode: 'qr'
+  });
+  const [creatingDepartment, setCreatingDepartment] = useState(false);
 
   const API_BASE = process.env.REACT_APP_BACKEND_URL;
 
