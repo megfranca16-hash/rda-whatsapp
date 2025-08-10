@@ -105,6 +105,7 @@ function App() {
       fetchContacts();
       fetchDepartments();
       fetchTransfers();
+      fetchAssistants();
       checkWhatsAppStatus();
     }
   }, [isAuthenticated]);
