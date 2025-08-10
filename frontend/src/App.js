@@ -79,6 +79,16 @@ function App() {
   });
   const [editingInstructions, setEditingInstructions] = useState(null);
   const [newInstructions, setNewInstructions] = useState('');
+  const [assistants, setAssistants] = useState([]);
+  const [editingAssistant, setEditingAssistant] = useState(null);
+  const [assistantForm, setAssistantForm] = useState({
+    name: '',
+    avatar_url: '',
+    manual_instructions: '',
+    signature_template: '',
+    phone_number: '',
+    enabled: true
+  });
 
   const API_BASE = process.env.REACT_APP_BACKEND_URL;
 
