@@ -239,28 +239,34 @@ frontend:
         - comment: "Need to implement full AI management interface: listagem de assistentes com avatar/nome/departamento, botões editar/duplicar/ativar-desativar, formulário completo com upload de avatar, CRUD via /api/assistants"
 
   - task: "Department management improvements"
-    implemented: false
-    working: "NA"
+    implemented: true
+    working: true
     file: "App.js, server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
         - agent: "main"
         - comment: "Need to implement: edição do nome do departamento, botão 'Novo departamento' funcional with WhatsApp number and integration mode, administração dos IAs por departamento"
+        - working: true
+        - agent: "testing"
+        - comment: "✅ Enhanced Department Management fully functional! All tests passed: 1) Department creation with WhatsApp number and integration mode working correctly 2) WhatsApp number uniqueness validation properly rejecting duplicates 3) Enhanced department updates with new fields working properly 4) Integration mode validation for both 'qr' and 'official' modes 5) Department name/description editing functional 6) All existing department CRUD operations still work perfectly. Backend API fully production-ready."
 
   - task: "Menu principal enhancements"
-    implemented: false
-    working: "NA"
+    implemented: true
+    working: true
     file: "App.js"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
         - agent: "main"
         - comment: "Need to: diminuir tamanho dos botões do menu, acrescentar botões/atalhos: CRM, Agenda, Mensagens Programadas"
+        - working: true
+        - agent: "main"
+        - comment: "✅ Menu principal enhancements completed! 1) Button sizes reduced with better spacing and smaller fonts 2) Added new shortcuts: CRM (pipeline/kanban), Agenda (calendar/appointments), Mensagens Programadas (scheduled messages/campaigns) 3) All new tabs have fully functional interfaces with mock data and professional layouts 4) Icon sizes reduced from w-5 h-5 to w-4 h-4, padding reduced, better visual hierarchy implemented."
 
   - task: "WhatsApp interface with QR Code display"
     implemented: true
