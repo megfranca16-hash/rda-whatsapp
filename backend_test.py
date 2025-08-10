@@ -316,6 +316,130 @@ class BackendTester:
             self.log_result("Contacts System", False, f"Contacts tests failed: {str(e)}")
             return False
             
+    async def test_whatsapp_qr_system(self):
+        """Test WhatsApp QR code generation and status"""
+        if not self.auth_token:
+            self.log_result("WhatsApp QR System", False, "No auth token available")
+            return False
+            
+        headers = {"Authorization": f"Bearer {self.auth_token}"}
+        
+        try:
+            # Test QR code generation
+            async with self.session.get(f"{API_BASE}/whatsapp/qr", headers=headers) as response:
+                if response.status == 200:
+                    qr_data = await response.json()
+                    if qr_data.get("qr_code") and qr_data["qr_code"].startswith("data:image/png;base64,"):
+                        self.log_result("WhatsApp QR Generation", True, f"QR code generated successfully, status: {qr_data.get('status')}")
+                    else:
+                        self.log_result("WhatsApp QR Generation", False, f"Invalid QR code format: {qr_data}")
+                        return False
+                else:
+                    self.log_result("WhatsApp QR Generation", False, f"Failed to generate QR: {response.status}")
+                    return False
+                    
+            # Test WhatsApp status
+            async with self.session.get(f"{API_BASE}/whatsapp/status", headers=headers) as response:
+                if response.status == 200:
+                    status_data = await response.json()
+                    required_fields = ["connected", "phone_number", "name", "status"]
+                    if all(field in status_data for field in required_fields):
+                        self.log_result("WhatsApp Status", True, f"Status: {status_data['status']}, Phone: {status_data['phone_number']}")
+                        return True
+                    else:
+                        missing = [field for field in required_fields if field not in status_data]
+                        self.log_result("WhatsApp Status", False, f"Missing status fields: {missing}")
+                        return False
+                else:
+                    self.log_result("WhatsApp Status", False, f"Failed to get WhatsApp status: {response.status}")
+                    return False
+                    
+        except Exception as e:
+            self.log_result("WhatsApp QR System", False, f"WhatsApp QR tests failed: {str(e)}")
+            return False
+            
+    async def test_department_signatures(self):
+        """Test department signatures functionality"""
+        if not self.auth_token:
+            self.log_result("Department Signatures", False, "No auth token available")
+            return False
+            
+        headers = {"Authorization": f"Bearer {self.auth_token}"}
+        
+        try:
+            # Get departments to check signatures
+            async with self.session.get(f"{API_BASE}/departments", headers=headers) as response:
+                if response.status == 200:
+                    departments = await response.json()
+                    
+                    # Check if default departments have signatures
+                    signatures_found = 0
+                    for dept in departments:
+                        if dept.get("signature") and len(dept["signature"]) > 10:
+                            signatures_found += 1
+                            
+                    if signatures_found >= 4:
+                        self.log_result("Department Signatures Check", True, f"Found {signatures_found} departments with signatures")
+                        
+                        # Test updating a department signature
+                        if departments:
+                            dept_id = departments[0]["id"]
+                            test_signature = "---\n🧪 Assinatura de Teste\n📧 teste@empresasweb.com\n📞 (11) 99999-0000\n\nEsta é uma assinatura de teste!"
+                            
+                            update_params = {"signature": test_signature}
+                            async with self.session.put(f"{API_BASE}/departments/{dept_id}", headers=headers, params=update_params) as update_response:
+                                if update_response.status == 200:
+                                    self.log_result("Department Signature Update", True, f"Updated signature for department {dept_id}")
+                                    return True
+                                else:
+                                    self.log_result("Department Signature Update", False, f"Failed to update signature: {update_response.status}")
+                                    return False
+                        else:
+                            self.log_result("Department Signatures", False, "No departments found to test signature update")
+                            return False
+                    else:
+                        self.log_result("Department Signatures Check", False, f"Only {signatures_found} departments have signatures, expected at least 4")
+                        return False
+                else:
+                    self.log_result("Department Signatures", False, f"Failed to get departments: {response.status}")
+                    return False
+                    
+        except Exception as e:
+            self.log_result("Department Signatures", False, f"Department signatures test failed: {str(e)}")
+            return False
+            
+    async def test_whatsapp_send_message(self):
+        """Test WhatsApp message sending (mock)"""
+        if not self.auth_token:
+            self.log_result("WhatsApp Send Message", False, "No auth token available")
+            return False
+            
+        headers = {"Authorization": f"Bearer {self.auth_token}"}
+        
+        try:
+            # Test sending a message
+            send_params = {
+                "phone_number": "+5511987654321",
+                "message": "Esta é uma mensagem de teste do sistema Empresas Web CRM!"
+            }
+            
+            async with self.session.post(f"{API_BASE}/whatsapp/send", headers=headers, params=send_params) as response:
+                if response.status == 200:
+                    send_result = await response.json()
+                    if send_result.get("success") and send_result.get("message_id"):
+                        self.log_result("WhatsApp Send Message", True, f"Message sent successfully, ID: {send_result['message_id']}")
+                        return True
+                    else:
+                        self.log_result("WhatsApp Send Message", False, f"Send failed: {send_result}")
+                        return False
+                else:
+                    self.log_result("WhatsApp Send Message", False, f"Failed to send message: {response.status}")
+                    return False
+                    
+        except Exception as e:
+            self.log_result("WhatsApp Send Message", False, f"WhatsApp send test failed: {str(e)}")
+            return False
+            
     async def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Empresas Web CRM Backend Tests")
