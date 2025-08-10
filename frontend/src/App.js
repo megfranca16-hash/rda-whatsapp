@@ -47,6 +47,8 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [departments, setDepartments] = useState([]);
   const [transfers, setTransfers] = useState([]);
+  const [editingDepartment, setEditingDepartment] = useState(null);
+  const [newSignature, setNewSignature] = useState('');
 
   const API_BASE = process.env.REACT_APP_BACKEND_URL;
 
