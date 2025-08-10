@@ -173,6 +173,8 @@ class Department(BaseModel):
     active: bool = True
     created_at: datetime
     signature: Optional[str] = None  # Assinatura automática do departamento
+    avatar_url: Optional[str] = None  # Avatar do assistente
+    manual_instructions: Optional[str] = None  # Instruções manuais editáveis
 
 class DepartmentTransfer(BaseModel):
     id: str
@@ -188,6 +190,8 @@ class DepartmentCreate(BaseModel):
     name: str
     description: str
     signature: Optional[str] = None
+    avatar_url: Optional[str] = None
+    manual_instructions: Optional[str] = None
 
 # Utility functions
 def create_token(user_id: str):
