@@ -393,6 +393,82 @@ function App() {
     setLoading(false);
   };
 
+  // Show demo page if requested
+  if (window.location.pathname === '/demo') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 flex items-center justify-center p-4">
+        <Card className="w-full max-w-4xl bg-white/10 backdrop-blur-lg border-white/20 shadow-2xl">
+          <CardHeader className="text-center space-y-4">
+            <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg">
+              <MessageCircle className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <CardTitle className="text-3xl text-white mb-2">Demonstração - Empresas Web</CardTitle>
+              <p className="text-slate-300">Veja como funciona nosso sistema CRM + WhatsApp + IA</p>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-6 p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold text-white">Recursos Principais</h3>
+                <ul className="space-y-2 text-slate-300">
+                  <li className="flex items-center space-x-2">
+                    <CheckCircle className="w-5 h-5 text-green-400" />
+                    <span>7 Assistentes IA Especializados</span>
+                  </li>
+                  <li className="flex items-center space-x-2">
+                    <CheckCircle className="w-5 h-5 text-green-400" />
+                    <span>Integração Completa WhatsApp</span>
+                  </li>
+                  <li className="flex items-center space-x-2">
+                    <CheckCircle className="w-5 h-5 text-green-400" />
+                    <span>CRM Avançado para Contabilidade</span>
+                  </li>
+                  <li className="flex items-center space-x-2">
+                    <CheckCircle className="w-5 h-5 text-green-400" />
+                    <span>Atendimento 24/7 Automatizado</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold text-white">Departamentos Especializados</h3>
+                <ul className="space-y-2 text-slate-300 text-sm">
+                  <li>• Abertura de Empresa</li>
+                  <li>• Dúvidas Contábeis</li>
+                  <li>• RH e Folha de Pagamento</li>
+                  <li>• Tributos e Impostos</li>
+                  <li>• Emissão de Notas Fiscais</li>
+                  <li>• Consultoria Geral</li>
+                  <li>• Financeiro</li>
+                </ul>
+              </div>
+            </div>
+            
+            <div className="text-center space-y-4">
+              <p className="text-slate-300">Pronto para começar? Crie sua conta gratuita!</p>
+              <div className="space-x-4">
+                <Button 
+                  onClick={() => window.location.href = '/'}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-2"
+                >
+                  Criar Conta Gratuita
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => window.location.href = '/'}
+                  className="border-white/20 text-white hover:bg-white/10 px-6 py-2"
+                >
+                  Voltar ao Início
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   // Show landing page if not authenticated
   if (!isAuthenticated) {
     return <LandingPage onLoginSuccess={() => {
