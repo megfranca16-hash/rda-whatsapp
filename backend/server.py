@@ -141,6 +141,12 @@ class LoginRequest(BaseModel):
     username: str
     password: str
 
+class RegisterRequest(BaseModel):
+    username: str
+    password: str
+    email: Optional[str] = None
+    name: Optional[str] = None
+
 class WhatsAppMessage(BaseModel):
     phone_number: str
     message: str
