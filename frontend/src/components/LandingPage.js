@@ -84,8 +84,6 @@ const LandingPage = ({ onLoginSuccess }) => {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         onLoginSuccess();
-      } else {
-        alert('Preencha todos os campos!');
       }
     } catch (error) {
       alert('Erro ao autenticar. Tente novamente.');
