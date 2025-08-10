@@ -220,8 +220,8 @@ class BackendTester:
                     if isinstance(departments, list) and len(departments) >= 4:
                         # Check for default departments
                         dept_names = [dept.get("name", "").lower() for dept in departments]
-                        expected_depts = ["vendas", "suporte", "financeiro", "gerencial"]
-                        found_depts = [dept for dept in expected_depts if dept in dept_names]
+                        expected_depts = ["abertura", "contábeis", "folha", "tributos", "notas", "outros", "financeiro"]
+                        found_depts = [dept for dept in expected_depts if any(dept in name for name in dept_names)]
                         
                         if len(found_depts) >= 4:
                             self.log_result("Departments GET", True, f"Found {len(departments)} departments including defaults: {found_depts}")
@@ -234,9 +234,9 @@ class BackendTester:
                     self.log_result("Departments GET", False, f"Failed to get departments: {response.status}")
                     return False
                     
-            # Test POST new department
+            # Test POST new department (basic)
             new_dept_data = {
-                "name": "Teste Departamento",
+                "name": "Teste Departamento Básico",
                 "description": "Departamento criado para teste automatizado",
                 "signature": "---\n🧪 Teste Departamento\n📧 teste@empresasweb.com\n📞 (11) 99999-0000\n\nDepartamento de teste!"
             }
@@ -245,18 +245,185 @@ class BackendTester:
                 if response.status == 200:
                     dept_data = await response.json()
                     if dept_data.get("name") == new_dept_data["name"]:
-                        self.log_result("Departments POST", True, f"Created department: {dept_data.get('name')}")
-                        return True
+                        self.log_result("Departments POST Basic", True, f"Created department: {dept_data.get('name')}")
                     else:
-                        self.log_result("Departments POST", False, f"Department creation returned unexpected data: {dept_data}")
+                        self.log_result("Departments POST Basic", False, f"Department creation returned unexpected data: {dept_data}")
                         return False
                 else:
                     response_text = await response.text()
-                    self.log_result("Departments POST", False, f"Failed to create department: {response.status} - {response_text}")
+                    self.log_result("Departments POST Basic", False, f"Failed to create department: {response.status} - {response_text}")
                     return False
                     
         except Exception as e:
             self.log_result("Departments System", False, f"Department tests failed: {str(e)}")
+            return False
+            
+        return True
+            
+    async def test_enhanced_department_management(self):
+        """Test enhanced department management with WhatsApp number and integration mode"""
+        if not self.auth_token:
+            self.log_result("Enhanced Department Management", False, "No auth token available")
+            return False
+            
+        headers = {"Authorization": f"Bearer {self.auth_token}"}
+        
+        try:
+            import time
+            unique_suffix = str(int(time.time()))
+            
+            # Test 1: Create department with WhatsApp number and integration mode
+            enhanced_dept_data = {
+                "name": f"Departamento Avançado {unique_suffix}",
+                "description": "Departamento com integração WhatsApp",
+                "signature": "---\n📱 Departamento Avançado\n📧 avancado@empresasweb.com\n📞 (11) 99999-1234\n\nDepartamento com WhatsApp!",
+                "whatsapp_number": f"+5511999{unique_suffix[-6:]}",
+                "integration_mode": "qr",
+                "avatar_url": "/avatars/advanced-dept.png",
+                "manual_instructions": "Instruções específicas para este departamento avançado"
+            }
+            
+            created_dept_id = None
+            async with self.session.post(f"{API_BASE}/departments", headers=headers, json=enhanced_dept_data) as response:
+                if response.status == 200:
+                    dept_data = await response.json()
+                    created_dept_id = dept_data.get("id")
+                    if (dept_data.get("name") == enhanced_dept_data["name"] and 
+                        dept_data.get("whatsapp_number") == enhanced_dept_data["whatsapp_number"] and
+                        dept_data.get("integration_mode") == enhanced_dept_data["integration_mode"]):
+                        self.log_result("Enhanced Department Creation", True, f"Created enhanced department with WhatsApp: {dept_data.get('whatsapp_number')}")
+                    else:
+                        self.log_result("Enhanced Department Creation", False, f"Enhanced department creation returned unexpected data: {dept_data}")
+                        return False
+                else:
+                    response_text = await response.text()
+                    self.log_result("Enhanced Department Creation", False, f"Failed to create enhanced department: {response.status} - {response_text}")
+                    return False
+            
+            # Test 2: Try to create department with duplicate WhatsApp number (should fail)
+            duplicate_whatsapp_data = {
+                "name": f"Departamento Duplicado {unique_suffix}",
+                "description": "Tentativa de criar com WhatsApp duplicado",
+                "whatsapp_number": enhanced_dept_data["whatsapp_number"],  # Same WhatsApp number
+                "integration_mode": "official"
+            }
+            
+            async with self.session.post(f"{API_BASE}/departments", headers=headers, json=duplicate_whatsapp_data) as response:
+                if response.status == 400:
+                    error_data = await response.json()
+                    if "whatsapp number already in use" in error_data.get("detail", "").lower():
+                        self.log_result("WhatsApp Number Uniqueness Validation", True, "Correctly rejected duplicate WhatsApp number")
+                    else:
+                        self.log_result("WhatsApp Number Uniqueness Validation", False, f"Wrong error message: {error_data}")
+                        return False
+                else:
+                    self.log_result("WhatsApp Number Uniqueness Validation", False, f"Should have failed with 400, got {response.status}")
+                    return False
+            
+            # Test 3: Update department with new WhatsApp number and integration mode
+            if created_dept_id:
+                new_whatsapp = f"+5511888{unique_suffix[-6:]}"
+                update_data = {
+                    "name": f"Departamento Atualizado {unique_suffix}",
+                    "description": "Departamento com dados atualizados",
+                    "whatsapp_number": new_whatsapp,
+                    "integration_mode": "official",
+                    "signature": "---\n📱 Departamento Atualizado\n📧 atualizado@empresasweb.com\n📞 (11) 99999-5678\n\nDepartamento atualizado!"
+                }
+                
+                async with self.session.put(f"{API_BASE}/departments/{created_dept_id}", headers=headers, json=update_data) as response:
+                    if response.status == 200:
+                        update_result = await response.json()
+                        if update_result.get("success"):
+                            self.log_result("Enhanced Department Update", True, f"Updated department with new WhatsApp: {new_whatsapp}")
+                            
+                            # Verify the update
+                            async with self.session.get(f"{API_BASE}/departments", headers=headers) as verify_response:
+                                if verify_response.status == 200:
+                                    departments = await verify_response.json()
+                                    updated_dept = next((d for d in departments if d["id"] == created_dept_id), None)
+                                    if (updated_dept and 
+                                        updated_dept.get("whatsapp_number") == new_whatsapp and
+                                        updated_dept.get("integration_mode") == "official" and
+                                        updated_dept.get("name") == update_data["name"]):
+                                        self.log_result("Enhanced Department Update Verification", True, "Department update verified successfully")
+                                    else:
+                                        self.log_result("Enhanced Department Update Verification", False, "Department update not reflected correctly")
+                                        return False
+                                else:
+                                    self.log_result("Enhanced Department Update Verification", False, "Failed to verify department update")
+                                    return False
+                        else:
+                            self.log_result("Enhanced Department Update", False, f"Update failed: {update_result}")
+                            return False
+                    else:
+                        response_text = await response.text()
+                        self.log_result("Enhanced Department Update", False, f"Failed to update department: {response.status} - {response_text}")
+                        return False
+            
+            # Test 4: Try to update another department with the same WhatsApp number (should fail)
+            # First create another department
+            another_dept_data = {
+                "name": f"Outro Departamento {unique_suffix}",
+                "description": "Outro departamento para teste de duplicação",
+                "whatsapp_number": f"+5511777{unique_suffix[-6:]}",
+                "integration_mode": "qr"
+            }
+            
+            another_dept_id = None
+            async with self.session.post(f"{API_BASE}/departments", headers=headers, json=another_dept_data) as response:
+                if response.status == 200:
+                    another_dept = await response.json()
+                    another_dept_id = another_dept.get("id")
+                    
+                    # Now try to update it with the WhatsApp number from the first department
+                    if another_dept_id and created_dept_id:
+                        duplicate_update = {
+                            "whatsapp_number": new_whatsapp  # Same as the first department
+                        }
+                        
+                        async with self.session.put(f"{API_BASE}/departments/{another_dept_id}", headers=headers, json=duplicate_update) as dup_response:
+                            if dup_response.status == 400:
+                                dup_error = await dup_response.json()
+                                if "whatsapp number already in use" in dup_error.get("detail", "").lower():
+                                    self.log_result("WhatsApp Update Uniqueness Validation", True, "Correctly rejected duplicate WhatsApp number on update")
+                                else:
+                                    self.log_result("WhatsApp Update Uniqueness Validation", False, f"Wrong error message on update: {dup_error}")
+                                    return False
+                            else:
+                                self.log_result("WhatsApp Update Uniqueness Validation", False, f"Should have failed update with 400, got {dup_response.status}")
+                                return False
+                else:
+                    self.log_result("Enhanced Department Management", False, "Failed to create second department for duplicate test")
+                    return False
+            
+            # Test 5: Test integration mode validation
+            integration_modes = ["qr", "official"]
+            for mode in integration_modes:
+                test_mode_data = {
+                    "name": f"Teste Modo {mode.upper()} {unique_suffix}",
+                    "description": f"Teste do modo de integração {mode}",
+                    "whatsapp_number": f"+5511666{unique_suffix[-6:]}{mode[0]}",
+                    "integration_mode": mode
+                }
+                
+                async with self.session.post(f"{API_BASE}/departments", headers=headers, json=test_mode_data) as response:
+                    if response.status == 200:
+                        mode_dept = await response.json()
+                        if mode_dept.get("integration_mode") == mode:
+                            self.log_result(f"Integration Mode {mode.upper()} Test", True, f"Successfully created department with {mode} mode")
+                        else:
+                            self.log_result(f"Integration Mode {mode.upper()} Test", False, f"Integration mode not set correctly: {mode_dept.get('integration_mode')}")
+                            return False
+                    else:
+                        response_text = await response.text()
+                        self.log_result(f"Integration Mode {mode.upper()} Test", False, f"Failed to create department with {mode} mode: {response.status} - {response_text}")
+                        return False
+            
+            return True
+                    
+        except Exception as e:
+            self.log_result("Enhanced Department Management", False, f"Enhanced department tests failed: {str(e)}")
             return False
             
     async def test_transfers_system(self):
