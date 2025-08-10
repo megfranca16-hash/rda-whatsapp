@@ -545,20 +545,53 @@ async def get_departments(current_user: str = Depends(get_current_user), db=Depe
 
 @app.post("/api/departments")
 async def create_department(
-    name: str,
-    description: str,
+    department: DepartmentCreate,
     current_user: str = Depends(get_current_user),
     db=Depends(get_database)
 ):
     department_data = {
         "id": str(uuid.uuid4()),
-        "name": name,
-        "description": description,
+        "name": department.name,
+        "description": department.description,
+        "signature": department.signature,
         "active": True,
         "created_at": datetime.utcnow().isoformat()
     }
     await db.departments.insert_one(department_data)
     return convert_mongo_document(department_data)
+
+@app.put("/api/departments/{department_id}")
+async def update_department(
+    department_id: str,
+    name: Optional[str] = None,
+    description: Optional[str] = None,
+    signature: Optional[str] = None,
+    active: Optional[bool] = None,
+    current_user: str = Depends(get_current_user),
+    db=Depends(get_database)
+):
+    """Update department information including signature"""
+    update_data = {}
+    if name is not None:
+        update_data["name"] = name
+    if description is not None:
+        update_data["description"] = description
+    if signature is not None:
+        update_data["signature"] = signature
+    if active is not None:
+        update_data["active"] = active
+    
+    if update_data:
+        update_data["updated_at"] = datetime.utcnow().isoformat()
+        result = await db.departments.update_one(
+            {"id": department_id},
+            {"$set": update_data}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Department not found")
+    
+    return {"success": True, "updated_fields": list(update_data.keys())}
 
 @app.get("/api/transfers")
 async def get_transfers(current_user: str = Depends(get_current_user), db=Depends(get_database)):
