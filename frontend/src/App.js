@@ -23,7 +23,9 @@ import {
   Zap,
   Shield,
   Globe,
-  Crown
+  Crown,
+  ArrowRight,
+  Clock
 } from 'lucide-react';
 
 function App() {
