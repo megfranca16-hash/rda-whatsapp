@@ -460,7 +460,7 @@ async def get_dashboard_stats(current_user: str = Depends(get_current_user), db=
 @app.get("/api/departments")
 async def get_departments(current_user: str = Depends(get_current_user), db=Depends(get_database)):
     departments = await db.departments.find().to_list(length=100)
-    return departments
+    return convert_mongo_document(departments)
 
 @app.post("/api/departments")
 async def create_department(
@@ -474,15 +474,15 @@ async def create_department(
         "name": name,
         "description": description,
         "active": True,
-        "created_at": datetime.utcnow()
+        "created_at": datetime.utcnow().isoformat()
     }
     await db.departments.insert_one(department_data)
-    return department_data
+    return convert_mongo_document(department_data)
 
 @app.get("/api/transfers")
 async def get_transfers(current_user: str = Depends(get_current_user), db=Depends(get_database)):
     transfers = await db.transfers.find().sort("created_at", -1).to_list(length=100)
-    return transfers
+    return convert_mongo_document(transfers)
 
 @app.post("/api/transfers")
 async def create_transfer(
@@ -498,12 +498,12 @@ async def create_transfer(
         "to_department": department_id,
         "message": message,
         "status": "pending",
-        "created_at": datetime.utcnow(),
+        "created_at": datetime.utcnow().isoformat(),
         "handled_by": None,
         "notes": None
     }
     await db.transfers.insert_one(transfer_data)
-    return transfer_data
+    return convert_mongo_document(transfer_data)
 
 @app.put("/api/transfers/{transfer_id}")
 async def update_transfer(
