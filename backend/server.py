@@ -251,8 +251,8 @@ async def root():
     return {"message": "Empresas Web CRM API", "status": "running"}
 
 @app.post("/api/auth/login")
-async def login(request: LoginRequest):
-    # Simple admin authentication for MVP
+async def login(request: LoginRequest, db=Depends(get_database)):
+    # Check admin credentials first
     if request.username == "admin" and request.password == "admin123":
         token = create_token("admin")
         return {
@@ -263,8 +263,77 @@ async def login(request: LoginRequest):
                 "role": "admin"
             }
         }
+    
+    # Check database for regular users
+    users_collection = db.users
+    user = await users_collection.find_one({"username": request.username})
+    
+    if user and user.get("password") == request.password:
+        token = create_token(user["id"])
+        return {
+            "token": token,
+            "user": {
+                "id": user["id"],
+                "username": user["username"],
+                "role": user.get("role", "user"),
+                "name": user.get("name"),
+                "email": user.get("email")
+            }
+        }
     else:
         raise HTTPException(status_code=401, detail="Invalid credentials")
+
+@app.post("/api/auth/register")
+async def register(request: RegisterRequest, db=Depends(get_database)):
+    """Register new user"""
+    try:
+        users_collection = db.users
+        
+        # Check if username already exists
+        existing_user = await users_collection.find_one({"username": request.username})
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Username already exists")
+        
+        # Check if email already exists (if provided)
+        if request.email:
+            existing_email = await users_collection.find_one({"email": request.email})
+            if existing_email:
+                raise HTTPException(status_code=400, detail="Email already registered")
+        
+        # Create new user
+        user_data = {
+            "id": str(uuid.uuid4()),
+            "username": request.username,
+            "password": request.password,  # In production, hash this password
+            "email": request.email,
+            "name": request.name or request.username,
+            "role": "user",
+            "created_at": datetime.utcnow().isoformat(),
+            "active": True
+        }
+        
+        await users_collection.insert_one(user_data)
+        
+        # Create token for immediate login
+        token = create_token(user_data["id"])
+        
+        return {
+            "token": token,
+            "user": {
+                "id": user_data["id"],
+                "username": user_data["username"],
+                "role": user_data["role"],
+                "name": user_data["name"],
+                "email": user_data["email"]
+            },
+            "message": "User registered successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error registering user: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error creating user account")
 
 @app.get("/api/auth/verify")
 async def verify_auth(current_user: str = Depends(get_current_user)):
