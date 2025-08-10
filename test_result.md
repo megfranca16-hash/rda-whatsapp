@@ -105,6 +105,18 @@
 user_problem_statement: "Criar o sistema 'Empresas Web' - um CRM moderno com integração WhatsApp Web (QR Code para administradores), recursos de IA usando Emergent LLM key (ChatGPT e Gemini), sistema de transferência de chamada para departamentos, e interface similar ao YouSeler"
 
 backend:
+  - task: "User registration endpoint"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Need to implement /api/auth/register endpoint for user registration functionality"
+
   - task: "WhatsApp Web integration with QR Code"
     implemented: true
     working: true
