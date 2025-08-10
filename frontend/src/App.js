@@ -2078,6 +2078,124 @@ function App() {
                   </CardContent>
                 </Card>
               </div>
+
+              {/* Create Department Modal */}
+              {creatingDepartment && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                  <Card className="w-full max-w-2xl bg-white shadow-2xl">
+                    <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b border-slate-200">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="flex items-center space-x-2">
+                          <Building className="w-5 h-5 text-blue-500" />
+                          <span>Novo Departamento</span>
+                        </CardTitle>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setCreatingDepartment(false);
+                            setNewDepartment({
+                              name: '',
+                              description: '',
+                              whatsapp_number: '',
+                              integration_mode: 'qr'
+                            });
+                          }}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-6 space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Nome do Departamento *
+                          </label>
+                          <Input
+                            value={newDepartment.name}
+                            onChange={(e) => setNewDepartment({...newDepartment, name: e.target.value})}
+                            placeholder="Ex: Suporte Técnico"
+                            className="bg-slate-50 border-slate-200"
+                            required
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Número WhatsApp *
+                          </label>
+                          <Input
+                            value={newDepartment.whatsapp_number}
+                            onChange={(e) => setNewDepartment({...newDepartment, whatsapp_number: e.target.value})}
+                            placeholder="+55 11 99999-9999"
+                            className="bg-slate-50 border-slate-200"
+                            required
+                          />
+                          <p className="text-xs text-slate-500 mt-1">Número único para este departamento</p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Descrição
+                        </label>
+                        <Input
+                          value={newDepartment.description}
+                          onChange={(e) => setNewDepartment({...newDepartment, description: e.target.value})}
+                          placeholder="Descrição do departamento"
+                          className="bg-slate-50 border-slate-200"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Modo de Integração WhatsApp
+                        </label>
+                        <select
+                          value={newDepartment.integration_mode}
+                          onChange={(e) => setNewDepartment({...newDepartment, integration_mode: e.target.value})}
+                          className="w-full px-3 py-2 border border-slate-300 rounded-md bg-slate-50"
+                        >
+                          <option value="qr">QR Code (Não oficial)</option>
+                          <option value="official">API Cloud (Oficial)</option>
+                        </select>
+                        <p className="text-xs text-slate-500 mt-1">
+                          {newDepartment.integration_mode === 'qr' 
+                            ? 'Conexão via QR Code do WhatsApp Web'
+                            : 'Conexão via API oficial do WhatsApp Business'
+                          }
+                        </p>
+                      </div>
+
+                      <div className="flex justify-end space-x-3 pt-4 border-t border-slate-200">
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setCreatingDepartment(false);
+                            setNewDepartment({
+                              name: '',
+                              description: '',
+                              whatsapp_number: '',
+                              integration_mode: 'qr'
+                            });
+                          }}
+                        >
+                          Cancelar
+                        </Button>
+                        <Button
+                          onClick={createDepartment}
+                          disabled={!newDepartment.name.trim() || !newDepartment.whatsapp_number.trim()}
+                          className="bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                        >
+                          <Building className="w-4 h-4 mr-2" />
+                          Criar Departamento
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
             </div>
           )}
 
