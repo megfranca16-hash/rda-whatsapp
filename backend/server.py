@@ -332,6 +332,79 @@ async def get_dashboard_stats(current_user: str = Depends(get_current_user), db=
         "whatsapp_connected": True  # Will be dynamic when WhatsApp service is integrated
     }
 
+# Department Routes
+@app.get("/api/departments")
+async def get_departments(current_user: str = Depends(get_current_user), db=Depends(get_database)):
+    departments = await db.departments.find().to_list(length=100)
+    return departments
+
+@app.post("/api/departments")
+async def create_department(
+    name: str,
+    description: str,
+    current_user: str = Depends(get_current_user),
+    db=Depends(get_database)
+):
+    department_data = {
+        "id": str(uuid.uuid4()),
+        "name": name,
+        "description": description,
+        "active": True,
+        "created_at": datetime.utcnow()
+    }
+    await db.departments.insert_one(department_data)
+    return department_data
+
+@app.get("/api/transfers")
+async def get_transfers(current_user: str = Depends(get_current_user), db=Depends(get_database)):
+    transfers = await db.transfers.find().sort("created_at", -1).to_list(length=100)
+    return transfers
+
+@app.post("/api/transfers")
+async def create_transfer(
+    contact_phone: str,
+    department_id: str,
+    message: str,
+    current_user: str = Depends(get_current_user),
+    db=Depends(get_database)
+):
+    transfer_data = {
+        "id": str(uuid.uuid4()),
+        "from_contact": contact_phone,
+        "to_department": department_id,
+        "message": message,
+        "status": "pending",
+        "created_at": datetime.utcnow(),
+        "handled_by": None,
+        "notes": None
+    }
+    await db.transfers.insert_one(transfer_data)
+    return transfer_data
+
+@app.put("/api/transfers/{transfer_id}")
+async def update_transfer(
+    transfer_id: str,
+    status: str,
+    notes: Optional[str] = None,
+    current_user: str = Depends(get_current_user),
+    db=Depends(get_database)
+):
+    update_data = {
+        "status": status,
+        "handled_by": current_user,
+        "notes": notes
+    }
+    
+    result = await db.transfers.update_one(
+        {"id": transfer_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Transfer not found")
+    
+    return {"success": True}
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
