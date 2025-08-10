@@ -623,96 +623,135 @@ function App() {
             )}
             
             {/* Navigation */}
-            <nav className="flex-1 space-y-2">
+            <nav className="flex-1 space-y-1">
               <Button
                 variant="ghost"
-                className={`w-full transition-all duration-200 ${
+                className={`w-full transition-all duration-200 text-sm ${
                   currentTab === 'dashboard' 
                     ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg hover:shadow-xl' 
                     : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                } ${sidebarCollapsed ? 'justify-center p-3' : 'justify-start'}`}
+                } ${sidebarCollapsed ? 'justify-center p-2' : 'justify-start px-3 py-2'}`}
                 onClick={() => setCurrentTab('dashboard')}
               >
-                <Home className="w-5 h-5" />
-                {!sidebarCollapsed && <span className="ml-3">Dashboard</span>}
+                <Home className="w-4 h-4" />
+                {!sidebarCollapsed && <span className="ml-2">Dashboard</span>}
               </Button>
               
               <Button
                 variant="ghost"
-                className={`w-full transition-all duration-200 ${
+                className={`w-full transition-all duration-200 text-sm ${
                   currentTab === 'whatsapp' 
                     ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg hover:shadow-xl' 
                     : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                } ${sidebarCollapsed ? 'justify-center p-3' : 'justify-start'}`}
+                } ${sidebarCollapsed ? 'justify-center p-2' : 'justify-start px-3 py-2'}`}
                 onClick={() => setCurrentTab('whatsapp')}
               >
-                <MessageSquare className="w-5 h-5" />
-                {!sidebarCollapsed && <span className="ml-3">Atendimentos</span>}
+                <MessageSquare className="w-4 h-4" />
+                {!sidebarCollapsed && <span className="ml-2">Atendimentos</span>}
               </Button>
               
               <Button
                 variant="ghost"
-                className={`w-full transition-all duration-200 ${
+                className={`w-full transition-all duration-200 text-sm ${
                   currentTab === 'contacts' 
                     ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg hover:shadow-xl' 
                     : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                } ${sidebarCollapsed ? 'justify-center p-3' : 'justify-start'}`}
+                } ${sidebarCollapsed ? 'justify-center p-2' : 'justify-start px-3 py-2'}`}
                 onClick={() => setCurrentTab('contacts')}
               >
-                <Users className="w-5 h-5" />
-                {!sidebarCollapsed && <span className="ml-3">Contatos</span>}
+                <Users className="w-4 h-4" />
+                {!sidebarCollapsed && <span className="ml-2">Contatos</span>}
+              </Button>
+
+              <Button
+                variant="ghost"
+                className={`w-full transition-all duration-200 text-sm ${
+                  currentTab === 'crm' 
+                    ? 'bg-gradient-to-r from-teal-500 to-cyan-600 text-white shadow-lg hover:shadow-xl' 
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                } ${sidebarCollapsed ? 'justify-center p-2' : 'justify-start px-3 py-2'}`}
+                onClick={() => setCurrentTab('crm')}
+              >
+                <BarChart3 className="w-4 h-4" />
+                {!sidebarCollapsed && <span className="ml-2">CRM</span>}
+              </Button>
+
+              <Button
+                variant="ghost"
+                className={`w-full transition-all duration-200 text-sm ${
+                  currentTab === 'agenda' 
+                    ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-lg hover:shadow-xl' 
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                } ${sidebarCollapsed ? 'justify-center p-2' : 'justify-start px-3 py-2'}`}
+                onClick={() => setCurrentTab('agenda')}
+              >
+                <Clock className="w-4 h-4" />
+                {!sidebarCollapsed && <span className="ml-2">Agenda</span>}
+              </Button>
+
+              <Button
+                variant="ghost"
+                className={`w-full transition-all duration-200 text-sm ${
+                  currentTab === 'mensagens' 
+                    ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-lg hover:shadow-xl' 
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                } ${sidebarCollapsed ? 'justify-center p-2' : 'justify-start px-3 py-2'}`}
+                onClick={() => setCurrentTab('mensagens')}
+              >
+                <Send className="w-4 h-4" />
+                {!sidebarCollapsed && <span className="ml-2">Mensagens Programadas</span>}
               </Button>
               
               <Button
                 variant="ghost"
-                className={`w-full transition-all duration-200 ${
+                className={`w-full transition-all duration-200 text-sm ${
                   currentTab === 'ai' 
                     ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg hover:shadow-xl' 
                     : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                } ${sidebarCollapsed ? 'justify-center p-3' : 'justify-start'}`}
+                } ${sidebarCollapsed ? 'justify-center p-2' : 'justify-start px-3 py-2'}`}
                 onClick={() => setCurrentTab('ai')}
               >
-                <Bot className="w-5 h-5" />
-                {!sidebarCollapsed && <span className="ml-3">Assistentes IA</span>}
+                <Bot className="w-4 h-4" />
+                {!sidebarCollapsed && <span className="ml-2">Assistentes IA</span>}
               </Button>
               
               <Button
                 variant="ghost"
-                className={`w-full transition-all duration-200 ${
+                className={`w-full transition-all duration-200 text-sm ${
                   currentTab === 'assistants' 
                     ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg hover:shadow-xl' 
                     : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                } ${sidebarCollapsed ? 'justify-center p-3' : 'justify-start'}`}
+                } ${sidebarCollapsed ? 'justify-center p-2' : 'justify-start px-3 py-2'}`}
                 onClick={() => setCurrentTab('assistants')}
               >
-                <UserCog className="w-5 h-5" />
-                {!sidebarCollapsed && <span className="ml-3">Gestão de IAs</span>}
+                <UserCog className="w-4 h-4" />
+                {!sidebarCollapsed && <span className="ml-2">Gestão de IAs</span>}
               </Button>
               
               <Button
                 variant="ghost"
-                className={`w-full transition-all duration-200 ${
+                className={`w-full transition-all duration-200 text-sm ${
                   currentTab === 'departments' 
                     ? 'bg-gradient-to-r from-indigo-500 to-blue-600 text-white shadow-lg hover:shadow-xl' 
                     : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                } ${sidebarCollapsed ? 'justify-center p-3' : 'justify-start'}`}
+                } ${sidebarCollapsed ? 'justify-center p-2' : 'justify-start px-3 py-2'}`}
                 onClick={() => setCurrentTab('departments')}
               >
-                <Briefcase className="w-5 h-5" />
-                {!sidebarCollapsed && <span className="ml-3">Departamentos</span>}
+                <Briefcase className="w-4 h-4" />
+                {!sidebarCollapsed && <span className="ml-2">Departamentos</span>}
               </Button>
               
               <Button
                 variant="ghost"
-                className={`w-full transition-all duration-200 ${
+                className={`w-full transition-all duration-200 text-sm ${
                   currentTab === 'admin' 
                     ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg hover:shadow-xl' 
                     : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                } ${sidebarCollapsed ? 'justify-center p-3' : 'justify-start'}`}
+                } ${sidebarCollapsed ? 'justify-center p-2' : 'justify-start px-3 py-2'}`}
                 onClick={() => setCurrentTab('admin')}
               >
-                <UserCog className="w-5 h-5" />
-                {!sidebarCollapsed && <span className="ml-3">Administração</span>}
+                <Settings className="w-4 h-4" />
+                {!sidebarCollapsed && <span className="ml-2">Administração</span>}
               </Button>
             </nav>
 
