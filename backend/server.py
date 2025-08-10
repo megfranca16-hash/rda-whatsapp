@@ -411,18 +411,6 @@ Seja sempre cordial, útil e direto. Mantenha respostas concisas."""
         logging.error(f"Error generating AI response: {str(e)}", exc_info=True)
         return "Olá! Sou o assistente virtual da Empresas Web. Como posso ajudá-lo hoje?"
 
-@app.post("/api/whatsapp/send")
-async def send_whatsapp_message(phone_number: str, message: str):
-    """Send message via WhatsApp service"""
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                f"{WHATSAPP_SERVICE_URL}/send",
-                json={"phone_number": phone_number, "message": message}
-            )
-            return response.json()
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 # WhatsApp QR Routes (Simplified for MVP)
 @app.get("/api/whatsapp/qr")
