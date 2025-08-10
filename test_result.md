@@ -118,7 +118,7 @@ backend:
         - comment: "Needs WhatsApp Web integration using integration_playbook_expert_v2"
 
   - task: "AI integration with Emergent LLM key"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "server.py"
     stuck_count: 0
@@ -127,10 +127,10 @@ backend:
     status_history:
         - working: "NA"
         - agent: "main"
-        - comment: "Needs ChatGPT and Gemini integration using Emergent LLM key"
+        - comment: "ChatGPT and Gemini integration implemented using Emergent LLM key. Need to test functionality."
 
   - task: "Department routing system"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "server.py"
     stuck_count: 0
@@ -139,7 +139,7 @@ backend:
     status_history:
         - working: "NA"
         - agent: "main"
-        - comment: "Sistema de transferência de chamadas para departamentos solicitado pelo usuário"
+        - comment: "Sistema de departamentos e transferências implementado com API routes e detecção automática de transferências pela IA"
 
   - task: "Basic CRM functionality"
     implemented: true
