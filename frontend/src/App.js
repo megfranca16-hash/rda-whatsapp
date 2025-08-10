@@ -39,6 +39,7 @@ import {
 
 function App() {
   const [currentTab, setCurrentTab] = useState('dashboard');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginData, setLoginData] = useState({ username: '', password: '' });
   const [contacts, setContacts] = useState([]);
@@ -58,6 +59,7 @@ function App() {
   const [transfers, setTransfers] = useState([]);
   const [editingDepartment, setEditingDepartment] = useState(null);
   const [newSignature, setNewSignature] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const API_BASE = process.env.REACT_APP_BACKEND_URL;
 
