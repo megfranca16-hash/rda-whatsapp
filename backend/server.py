@@ -422,24 +422,24 @@ async def get_whatsapp_status():
 @app.get("/api/contacts", response_model=List[Contact])
 async def get_contacts(current_user: str = Depends(get_current_user), db=Depends(get_database)):
     contacts = await db.contacts.find().to_list(length=100)
-    return [Contact(**contact) for contact in contacts]
+    return convert_mongo_document(contacts)
 
 @app.post("/api/contacts")
 async def create_contact(contact: ContactCreate, current_user: str = Depends(get_current_user), db=Depends(get_database)):
     contact_data = {
         "id": str(uuid.uuid4()),
         **contact.dict(),
-        "created_at": datetime.utcnow()
+        "created_at": datetime.utcnow().isoformat()
     }
     await db.contacts.insert_one(contact_data)
-    return Contact(**contact_data)
+    return convert_mongo_document(contact_data)
 
 @app.get("/api/conversations/{phone_number}")
 async def get_conversations(phone_number: str, current_user: str = Depends(get_current_user), db=Depends(get_database)):
     conversations = await db.conversations.find(
         {"contact_phone": phone_number}
     ).sort("timestamp", 1).to_list(length=100)
-    return conversations
+    return convert_mongo_document(conversations)
 
 @app.get("/api/dashboard/stats")
 async def get_dashboard_stats(current_user: str = Depends(get_current_user), db=Depends(get_database)):
