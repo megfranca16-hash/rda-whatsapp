@@ -828,110 +828,318 @@ function App() {
 
           {currentTab === 'whatsapp' && (
             <div className="h-full flex">
-              {/* Contacts List */}
-              <div className="w-80 bg-white border-r">
-                <div className="p-4 border-b">
-                  <h3 className="text-lg font-semibold">Contatos WhatsApp</h3>
-                  {whatsappStatus !== 'connected' && (
-                    <Button 
-                      onClick={fetchQRCode} 
-                      className="w-full mt-2"
-                      variant="outline"
-                    >
-                      <QrCode className="w-4 h-4 mr-2" />
-                      Conectar WhatsApp
-                    </Button>
-                  )}
-                </div>
-                
-                {qrCode && (
-                  <div className="p-4 border-b bg-blue-50">
-                    <p className="text-sm text-center mb-2">Escaneie o QR Code:</p>
-                    <div className="flex justify-center">
-                      <img src={`data:image/png;base64,${qrCode}`} alt="QR Code" className="w-32 h-32" />
-                    </div>
+              {/* Left Column - Conversation List */}
+              <div className="w-80 bg-white border-r border-slate-200 flex flex-col">
+                {/* Search Header */}
+                <div className="p-4 border-b border-slate-200">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <Input
+                      placeholder="Buscar conversas..."
+                      className="pl-10 bg-slate-50 border-slate-200"
+                    />
                   </div>
-                )}
-                
-                <div className="overflow-y-auto">
-                  {contacts.map((contact) => (
-                    <div 
-                      key={contact.id}
-                      className={`p-4 border-b cursor-pointer hover:bg-gray-50 ${selectedContact?.id === contact.id ? 'bg-blue-50' : ''}`}
-                      onClick={() => selectContact(contact)}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <Avatar>
-                          <AvatarFallback>{contact.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium">{contact.name}</p>
-                          <p className="text-sm text-gray-500">{contact.phone_number}</p>
+                  
+                  {/* Filters */}
+                  <div className="flex items-center space-x-2 mt-3">
+                    <Badge variant="secondary" className="text-xs cursor-pointer hover:bg-slate-200">
+                      Todas
+                    </Badge>
+                    <Badge variant="outline" className="text-xs cursor-pointer hover:bg-slate-50">
+                      Não lidas (3)
+                    </Badge>
+                    <Badge variant="outline" className="text-xs cursor-pointer hover:bg-slate-50">
+                      Grupos
+                    </Badge>
+                  </div>
+                </div>
+
+                {/* Conversations List */}
+                <div className="flex-1 overflow-y-auto">
+                  {contacts.slice(0, 10).map((contact, index) => {
+                    const isActive = selectedContact?.id === contact.id;
+                    const unreadCount = Math.floor(Math.random() * 3);
+                    const lastMessage = "Olá, preciso de ajuda com contabilidade...";
+                    const timestamp = "14:35";
+                    
+                    return (
+                      <div
+                        key={contact.id}
+                        onClick={() => setSelectedContact(contact)}
+                        className={`p-4 border-b border-slate-100 cursor-pointer transition-colors hover:bg-slate-50 ${
+                          isActive ? 'bg-blue-50 border-r-2 border-r-blue-500' : ''
+                        }`}
+                      >
+                        <div className="flex items-start space-x-3">
+                          <div className="relative">
+                            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
+                              {contact.name.charAt(0).toUpperCase()}
+                            </div>
+                            {Math.random() > 0.5 && (
+                              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+                            )}
+                          </div>
+                          
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-1">
+                              <h3 className={`font-medium truncate ${isActive ? 'text-blue-900' : 'text-slate-900'}`}>
+                                {contact.name}
+                              </h3>
+                              <span className="text-xs text-slate-500">{timestamp}</span>
+                            </div>
+                            
+                            <div className="flex items-center justify-between">
+                              <p className="text-sm text-slate-600 truncate pr-2">
+                                {lastMessage}
+                              </p>
+                              {unreadCount > 0 && (
+                                <Badge variant="default" className="bg-blue-500 text-white rounded-full w-5 h-5 p-0 flex items-center justify-center text-xs">
+                                  {unreadCount}
+                                </Badge>
+                              )}
+                            </div>
+                            
+                            <div className="flex items-center space-x-2 mt-2">
+                              <Badge variant="outline" className="text-xs">
+                                Contabilidade
+                              </Badge>
+                              {Math.random() > 0.7 && (
+                                <div className="w-4 h-4 text-slate-400">
+                                  <MessageCircle className="w-3 h-3" />
+                                </div>
+                              )}
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
-              {/* Chat Area */}
-              <div className="flex-1 flex flex-col">
+              {/* Center Column - Chat Thread */}
+              <div className="flex-1 flex flex-col bg-slate-50">
                 {selectedContact ? (
                   <>
-                    <div className="p-4 border-b bg-white">
+                    {/* Chat Header */}
+                    <div className="bg-white border-b border-slate-200 p-4 flex items-center justify-between">
                       <div className="flex items-center space-x-3">
-                        <Avatar>
-                          <AvatarFallback>{selectedContact.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
+                          {selectedContact.name.charAt(0).toUpperCase()}
+                        </div>
                         <div>
-                          <p className="font-medium">{selectedContact.name}</p>
-                          <p className="text-sm text-gray-500">{selectedContact.phone_number}</p>
+                          <h3 className="font-semibold text-slate-900">{selectedContact.name}</h3>
+                          <p className="text-sm text-slate-500">{selectedContact.phone_number}</p>
                         </div>
                       </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        <Button variant="outline" size="sm">
+                          <ArrowRight className="w-4 h-4 mr-1" />
+                          Transferir
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          Etiquetas
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          <Settings className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
-                    
-                    <div className="flex-1 overflow-y-auto p-4 bg-gray-50 space-y-4">
-                      {conversations.map((conv) => (
-                        <div key={conv.id} className={`flex ${conv.direction === 'outgoing' ? 'justify-end' : 'justify-start'}`}>
-                          <div className={`max-w-xs px-4 py-2 rounded-lg ${
-                            conv.direction === 'outgoing' 
-                              ? 'bg-blue-500 text-white' 
-                              : 'bg-white text-gray-800'
-                          }`}>
-                            <p>{conv.message}</p>
-                            <p className="text-xs mt-1 opacity-70">
-                              {new Date(conv.timestamp).toLocaleTimeString()}
-                            </p>
+
+                    {/* Messages Area */}
+                    <div className="flex-1 p-4 overflow-y-auto space-y-4">
+                      {/* Incoming Message */}
+                      <div className="flex items-start space-x-3">
+                        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                          {selectedContact.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="flex-1">
+                          <div className="bg-white rounded-2xl rounded-bl-sm p-3 shadow-sm max-w-xs">
+                            <p className="text-slate-800">Olá, preciso de ajuda com questões contábeis da minha empresa</p>
+                          </div>
+                          <p className="text-xs text-slate-500 mt-1 ml-1">14:30</p>
+                        </div>
+                      </div>
+
+                      {/* AI Response */}
+                      <div className="flex items-start space-x-3 justify-end">
+                        <div className="flex-1 flex justify-end">
+                          <div className="bg-blue-500 text-white rounded-2xl rounded-br-sm p-3 shadow-sm max-w-xs">
+                            <p>Olá! Sou especialista em contabilidade. Como posso ajudá-lo com suas questões contábeis?</p>
                           </div>
                         </div>
-                      ))}
+                        <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white text-sm">
+                          <Bot className="w-4 h-4" />
+                        </div>
+                      </div>
+
+                      {/* Internal Note */}
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3 mx-8">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 text-xs">
+                            Nota Interna
+                          </Badge>
+                          <span className="text-xs text-slate-500">Admin • 14:35</span>
+                        </div>
+                        <p className="text-sm text-slate-700">Cliente parece interessado em serviços contábeis completos</p>
+                      </div>
+
+                      {/* Typing Indicator */}
+                      <div className="flex items-center space-x-2 text-slate-500 text-sm">
+                        <div className="flex space-x-1">
+                          <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
+                          <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-100"></div>
+                          <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-200"></div>
+                        </div>
+                        <span>IA digitando...</span>
+                      </div>
                     </div>
-                    
-                    <div className="p-4 bg-white border-t">
-                      <div className="flex space-x-2">
-                        <Input
-                          placeholder="Digite sua mensagem..."
-                          value={message}
-                          onChange={(e) => setMessage(e.target.value)}
-                          onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                          className="flex-1"
-                        />
-                        <Button onClick={sendMessage} disabled={loading}>
+
+                    {/* Reply Bar */}
+                    <div className="bg-white border-t border-slate-200 p-4">
+                      <div className="flex items-end space-x-3">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2 mb-2">
+                            <Button variant="outline" size="sm" className="text-xs">
+                              😀
+                            </Button>
+                            <Button variant="outline" size="sm" className="text-xs">
+                              📎
+                            </Button>
+                            <Button variant="outline" size="sm" className="text-xs">
+                              🎤
+                            </Button>
+                            <Button variant="outline" size="sm" className="text-xs">
+                              🤖 IA
+                            </Button>
+                          </div>
+                          <div className="relative">
+                            <textarea
+                              value={message}
+                              onChange={(e) => setMessage(e.target.value)}
+                              placeholder="Digite sua mensagem... (Ctrl+Enter para enviar)"
+                              className="w-full p-3 border border-slate-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              rows={2}
+                              maxLength={5000}
+                            />
+                            <div className="absolute bottom-2 right-2 text-xs text-slate-400">
+                              {message.length}/5000
+                            </div>
+                          </div>
+                        </div>
+                        <Button
+                          onClick={() => {
+                            if (message.trim()) {
+                              // Send message logic here
+                              setMessage('');
+                            }
+                          }}
+                          className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl"
+                          disabled={!message.trim()}
+                        >
                           <Send className="w-4 h-4" />
                         </Button>
                       </div>
                     </div>
                   </>
                 ) : (
-                  <div className="flex-1 flex items-center justify-center bg-gray-50">
-                    <div className="text-center">
-                      <MessageCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                      <p className="text-xl font-medium text-gray-500">Selecione um contato</p>
-                      <p className="text-gray-400">para iniciar uma conversa</p>
+                  <div className="flex-1 flex items-center justify-center">
+                    <div className="text-center text-slate-500">
+                      <MessageCircle className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                      <h3 className="text-lg font-medium mb-2">Selecione uma conversa</h3>
+                      <p>Escolha uma conversa na lista para começar</p>
                     </div>
                   </div>
                 )}
               </div>
+
+              {/* Right Column - Contact Info */}
+              {selectedContact && (
+                <div className="w-80 bg-white border-l border-slate-200 p-4 overflow-y-auto">
+                  <div className="space-y-6">
+                    {/* Contact Header */}
+                    <div className="text-center">
+                      <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-xl font-bold mx-auto mb-3">
+                        {selectedContact.name.charAt(0).toUpperCase()}
+                      </div>
+                      <h3 className="font-semibold text-slate-900">{selectedContact.name}</h3>
+                      <p className="text-sm text-slate-500">{selectedContact.phone_number}</p>
+                      <div className="flex items-center justify-center space-x-2 mt-2">
+                        <Badge variant="outline" className="text-xs">
+                          Contato Salvo
+                        </Badge>
+                      </div>
+                    </div>
+
+                    {/* Contact Info */}
+                    <div>
+                      <h4 className="font-medium text-slate-900 mb-3">Informações</h4>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-slate-500">Email:</span>
+                          <span className="text-slate-900">{selectedContact.email || 'Não informado'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-500">Empresa:</span>
+                          <span className="text-slate-900">{selectedContact.company || 'Não informado'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-500">Departamento:</span>
+                          <Badge variant="secondary" className="text-xs">
+                            Contabilidade
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Tags */}
+                    <div>
+                      <h4 className="font-medium text-slate-900 mb-3">Etiquetas</h4>
+                      <div className="flex flex-wrap gap-2">
+                        <Badge variant="outline" className="text-xs">
+                          Cliente
+                        </Badge>
+                        <Badge variant="outline" className="text-xs">
+                          Interessado
+                        </Badge>
+                        <Button variant="outline" size="sm" className="h-6 text-xs">
+                          + Adicionar
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Internal Notes */}
+                    <div>
+                      <h4 className="font-medium text-slate-900 mb-3">Anotações</h4>
+                      <div className="space-y-2">
+                        <div className="bg-slate-50 rounded-lg p-3">
+                          <p className="text-sm text-slate-700">Cliente interessado em serviços contábeis</p>
+                          <p className="text-xs text-slate-500 mt-1">Admin • Hoje 14:35</p>
+                        </div>
+                      </div>
+                      <Button variant="outline" size="sm" className="w-full mt-2 text-xs">
+                        + Nova Anotação
+                      </Button>
+                    </div>
+
+                    {/* CRM Actions */}
+                    <div>
+                      <h4 className="font-medium text-slate-900 mb-3">Ações CRM</h4>
+                      <div className="space-y-2">
+                        <Button variant="outline" className="w-full justify-start text-sm">
+                          <BarChart3 className="w-4 h-4 mr-2" />
+                          Criar Oportunidade
+                        </Button>
+                        <Button variant="outline" className="w-full justify-start text-sm">
+                          <Users className="w-4 h-4 mr-2" />
+                          Ver Histórico
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
