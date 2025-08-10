@@ -871,6 +871,15 @@ async def update_department(
     db=Depends(get_database)
 ):
     """Update department information including signature, avatar and manual instructions"""
+    # Check if WhatsApp number is unique (if provided and different from current)
+    if whatsapp_number is not None:
+        existing_dept = await db.departments.find_one({
+            "whatsapp_number": whatsapp_number,
+            "id": {"$ne": department_id}
+        })
+        if existing_dept:
+            raise HTTPException(status_code=400, detail="WhatsApp number already in use")
+    
     update_data = {}
     if name is not None:
         update_data["name"] = name
@@ -882,6 +891,10 @@ async def update_department(
         update_data["avatar_url"] = avatar_url
     if manual_instructions is not None:
         update_data["manual_instructions"] = manual_instructions
+    if whatsapp_number is not None:
+        update_data["whatsapp_number"] = whatsapp_number
+    if integration_mode is not None:
+        update_data["integration_mode"] = integration_mode
     if active is not None:
         update_data["active"] = active
     
