@@ -198,6 +198,8 @@ class DepartmentCreate(BaseModel):
     signature: Optional[str] = None
     avatar_url: Optional[str] = None
     manual_instructions: Optional[str] = None
+    whatsapp_number: Optional[str] = None
+    integration_mode: Optional[str] = "qr"  # "qr" or "official"
 
 # Utility functions
 def create_token(user_id: str):
