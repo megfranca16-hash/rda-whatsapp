@@ -44,28 +44,28 @@ async def initialize_default_departments(db):
                     "name": "Vendas",
                     "description": "Departamento de vendas e novos clientes",
                     "active": True,
-                    "created_at": datetime.utcnow()
+                    "created_at": datetime.utcnow().isoformat()
                 },
                 {
                     "id": str(uuid.uuid4()),
                     "name": "Suporte",
                     "description": "Departamento de suporte técnico",
                     "active": True,
-                    "created_at": datetime.utcnow()
+                    "created_at": datetime.utcnow().isoformat()
                 },
                 {
                     "id": str(uuid.uuid4()),
                     "name": "Financeiro",
                     "description": "Departamento financeiro e cobrança",
                     "active": True,
-                    "created_at": datetime.utcnow()
+                    "created_at": datetime.utcnow().isoformat()
                 },
                 {
                     "id": str(uuid.uuid4()),
                     "name": "Gerencial",
                     "description": "Departamento gerencial e administrativo",
                     "active": True,
-                    "created_at": datetime.utcnow()
+                    "created_at": datetime.utcnow().isoformat()
                 }
             ]
             
