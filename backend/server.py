@@ -246,7 +246,7 @@ async def handle_whatsapp_message(message_data: WhatsAppMessage, db=Depends(get_
             "contact_phone": message_data.phone_number,
             "message": message_data.message,
             "direction": "incoming",
-            "timestamp": datetime.utcnow(),
+            "timestamp": datetime.utcnow().isoformat(),
             "ai_processed": False
         }
         await conversations_collection.insert_one(conversation_data)
@@ -264,7 +264,7 @@ async def handle_whatsapp_message(message_data: WhatsAppMessage, db=Depends(get_
                 "contact_phone": message_data.phone_number,
                 "message": ai_response,
                 "direction": "outgoing",
-                "timestamp": datetime.utcnow(),
+                "timestamp": datetime.utcnow().isoformat(),
                 "ai_generated": True
             }
             await conversations_collection.insert_one(response_data)
