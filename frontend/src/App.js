@@ -309,6 +309,82 @@ function App() {
     }
   };
 
+  const handleAvatarUpload = async (file, assistantId = null) => {
+    if (!file) return null;
+    
+    // Validate file
+    if (file.size > 1024 * 1024) { // 1MB limit
+      alert('Arquivo muito grande. Limite: 1MB');
+      return null;
+    }
+    
+    if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
+      alert('Formato não suportado. Use PNG, JPG ou WebP');
+      return null;
+    }
+    
+    setUploadingAvatar(true);
+    try {
+      // Convert to base64 for simple storage (in production, use proper file upload)
+      const reader = new FileReader();
+      return new Promise((resolve) => {
+        reader.onload = () => {
+          const base64 = reader.result;
+          setUploadingAvatar(false);
+          resolve(base64);
+        };
+        reader.readAsDataURL(file);
+      });
+    } catch (error) {
+      setUploadingAvatar(false);
+      alert('Erro ao fazer upload do avatar');
+      return null;
+    }
+  };
+
+  const createDepartment = async () => {
+    if (!newDepartment.name.trim() || !newDepartment.whatsapp_number.trim()) {
+      alert('Nome e número do WhatsApp são obrigatórios');
+      return;
+    }
+    
+    setCreatingDepartment(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE}/api/departments`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: newDepartment.name,
+          description: newDepartment.description,
+          whatsapp_number: newDepartment.whatsapp_number,
+          integration_mode: newDepartment.integration_mode
+        })
+      });
+      
+      if (response.ok) {
+        await fetchDepartments();
+        setNewDepartment({
+          name: '',
+          description: '',
+          whatsapp_number: '',
+          integration_mode: 'qr'
+        });
+        alert('Departamento criado com sucesso!');
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Erro ao criar departamento');
+      }
+    } catch (error) {
+      console.error('Error creating department:', error);
+      alert('Erro ao criar departamento');
+    }
+    setCreatingDepartment(false);
+  };
+
   const updateDepartmentInstructions = async (departmentId, instructions) => {
     try {
       const token = localStorage.getItem('token');
