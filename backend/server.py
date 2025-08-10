@@ -341,8 +341,8 @@ async def check_and_handle_department_transfer(ai_response: str, phone_number: s
     except Exception as e:
         logging.error(f"Error handling department transfer: {str(e)}")
 
-async def generate_ai_response(message: str, phone_number: str) -> str:
-    """Generate AI response using Emergent LLM"""
+async def generate_ai_response(message: str, phone_number: str, department_id: Optional[str] = None) -> str:
+    """Generate AI response using Emergent LLM with department signature"""
     try:
         from emergentintegrations.llm.chat import LlmChat, UserMessage
         import os
@@ -353,7 +353,19 @@ async def generate_ai_response(message: str, phone_number: str) -> str:
         
         if not api_key:
             logging.warning("No EMERGENT_LLM_KEY found, using fallback response")
-            return "Olá! Sou o assistente virtual da Empresas Web. Como posso ajudá-lo hoje?"
+            base_response = "Olá! Sou o assistente virtual da Empresas Web. Como posso ajudá-lo hoje?"
+            return await add_department_signature(base_response, department_id)
+        
+        # Get department info for signature
+        department_info = ""
+        if department_id:
+            try:
+                db = database
+                department = await db.departments.find_one({"id": department_id})
+                if department:
+                    department_info = f"\n\nDepartamento: {department['name']}"
+            except:
+                pass
         
         # Try different models if one fails
         models_to_try = [
@@ -368,7 +380,7 @@ async def generate_ai_response(message: str, phone_number: str) -> str:
                 chat = LlmChat(
                     api_key=api_key,
                     session_id=f"whatsapp_{phone_number}",
-                    system_message="""Você é o assistente virtual da Empresas Web, uma empresa líder em CRM e automação.
+                    system_message=f"""Você é o assistente virtual da Empresas Web, uma empresa líder em CRM e automação.{department_info}
 
 Seu papel:
 - Atender clientes via WhatsApp de forma profissional e amigável
@@ -392,7 +404,8 @@ Departamentos disponíveis:
 Para transferir, use comandos como:
 - "Vou transferir você para o departamento de [DEPARTAMENTO]"
 
-Seja sempre cordial, útil e direto. Mantenha respostas concisas."""
+Seja sempre cordial, útil e direto. Mantenha respostas concisas.
+NÃO inclua assinatura na resposta - ela será adicionada automaticamente."""
                 ).with_model(provider, model)
                 
                 # Create user message
@@ -404,18 +417,41 @@ Seja sempre cordial, útil e direto. Mantenha respostas concisas."""
                 logging.info(f"AI Response received from {provider}/{model}: {response}")
                 
                 if response:
-                    return response
+                    # Add department signature
+                    return await add_department_signature(response, department_id)
                     
             except Exception as model_error:
                 logging.warning(f"Failed with {provider}/{model}: {str(model_error)}")
                 continue
         
-        # If all models fail, return fallback
-        return "Olá! Sou o assistente virtual da Empresas Web. Como posso ajudá-lo hoje? 🤖\n\nEm que posso auxiliá-lo?"
+        # If all models fail, return fallback with signature
+        base_response = "Olá! Sou o assistente virtual da Empresas Web. Como posso ajudá-lo hoje? 🤖\n\nEm que posso auxiliá-lo?"
+        return await add_department_signature(base_response, department_id)
         
     except Exception as e:
         logging.error(f"Error generating AI response: {str(e)}", exc_info=True)
-        return "Olá! Sou o assistente virtual da Empresas Web. Como posso ajudá-lo hoje?"
+        base_response = "Olá! Sou o assistente virtual da Empresas Web. Como posso ajudá-lo hoje?"
+        return await add_department_signature(base_response, department_id)
+
+async def add_department_signature(message: str, department_id: Optional[str] = None) -> str:
+    """Add department signature to message"""
+    try:
+        if not department_id:
+            return message
+            
+        db = database
+        department = await db.departments.find_one({"id": department_id})
+        
+        if department and department.get('signature'):
+            return f"{message}\n\n{department['signature']}"
+        elif department:
+            return f"{message}\n\n---\n{department['name']} - Empresas Web\n📞 Entre em contato conosco!"
+            
+        return message
+        
+    except Exception as e:
+        logging.error(f"Error adding signature: {str(e)}")
+        return message
 
 
 # WhatsApp QR Routes (Simplified for MVP)
