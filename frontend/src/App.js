@@ -2081,6 +2081,342 @@ function App() {
             </div>
           )}
 
+          {currentTab === 'assistants' && (
+            <div className="p-6 space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-3xl font-bold text-slate-900 mb-2">Gestão de IAs</h2>
+                  <p className="text-slate-600">Configure e gerencie os assistentes de IA especializados</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                {assistants.map((assistant) => (
+                  <Card key={assistant.id} className="shadow-lg border-slate-200 hover:shadow-xl transition-shadow duration-200">
+                    <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b border-slate-200">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center overflow-hidden">
+                            {assistant.avatar_url ? (
+                              <img src={assistant.avatar_url} alt={assistant.name} className="w-14 h-14 rounded-xl object-cover" />
+                            ) : (
+                              <Bot className="w-7 h-7 text-white" />
+                            )}
+                          </div>
+                          <div>
+                            <CardTitle className="text-lg">{assistant.name}</CardTitle>
+                            <p className="text-sm text-slate-600">{assistant.department_name}</p>
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-end space-y-2">
+                          <Badge variant={assistant.enabled ? "default" : "secondary"} 
+                                 className={assistant.enabled ? "bg-green-500 hover:bg-green-600" : ""}>
+                            {assistant.enabled ? 'Ativo' : 'Inativo'}
+                          </Badge>
+                          <button
+                            onClick={() => updateAssistant(assistant.id, { enabled: !assistant.enabled })}
+                            className="text-xs text-slate-500 hover:text-slate-700"
+                          >
+                            {assistant.enabled ? 'Desativar' : 'Ativar'}
+                          </button>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-4">
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wide">Especialização</label>
+                          <p className="text-sm text-slate-700">{assistant.specialization}</p>
+                        </div>
+                        
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wide">Instruções</label>
+                          <p className="text-sm text-slate-700 line-clamp-2">
+                            {assistant.manual_instructions || 'Instruções padrão do sistema'}
+                          </p>
+                        </div>
+
+                        <div>
+                          <label className="text-xs font-medium text-slate-500 uppercase tracking-wide">Capacidades</label>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            <Badge variant="outline" className="text-xs">PDF</Badge>
+                            <Badge variant="outline" className="text-xs">Imagem</Badge>
+                            <Badge variant="outline" className="text-xs">Áudio</Badge>
+                          </div>
+                        </div>
+
+                        <div className="flex space-x-2 pt-2">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => {
+                              setEditingAssistant(assistant.id);
+                              setAssistantForm({
+                                name: assistant.name,
+                                avatar_url: assistant.avatar_url || '',
+                                manual_instructions: assistant.manual_instructions || '',
+                                signature_template: assistant.signature_template || '',
+                                phone_number: assistant.phone_number || '',
+                                department_id: assistant.department_id || '',
+                                enabled: assistant.enabled,
+                                supports_pdf: true,
+                                supports_image: true,
+                                supports_audio: true,
+                                message_limit: 100
+                              });
+                            }}
+                            className="flex-1"
+                          >
+                            <Settings className="w-3 h-3 mr-1" />
+                            Editar
+                          </Button>
+                          
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => duplicateAssistant(assistant.id)}
+                            className="flex-1"
+                          >
+                            <User className="w-3 h-3 mr-1" />
+                            Duplicar
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Edit Assistant Modal */}
+              {editingAssistant && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                  <Card className="w-full max-w-4xl bg-white shadow-2xl max-h-[90vh] overflow-y-auto">
+                    <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b border-slate-200">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="flex items-center space-x-2">
+                          <Bot className="w-5 h-5 text-blue-500" />
+                          <span>Editar Assistente de IA</span>
+                        </CardTitle>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setEditingAssistant(null);
+                            setAssistantForm({
+                              name: '',
+                              avatar_url: '',
+                              manual_instructions: '',
+                              signature_template: '',
+                              phone_number: '',
+                              department_id: '',
+                              enabled: true,
+                              supports_pdf: true,
+                              supports_image: true,
+                              supports_audio: true,
+                              message_limit: 100
+                            });
+                          }}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-6 space-y-6">
+                      {/* Basic Information */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Nome do Assistente
+                          </label>
+                          <Input
+                            value={assistantForm.name}
+                            onChange={(e) => setAssistantForm({...assistantForm, name: e.target.value})}
+                            placeholder="Nome do assistente"
+                            className="bg-slate-50 border-slate-200"
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Departamento
+                          </label>
+                          <select
+                            value={assistantForm.department_id}
+                            onChange={(e) => setAssistantForm({...assistantForm, department_id: e.target.value})}
+                            className="w-full px-3 py-2 border border-slate-300 rounded-md bg-slate-50"
+                          >
+                            <option value="">Selecionar Departamento</option>
+                            {departments.map((dept) => (
+                              <option key={dept.id} value={dept.id}>{dept.name}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Avatar Upload */}
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Avatar do Assistente
+                        </label>
+                        <div className="flex items-center space-x-4">
+                          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center overflow-hidden">
+                            {assistantForm.avatar_url ? (
+                              <img src={assistantForm.avatar_url} alt="Avatar" className="w-16 h-16 rounded-xl object-cover" />
+                            ) : (
+                              <Bot className="w-8 h-8 text-white" />
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <input
+                              type="file"
+                              accept="image/png,image/jpeg,image/webp"
+                              onChange={async (e) => {
+                                const file = e.target.files[0];
+                                if (file) {
+                                  const base64 = await handleAvatarUpload(file);
+                                  if (base64) {
+                                    setAssistantForm({...assistantForm, avatar_url: base64});
+                                  }
+                                }
+                              }}
+                              className="hidden"
+                              id="avatar-upload"
+                            />
+                            <label htmlFor="avatar-upload" className="cursor-pointer">
+                              <Button type="button" variant="outline" disabled={uploadingAvatar}>
+                                {uploadingAvatar ? 'Enviando...' : 'Escolher Avatar'}
+                              </Button>
+                            </label>
+                            <p className="text-xs text-slate-500 mt-1">PNG, JPG ou WebP até 1MB</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Instructions */}
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Comandos/Instruções Manuais
+                        </label>
+                        <textarea
+                          value={assistantForm.manual_instructions}
+                          onChange={(e) => setAssistantForm({...assistantForm, manual_instructions: e.target.value})}
+                          placeholder="Instruções específicas para este assistente..."
+                          className="w-full h-32 px-3 py-2 border border-slate-300 rounded-md bg-slate-50 resize-none"
+                        />
+                      </div>
+
+                      {/* Signature */}
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Assinatura
+                        </label>
+                        <textarea
+                          value={assistantForm.signature_template}
+                          onChange={(e) => setAssistantForm({...assistantForm, signature_template: e.target.value})}
+                          placeholder="Assinatura que aparecerá nas mensagens..."
+                          className="w-full h-24 px-3 py-2 border border-slate-300 rounded-md bg-slate-50 resize-none"
+                        />
+                      </div>
+
+                      {/* Capabilities and Settings */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-3">
+                            Capacidades de Mídia
+                          </label>
+                          <div className="space-y-2">
+                            <label className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                checked={assistantForm.supports_pdf}
+                                onChange={(e) => setAssistantForm({...assistantForm, supports_pdf: e.target.checked})}
+                                className="rounded border-slate-300"
+                              />
+                              <span className="text-sm text-slate-700">Suporte a PDF</span>
+                            </label>
+                            <label className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                checked={assistantForm.supports_image}
+                                onChange={(e) => setAssistantForm({...assistantForm, supports_image: e.target.checked})}
+                                className="rounded border-slate-300"
+                              />
+                              <span className="text-sm text-slate-700">Suporte a Imagens</span>
+                            </label>
+                            <label className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                checked={assistantForm.supports_audio}
+                                onChange={(e) => setAssistantForm({...assistantForm, supports_audio: e.target.checked})}
+                                className="rounded border-slate-300"
+                              />
+                              <span className="text-sm text-slate-700">Suporte a Áudio</span>
+                            </label>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Limite de Mensagens/Hora
+                          </label>
+                          <Input
+                            type="number"
+                            value={assistantForm.message_limit}
+                            onChange={(e) => setAssistantForm({...assistantForm, message_limit: parseInt(e.target.value) || 100})}
+                            placeholder="100"
+                            className="bg-slate-50 border-slate-200"
+                          />
+                          
+                          <div className="mt-4">
+                            <label className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                checked={assistantForm.enabled}
+                                onChange={(e) => setAssistantForm({...assistantForm, enabled: e.target.checked})}
+                                className="rounded border-slate-300"
+                              />
+                              <span className="text-sm font-medium text-slate-700">Assistente Ativo</span>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end space-x-3 pt-6 border-t border-slate-200">
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setEditingAssistant(null);
+                            setAssistantForm({
+                              name: '',
+                              avatar_url: '',
+                              manual_instructions: '',
+                              signature_template: '',
+                              phone_number: '',
+                              department_id: '',
+                              enabled: true,
+                              supports_pdf: true,
+                              supports_image: true,
+                              supports_audio: true,
+                              message_limit: 100
+                            });
+                          }}
+                        >
+                          Cancelar
+                        </Button>
+                        <Button
+                          onClick={() => updateAssistant(editingAssistant, assistantForm)}
+                          className="bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                        >
+                          <Settings className="w-4 h-4 mr-2" />
+                          Salvar Alterações
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+            </div>
+          )}
           {currentTab === 'admin' && (
             <div className="p-6 space-y-6">
               <div className="flex items-center justify-between">
