@@ -1179,6 +1179,247 @@ function App() {
               </div>
             </div>
           )}
+
+          {currentTab === 'admin' && (
+            <div className="p-6 space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-3xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                    Área do Administrador
+                  </h2>
+                  <p className="text-slate-600">Configurações avançadas e gestão do sistema</p>
+                </div>
+                <Badge className="bg-violet-100 text-violet-700 px-3 py-1">
+                  <Crown className="w-4 h-4 mr-1" />
+                  Admin Only
+                </Badge>
+              </div>
+
+              {/* Company Profile Section */}
+              <Card className="shadow-lg border-slate-200">
+                <CardHeader className="bg-gradient-to-r from-violet-50 to-purple-50 border-b border-slate-200">
+                  <CardTitle className="flex items-center space-x-2">
+                    <Building className="w-5 h-5 text-violet-500" />
+                    <span className="text-slate-900">Perfil da Empresa</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6 space-y-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Nome da Empresa
+                        </label>
+                        <Input
+                          value={companyProfile.name}
+                          onChange={(e) => setCompanyProfile({...companyProfile, name: e.target.value})}
+                          className="bg-slate-50 border-slate-200"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Sobre a Empresa
+                        </label>
+                        <textarea
+                          value={companyProfile.about}
+                          onChange={(e) => setCompanyProfile({...companyProfile, about: e.target.value})}
+                          className="w-full p-3 border border-slate-200 rounded-lg bg-slate-50 resize-none"
+                          rows={4}
+                          placeholder="Descreva sua empresa, serviços e diferenciais..."
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Website (Opcional)
+                        </label>
+                        <Input
+                          value={companyProfile.website_url}
+                          onChange={(e) => setCompanyProfile({...companyProfile, website_url: e.target.value})}
+                          placeholder="https://www.empresasweb.com"
+                          className="bg-slate-50 border-slate-200"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Facebook (Opcional)
+                        </label>
+                        <Input
+                          value={companyProfile.facebook_url}
+                          onChange={(e) => setCompanyProfile({...companyProfile, facebook_url: e.target.value})}
+                          placeholder="https://facebook.com/empresasweb"
+                          className="bg-slate-50 border-slate-200"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          LinkedIn (Opcional)
+                        </label>
+                        <Input
+                          value={companyProfile.linkedin_url}
+                          onChange={(e) => setCompanyProfile({...companyProfile, linkedin_url: e.target.value})}
+                          placeholder="https://linkedin.com/company/empresasweb"
+                          className="bg-slate-50 border-slate-200"
+                        />
+                      </div>
+                      
+                      <Button className="w-full bg-violet-600 hover:bg-violet-700">
+                        <Settings className="w-4 h-4 mr-2" />
+                        Salvar Perfil da Empresa
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* AI Assistants Management */}
+              <Card className="shadow-lg border-slate-200">
+                <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-slate-200">
+                  <CardTitle className="flex items-center space-x-2">
+                    <Bot className="w-5 h-5 text-blue-500" />
+                    <span className="text-slate-900">Gestão dos 7 Assistentes de IA</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {departments.map((department) => (
+                      <div key={department.id} className="border border-slate-200 rounded-xl p-4 bg-gradient-to-br from-slate-50 to-blue-50">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                              <Bot className="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-slate-900">{department.name}</h3>
+                              <p className="text-sm text-slate-600">{department.description}</p>
+                            </div>
+                          </div>
+                          <Badge variant={department.active ? "default" : "secondary"} className="shrink-0">
+                            {department.active ? "Ativo" : "Inativo"}
+                          </Badge>
+                        </div>
+                        
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-xs font-medium text-slate-600 mb-1">
+                              Instruções Manuais da IA:
+                            </label>
+                            {editingInstructions === department.id ? (
+                              <div className="space-y-2">
+                                <textarea
+                                  value={newInstructions}
+                                  onChange={(e) => setNewInstructions(e.target.value)}
+                                  placeholder="Digite as instruções específicas para este assistente de IA..."
+                                  className="w-full p-2 border border-slate-300 rounded-lg text-sm resize-none bg-white"
+                                  rows={6}
+                                />
+                                <div className="flex items-center space-x-2">
+                                  <Button size="sm" onClick={() => updateDepartmentInstructions(department.id, newInstructions)}>
+                                    Salvar IA
+                                  </Button>
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline"
+                                    onClick={() => {
+                                      setEditingInstructions(null);
+                                      setNewInstructions('');
+                                    }}
+                                  >
+                                    Cancelar
+                                  </Button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div>
+                                <div className="bg-white rounded-lg p-3 border border-slate-200 min-h-[80px]">
+                                  <p className="text-sm text-slate-700 whitespace-pre-wrap">
+                                    {department.manual_instructions || "Nenhuma instrução manual definida"}
+                                  </p>
+                                </div>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  className="mt-2"
+                                  onClick={() => {
+                                    setEditingInstructions(department.id);
+                                    setNewInstructions(department.manual_instructions || '');
+                                  }}
+                                >
+                                  <Bot className="w-3 h-3 mr-1" />
+                                  Editar IA
+                                </Button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* System Health */}
+              <Card className="shadow-lg border-slate-200">
+                <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-slate-200">
+                  <CardTitle className="flex items-center space-x-2">
+                    <Shield className="w-5 h-5 text-green-500" />
+                    <span className="text-slate-900">Saúde do Sistema</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="bg-green-50 rounded-xl p-4 border border-green-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-green-800">Backend API</p>
+                          <p className="text-xs text-green-600">Funcionando</p>
+                        </div>
+                        <CheckCircle className="w-8 h-8 text-green-500" />
+                      </div>
+                    </div>
+                    
+                    <div className={`rounded-xl p-4 border ${
+                      whatsappStatus === 'connected' 
+                        ? 'bg-green-50 border-green-200' 
+                        : 'bg-red-50 border-red-200'
+                    }`}>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className={`text-sm font-medium ${
+                            whatsappStatus === 'connected' ? 'text-green-800' : 'text-red-800'
+                          }`}>WhatsApp</p>
+                          <p className={`text-xs ${
+                            whatsappStatus === 'connected' ? 'text-green-600' : 'text-red-600'
+                          }`}>
+                            {whatsappStatus === 'connected' ? 'Conectado' : 'Desconectado'}
+                          </p>
+                        </div>
+                        {whatsappStatus === 'connected' ? 
+                          <CheckCircle className="w-8 h-8 text-green-500" /> :
+                          <AlertCircle className="w-8 h-8 text-red-500" />
+                        }
+                      </div>
+                    </div>
+                    
+                    <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-blue-800">IA Assistants</p>
+                          <p className="text-xs text-blue-600">7 Ativos</p>
+                        </div>
+                        <Bot className="w-8 h-8 text-blue-500" />
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
           </div>
         </main>
       </div>
