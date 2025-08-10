@@ -395,7 +395,10 @@ function App() {
 
   // Show landing page if not authenticated
   if (!isAuthenticated) {
-    return <LandingPage onLoginClick={() => setCurrentTab('login')} />;
+    return <LandingPage onLoginSuccess={() => {
+      setIsAuthenticated(true);
+      setCurrentTab('dashboard');
+    }} />;
   }
 
   // Show login screen
