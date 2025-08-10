@@ -654,7 +654,99 @@ async def get_dashboard_stats(current_user: str = Depends(get_current_user), db=
         "whatsapp_connected": True  # Will be dynamic when WhatsApp service is integrated
     }
 
-# Department Routes
+# Assistants Management Routes
+@app.get("/api/assistants")
+async def get_assistants(current_user: str = Depends(get_current_user), db=Depends(get_database)):
+    """Get all AI assistants with department info"""
+    assistants = []
+    departments = await db.departments.find().to_list(length=100)
+    
+    for dept in departments:
+        assistant_data = {
+            "id": dept["id"],
+            "name": dept.get("assistant_name", dept["name"]),
+            "type": "ia",
+            "department_id": dept["id"],
+            "department_name": dept["name"],
+            "avatar_url": dept.get("avatar_url"),
+            "manual_instructions": dept.get("manual_instructions", ""),
+            "signature_template": dept.get("signature", ""),
+            "enabled": dept.get("active", True),
+            "created_at": dept.get("created_at"),
+            "phone_number": dept.get("phone_number", ""),
+            "specialization": dept.get("description", "")
+        }
+        assistants.append(assistant_data)
+    
+    return convert_mongo_document(assistants)
+
+@app.put("/api/assistants/{assistant_id}")
+async def update_assistant(
+    assistant_id: str,
+    name: Optional[str] = None,
+    avatar_url: Optional[str] = None,
+    manual_instructions: Optional[str] = None,
+    signature_template: Optional[str] = None,
+    enabled: Optional[bool] = None,
+    phone_number: Optional[str] = None,
+    current_user: str = Depends(get_current_user),
+    db=Depends(get_database)
+):
+    """Update AI assistant information"""
+    update_data = {}
+    
+    if name is not None:
+        update_data["assistant_name"] = name
+    if avatar_url is not None:
+        update_data["avatar_url"] = avatar_url
+    if manual_instructions is not None:
+        update_data["manual_instructions"] = manual_instructions
+    if signature_template is not None:
+        update_data["signature"] = signature_template
+    if enabled is not None:
+        update_data["active"] = enabled
+    if phone_number is not None:
+        update_data["phone_number"] = phone_number
+    
+    if update_data:
+        update_data["updated_at"] = datetime.utcnow().isoformat()
+        result = await db.departments.update_one(
+            {"id": assistant_id},
+            {"$set": update_data}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Assistant not found")
+    
+    return {"success": True, "updated_fields": list(update_data.keys())}
+
+@app.post("/api/assistants/{assistant_id}/duplicate")
+async def duplicate_assistant(
+    assistant_id: str,
+    current_user: str = Depends(get_current_user),
+    db=Depends(get_database)
+):
+    """Duplicate an existing assistant"""
+    original = await db.departments.find_one({"id": assistant_id})
+    if not original:
+        raise HTTPException(status_code=404, detail="Assistant not found")
+    
+    # Create duplicate with modified name
+    duplicate_data = {
+        "id": str(uuid.uuid4()),
+        "name": f"{original['name']} - Cópia",
+        "assistant_name": f"{original.get('assistant_name', original['name'])} - Cópia",
+        "description": original["description"],
+        "avatar_url": original.get("avatar_url"),
+        "manual_instructions": original.get("manual_instructions", ""),
+        "signature": original.get("signature", ""),
+        "active": False,  # Start duplicates as inactive
+        "created_at": datetime.utcnow().isoformat(),
+        "phone_number": ""  # Clear phone number for duplicate
+    }
+    
+    await db.departments.insert_one(duplicate_data)
+    return convert_mongo_document(duplicate_data)
 @app.get("/api/departments")
 async def get_departments(current_user: str = Depends(get_current_user), db=Depends(get_database)):
     departments = await db.departments.find().to_list(length=100)
