@@ -1,75 +1,297 @@
-from fastapi import FastAPI, APIRouter
-from dotenv import load_dotenv
-from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
+from fastapi import FastAPI, HTTPException, Depends, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from pydantic import BaseModel
+from typing import Optional, List
 import os
-import logging
-from pathlib import Path
-from pydantic import BaseModel, Field
-from typing import List
+from datetime import datetime, timedelta
+import jwt
+import httpx
 import uuid
-from datetime import datetime
+import motor.motor_asyncio
+from contextlib import asynccontextmanager
+import logging
 
+# Database connection
+client = None
+database = None
 
-ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    global client, database
+    mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017/')
+    client = motor.motor_asyncio.AsyncIOMotorClient(mongo_url)
+    database = client.empresas_web
+    yield
+    # Shutdown
+    client.close()
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+app = FastAPI(title="Empresas Web CRM API", lifespan=lifespan)
 
-# Create the main app without a prefix
-app = FastAPI()
-
-# Create a router with the /api prefix
-api_router = APIRouter(prefix="/api")
-
-
-# Define Models
-class StatusCheck(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
-
-class StatusCheckCreate(BaseModel):
-    client_name: str
-
-# Add your routes to the router instead of directly to app
-@api_router.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.dict()
-    status_obj = StatusCheck(**status_dict)
-    _ = await db.status_checks.insert_one(status_obj.dict())
-    return status_obj
-
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    status_checks = await db.status_checks.find().to_list(1000)
-    return [StatusCheck(**status_check) for status_check in status_checks]
-
-# Include the router in the main app
-app.include_router(api_router)
-
+# CORS configuration
 app.add_middleware(
     CORSMiddleware,
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+# Security
+security = HTTPBearer()
+SECRET_KEY = "empresas-web-secret-key-2025"
 
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()
+# Models
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+class WhatsAppMessage(BaseModel):
+    phone_number: str
+    message: str
+    message_id: str
+    timestamp: int
+
+class MessageResponse(BaseModel):
+    reply: Optional[str] = None
+    success: bool = True
+
+class ContactCreate(BaseModel):
+    name: str
+    phone_number: str
+    email: Optional[str] = None
+    company: Optional[str] = None
+
+class Contact(BaseModel):
+    id: str
+    name: str
+    phone_number: str
+    email: Optional[str] = None
+    company: Optional[str] = None
+    created_at: datetime
+    last_message: Optional[datetime] = None
+
+# Utility functions
+def create_token(user_id: str):
+    payload = {
+        "user_id": user_id,
+        "exp": datetime.utcnow() + timedelta(days=7)
+    }
+    return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+
+def verify_token(token: str):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        return payload.get("user_id")
+    except jwt.ExpiredSignatureError:
+        return None
+    except jwt.InvalidTokenError:
+        return None
+
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    user_id = verify_token(credentials.credentials)
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    return user_id
+
+def get_database():
+    return database
+
+# Routes
+@app.get("/")
+async def root():
+    return {"message": "Empresas Web CRM API", "status": "running"}
+
+@app.post("/api/auth/login")
+async def login(request: LoginRequest):
+    # Simple admin authentication for MVP
+    if request.username == "admin" and request.password == "admin123":
+        token = create_token("admin")
+        return {
+            "token": token,
+            "user": {
+                "id": "admin",
+                "username": "admin",
+                "role": "admin"
+            }
+        }
+    else:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+@app.get("/api/auth/verify")
+async def verify_auth(current_user: str = Depends(get_current_user)):
+    return {"valid": True, "user_id": current_user}
+
+# WhatsApp Routes
+WHATSAPP_SERVICE_URL = "http://localhost:3001"
+
+@app.post("/api/whatsapp/message", response_model=MessageResponse)
+async def handle_whatsapp_message(message_data: WhatsAppMessage, db=Depends(get_database)):
+    """Process incoming WhatsApp messages and generate AI responses"""
+    try:
+        # Get or create contact
+        contacts_collection = db.contacts
+        contact = await contacts_collection.find_one({"phone_number": message_data.phone_number})
+        
+        if not contact:
+            # Create new contact
+            contact_data = {
+                "id": str(uuid.uuid4()),
+                "name": f"Contact {message_data.phone_number}",
+                "phone_number": message_data.phone_number,
+                "email": None,
+                "company": None,
+                "created_at": datetime.utcnow(),
+                "last_message": datetime.utcnow()
+            }
+            await contacts_collection.insert_one(contact_data)
+            contact = contact_data
+        else:
+            # Update last message time
+            await contacts_collection.update_one(
+                {"phone_number": message_data.phone_number},
+                {"$set": {"last_message": datetime.utcnow()}}
+            )
+
+        # Store message in conversation history
+        conversations_collection = db.conversations
+        conversation_data = {
+            "id": str(uuid.uuid4()),
+            "contact_phone": message_data.phone_number,
+            "message": message_data.message,
+            "direction": "incoming",
+            "timestamp": datetime.utcnow(),
+            "ai_processed": False
+        }
+        await conversations_collection.insert_one(conversation_data)
+
+        # Generate AI response (placeholder for now - will implement with Emergent LLM)
+        ai_response = await generate_ai_response(message_data.message, message_data.phone_number)
+        
+        if ai_response:
+            # Store AI response
+            response_data = {
+                "id": str(uuid.uuid4()),
+                "contact_phone": message_data.phone_number,
+                "message": ai_response,
+                "direction": "outgoing",
+                "timestamp": datetime.utcnow(),
+                "ai_generated": True
+            }
+            await conversations_collection.insert_one(response_data)
+
+        return MessageResponse(reply=ai_response)
+
+    except Exception as e:
+        logging.error(f"Error processing WhatsApp message: {str(e)}")
+        return MessageResponse(
+            reply="Olá! Sou o assistente virtual da Empresas Web. Como posso ajudá-lo hoje?",
+            success=False
+        )
+
+async def generate_ai_response(message: str, phone_number: str) -> str:
+    """Generate AI response using Emergent LLM (to be implemented)"""
+    # Basic responses for now - will enhance with Emergent LLM
+    message_lower = message.lower()
+    
+    if any(greeting in message_lower for greeting in ["oi", "olá", "bom dia", "boa tarde", "boa noite"]):
+        return "Olá! Bem-vindo à Empresas Web! 👋\n\nSou seu assistente virtual e estou aqui para ajudá-lo. Como posso auxiliá-lo hoje?"
+    
+    elif any(help_word in message_lower for help_word in ["ajuda", "help", "serviços", "o que vocês fazem"]):
+        return """🏢 **Empresas Web - Seus serviços:**
+
+🔹 Sistema CRM completo
+🔹 Integração WhatsApp Business
+🔹 Assistente virtual com IA
+🔹 Automação de atendimento
+🔹 Gestão de clientes e vendas
+
+Digite "contato" para falar com nossa equipe!"""
+    
+    elif "contato" in message_lower:
+        return """📞 **Entre em contato conosco:**
+
+✅ WhatsApp: Este chat
+✅ Email: contato@empresasweb.com
+✅ Horário: Segunda a Sexta, 8h às 18h
+
+Nossa equipe responderá em breve! 😊"""
+    
+    else:
+        return f"Interessante! Recebi sua mensagem: '{message}'\n\nNosso assistente com IA está processando sua solicitação. Em breve você terá uma resposta personalizada! 🤖✨"
+
+@app.post("/api/whatsapp/send")
+async def send_whatsapp_message(phone_number: str, message: str):
+    """Send message via WhatsApp service"""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f"{WHATSAPP_SERVICE_URL}/send",
+                json={"phone_number": phone_number, "message": message}
+            )
+            return response.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/whatsapp/qr")
+async def get_qr_code():
+    """Get current QR code for WhatsApp authentication"""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{WHATSAPP_SERVICE_URL}/qr")
+            return response.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/whatsapp/status")
+async def get_whatsapp_status():
+    """Get WhatsApp connection status"""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{WHATSAPP_SERVICE_URL}/status")
+            return response.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Contacts Routes
+@app.get("/api/contacts", response_model=List[Contact])
+async def get_contacts(current_user: str = Depends(get_current_user), db=Depends(get_database)):
+    contacts = await db.contacts.find().to_list(length=100)
+    return [Contact(**contact) for contact in contacts]
+
+@app.post("/api/contacts")
+async def create_contact(contact: ContactCreate, current_user: str = Depends(get_current_user), db=Depends(get_database)):
+    contact_data = {
+        "id": str(uuid.uuid4()),
+        **contact.dict(),
+        "created_at": datetime.utcnow()
+    }
+    await db.contacts.insert_one(contact_data)
+    return Contact(**contact_data)
+
+@app.get("/api/conversations/{phone_number}")
+async def get_conversations(phone_number: str, current_user: str = Depends(get_current_user), db=Depends(get_database)):
+    conversations = await db.conversations.find(
+        {"contact_phone": phone_number}
+    ).sort("timestamp", 1).to_list(length=100)
+    return conversations
+
+@app.get("/api/dashboard/stats")
+async def get_dashboard_stats(current_user: str = Depends(get_current_user), db=Depends(get_database)):
+    contacts_count = await db.contacts.count_documents({})
+    conversations_count = await db.conversations.count_documents({})
+    today_messages = await db.conversations.count_documents({
+        "timestamp": {"$gte": datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)}
+    })
+    
+    return {
+        "total_contacts": contacts_count,
+        "total_conversations": conversations_count,
+        "today_messages": today_messages,
+        "whatsapp_connected": True  # Will be dynamic when WhatsApp service is integrated
+    }
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8001)
