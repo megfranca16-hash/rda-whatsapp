@@ -183,8 +183,11 @@ async def handle_whatsapp_message(message_data: WhatsAppMessage, db=Depends(get_
         }
         await conversations_collection.insert_one(conversation_data)
 
-        # Generate AI response (placeholder for now - will implement with Emergent LLM)
+        # Generate AI response
         ai_response = await generate_ai_response(message_data.message, message_data.phone_number)
+        
+        # Check if AI response indicates a department transfer
+        await check_and_handle_department_transfer(ai_response, message_data.phone_number, db)
         
         if ai_response:
             # Store AI response
@@ -206,6 +209,59 @@ async def handle_whatsapp_message(message_data: WhatsAppMessage, db=Depends(get_
             reply="Olá! Sou o assistente virtual da Empresas Web. Como posso ajudá-lo hoje?",
             success=False
         )
+
+async def check_and_handle_department_transfer(ai_response: str, phone_number: str, db):
+    """Check if AI response indicates a department transfer and handle it"""
+    try:
+        transfer_indicators = [
+            "transferir você para",
+            "vou transferir",
+            "encaminhar para",
+            "direcionando para",
+            "departamento de"
+        ]
+        
+        if any(indicator in ai_response.lower() for indicator in transfer_indicators):
+            # Extract department from response
+            departments = ["vendas", "suporte", "financeiro", "gerencial"]
+            detected_department = None
+            
+            for dept in departments:
+                if dept in ai_response.lower():
+                    detected_department = dept
+                    break
+            
+            if detected_department:
+                # Get or create department
+                department = await db.departments.find_one({"name": {"$regex": detected_department, "$options": "i"}})
+                
+                if not department:
+                    # Create department if it doesn't exist
+                    department_data = {
+                        "id": str(uuid.uuid4()),
+                        "name": detected_department.title(),
+                        "description": f"Departamento de {detected_department}",
+                        "active": True,
+                        "created_at": datetime.utcnow()
+                    }
+                    await db.departments.insert_one(department_data)
+                    department = department_data
+                
+                # Create transfer record
+                transfer_data = {
+                    "id": str(uuid.uuid4()),
+                    "from_contact": phone_number,
+                    "to_department": department["id"],
+                    "message": ai_response,
+                    "status": "pending",
+                    "created_at": datetime.utcnow(),
+                    "handled_by": None,
+                    "notes": f"Transfer automático detectado pela IA para {detected_department}"
+                }
+                await db.transfers.insert_one(transfer_data)
+                
+    except Exception as e:
+        logging.error(f"Error handling department transfer: {str(e)}")
 
 async def generate_ai_response(message: str, phone_number: str) -> str:
     """Generate AI response using Emergent LLM"""
