@@ -1896,7 +1896,7 @@ function App() {
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">Departamentos</h2>
                   <p className="text-gray-600">Gerencie departamentos e transferências de chamadas</p>
                 </div>
-                <Button>
+                <Button onClick={() => setCreatingDepartment(true)} className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
                   <Building className="w-4 h-4 mr-2" />
                   Novo Departamento
                 </Button>
