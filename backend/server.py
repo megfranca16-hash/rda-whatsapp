@@ -160,6 +160,26 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         raise HTTPException(status_code=401, detail="Invalid token")
     return user_id
 
+def convert_mongo_document(doc):
+    """Convert MongoDB document to JSON-serializable format"""
+    if doc is None:
+        return None
+    if isinstance(doc, list):
+        return [convert_mongo_document(item) for item in doc]
+    if isinstance(doc, dict):
+        result = {}
+        for key, value in doc.items():
+            if key == '_id':
+                continue  # Skip MongoDB _id field
+            elif isinstance(value, datetime):
+                result[key] = value.isoformat()
+            elif hasattr(value, '__dict__'):
+                result[key] = str(value)
+            else:
+                result[key] = value
+        return result
+    return doc
+
 def get_database():
     return database
 
