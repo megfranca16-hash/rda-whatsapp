@@ -36,52 +36,90 @@ async def lifespan(app: FastAPI):
     client.close()
 
 async def initialize_default_departments(db):
-    """Initialize default departments if they don't exist"""
+    """Initialize 7 specialized departments for business services"""
     try:
         departments_collection = db.departments
         existing_count = await departments_collection.count_documents({})
         
         if existing_count == 0:
-            default_departments = [
+            specialized_departments = [
                 {
                     "id": str(uuid.uuid4()),
-                    "name": "Vendas",
-                    "description": "Departamento de vendas e novos clientes",
-                    "signature": "---\n💼 Equipe de Vendas - Empresas Web\n📧 vendas@empresasweb.com\n📞 (11) 99999-1111\n\nEstamos aqui para ajudá-lo a escolher a melhor solução CRM!",
+                    "name": "Abertura de Empresa",
+                    "description": "Abertura de empresa, MEI, CNPJ e documentação legal",
+                    "signature": "---\n🏢 Abertura de Empresa - Empresas Web\n📧 abertura@empresasweb.com\n📞 (11) 99999-1001\n\nEspecialistas em abertura de empresas e MEI!",
+                    "avatar_url": "/avatars/abertura-empresa.png",
+                    "manual_instructions": "Você é especialista em abertura de empresas, MEI, CNPJ e documentação legal. Ajude com: constituição de empresas, escolha de regime tributário, documentação necessária, prazos e custos.",
                     "active": True,
                     "created_at": datetime.utcnow().isoformat()
                 },
                 {
                     "id": str(uuid.uuid4()),
-                    "name": "Suporte",
-                    "description": "Departamento de suporte técnico",
-                    "signature": "---\n🛠️ Equipe de Suporte - Empresas Web\n📧 suporte@empresasweb.com\n📞 (11) 99999-2222\n\nSua satisfação é nossa prioridade!",
+                    "name": "Dúvidas Contábeis",
+                    "description": "Contabilidade geral, balanços e demonstrações",
+                    "signature": "---\n📊 Contabilidade - Empresas Web\n📧 contabil@empresasweb.com\n📞 (11) 99999-1002\n\nContabilidade precisa para seu negócio!",
+                    "avatar_url": "/avatars/contabilidade.png",
+                    "manual_instructions": "Você é especialista em contabilidade. Ajude com: escrituração contábil, balanços, demonstrações financeiras, análise de custos, orientações sobre registros contábeis.",
+                    "active": True,
+                    "created_at": datetime.utcnow().isoformat()
+                },
+                {
+                    "id": str(uuid.uuid4()),
+                    "name": "RH e Folha",
+                    "description": "Recursos humanos, folha de pagamento e trabalhista",
+                    "signature": "---\n👥 RH e Folha - Empresas Web\n📧 rh@empresasweb.com\n📞 (11) 99999-1003\n\nGestão completa de pessoas!",
+                    "avatar_url": "/avatars/rh-folha.png",
+                    "manual_instructions": "Você é especialista em RH e folha de pagamento. Ajude com: admissão e demissão, cálculos trabalhistas, férias, 13º salário, eSocial, obrigações trabalhistas.",
+                    "active": True,  
+                    "created_at": datetime.utcnow().isoformat()
+                },
+                {
+                    "id": str(uuid.uuid4()),
+                    "name": "Tributos e Impostos",
+                    "description": "Impostos, tributos, Simples Nacional e planejamento tributário",
+                    "signature": "---\n🧾 Tributos - Empresas Web\n📧 tributos@empresasweb.com\n📞 (11) 99999-1004\n\nPlanejamento tributário inteligente!",
+                    "avatar_url": "/avatars/tributos.png",
+                    "manual_instructions": "Você é especialista em tributos e impostos. Ajude com: Simples Nacional, Lucro Presumido, Lucro Real, planejamento tributário, apuração de impostos, obrigações acessórias.",
+                    "active": True,
+                    "created_at": datetime.utcnow().isoformat()
+                },
+                {
+                    "id": str(uuid.uuid4()),
+                    "name": "Emissão de Notas Fiscais",
+                    "description": "Notas fiscais, NFe, NFSe e certificados digitais",
+                    "signature": "---\n📋 Notas Fiscais - Empresas Web\n📧 nfe@empresasweb.com\n📞 (11) 99999-1005\n\nEmissão rápida e segura!",
+                    "avatar_url": "/avatars/notas-fiscais.png",
+                    "manual_instructions": "Você é especialista em emissão de notas fiscais. Ajude com: NFe, NFSe, certificados digitais, SPED, configuração de emissores, correção de notas.",
+                    "active": True,
+                    "created_at": datetime.utcnow().isoformat()
+                },
+                {
+                    "id": str(uuid.uuid4()),
+                    "name": "Outros Assuntos",
+                    "description": "Consultoria geral e outros assuntos empresariais",
+                    "signature": "---\n💼 Consultoria Geral - Empresas Web\n📧 consultoria@empresasweb.com\n📞 (11) 99999-1006\n\nSoluções empresariais completas!",
+                    "avatar_url": "/avatars/consultoria.png",
+                    "manual_instructions": "Você é consultor empresarial geral. Ajude com: orientações gerais, consultoria estratégica, processos empresariais, questões diversas não cobertas pelos outros departamentos.",
                     "active": True,
                     "created_at": datetime.utcnow().isoformat()
                 },
                 {
                     "id": str(uuid.uuid4()),
                     "name": "Financeiro",
-                    "description": "Departamento financeiro e cobrança",
-                    "signature": "---\n💰 Equipe Financeira - Empresas Web\n📧 financeiro@empresasweb.com\n📞 (11) 99999-3333\n\nFacilitamos suas questões financeiras!",
-                    "active": True,
-                    "created_at": datetime.utcnow().isoformat()
-                },
-                {
-                    "id": str(uuid.uuid4()),
-                    "name": "Gerencial",
-                    "description": "Departamento gerencial e administrativo",
-                    "signature": "---\n👔 Equipe Gerencial - Empresas Web\n📧 gerencia@empresasweb.com\n📞 (11) 99999-4444\n\nGestão estratégica para seu sucesso!",
+                    "description": "Questões financeiras, pagamentos e cobrança",
+                    "signature": "---\n💰 Financeiro - Empresas Web\n📧 financeiro@empresasweb.com\n📞 (11) 99999-1007\n\nGestão financeira eficiente!",
+                    "avatar_url": "/avatars/financeiro.png",
+                    "manual_instructions": "Você é especialista financeiro. Ajude com: contas a pagar/receber, fluxo de caixa, cobrança, negociações, questões de pagamento e faturamento.",
                     "active": True,
                     "created_at": datetime.utcnow().isoformat()
                 }
             ]
             
-            await departments_collection.insert_many(default_departments)
-            logging.info("Default departments with signatures initialized")
+            await departments_collection.insert_many(specialized_departments)
+            logging.info("7 specialized business departments initialized with AI assistants")
             
     except Exception as e:
-        logging.error(f"Error initializing default departments: {str(e)}")
+        logging.error(f"Error initializing specialized departments: {str(e)}")
 
 app = FastAPI(title="Empresas Web CRM API", lifespan=lifespan)
 
