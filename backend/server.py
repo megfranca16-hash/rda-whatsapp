@@ -11,6 +11,10 @@ import uuid
 import motor.motor_asyncio
 from contextlib import asynccontextmanager
 import logging
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Database connection
 client = None
