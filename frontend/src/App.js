@@ -1915,9 +1915,38 @@ function App() {
                     {departments.map((department) => (
                       <div key={department.id} className="border border-slate-200 rounded-lg p-4 bg-slate-50">
                         <div className="flex items-center justify-between mb-3">
-                          <div>
-                            <p className="font-medium text-slate-900">{department.name}</p>
-                            <p className="text-sm text-slate-600">{department.description}</p>
+                          <div className="flex-1">
+                            {editingDepartment === department.id ? (
+                              <div className="space-y-2">
+                                <Input
+                                  value={newDepartment.name || department.name}
+                                  onChange={(e) => setNewDepartment({...newDepartment, name: e.target.value})}
+                                  placeholder="Nome do departamento"
+                                  className="bg-white border-slate-300 text-slate-900 font-medium"
+                                />
+                                <Input
+                                  value={newDepartment.description || department.description}
+                                  onChange={(e) => setNewDepartment({...newDepartment, description: e.target.value})}
+                                  placeholder="Descrição do departamento"
+                                  className="bg-white border-slate-300 text-sm"
+                                />
+                              </div>
+                            ) : (
+                              <div>
+                                <p className="font-medium text-slate-900">{department.name}</p>
+                                <p className="text-sm text-slate-600">{department.description}</p>
+                                {department.whatsapp_number && (
+                                  <p className="text-xs text-slate-500 mt-1">
+                                    WhatsApp: {department.whatsapp_number} 
+                                    {department.integration_mode && (
+                                      <span className="ml-2 text-blue-600">
+                                        ({department.integration_mode === 'qr' ? 'QR Code' : 'API Oficial'})
+                                      </span>
+                                    )}
+                                  </p>
+                                )}
+                              </div>
+                            )}
                           </div>
                           <div className="flex items-center space-x-2">
                             <Badge variant={department.active ? "default" : "secondary"}>
@@ -1927,12 +1956,54 @@ function App() {
                               size="sm" 
                               variant="outline"
                               onClick={() => {
-                                setEditingDepartment(department.id);
-                                setNewSignature(department.signature || '');
+                                if (editingDepartment === department.id) {
+                                  // Save changes
+                                  const updateData = {};
+                                  if (newDepartment.name && newDepartment.name !== department.name) {
+                                    updateData.name = newDepartment.name;
+                                  }
+                                  if (newDepartment.description !== undefined && newDepartment.description !== department.description) {
+                                    updateData.description = newDepartment.description;
+                                  }
+                                  if (newSignature !== department.signature) {
+                                    updateData.signature = newSignature;
+                                  }
+                                  
+                                  if (Object.keys(updateData).length > 0) {
+                                    updateDepartmentSignature(department.id, newSignature, updateData);
+                                  }
+                                  
+                                  setEditingDepartment(null);
+                                  setNewDepartment({ name: '', description: '', whatsapp_number: '', integration_mode: 'qr' });
+                                  setNewSignature('');
+                                } else {
+                                  // Start editing
+                                  setEditingDepartment(department.id);
+                                  setNewSignature(department.signature || '');
+                                  setNewDepartment({
+                                    name: department.name,
+                                    description: department.description,
+                                    whatsapp_number: department.whatsapp_number || '',
+                                    integration_mode: department.integration_mode || 'qr'
+                                  });
+                                }
                               }}
                             >
-                              Editar
+                              {editingDepartment === department.id ? 'Salvar' : 'Editar'}
                             </Button>
+                            {editingDepartment === department.id && (
+                              <Button 
+                                size="sm" 
+                                variant="ghost"
+                                onClick={() => {
+                                  setEditingDepartment(null);
+                                  setNewDepartment({ name: '', description: '', whatsapp_number: '', integration_mode: 'qr' });
+                                  setNewSignature('');
+                                }}
+                              >
+                                Cancelar
+                              </Button>
+                            )}
                           </div>
                         </div>
                         
