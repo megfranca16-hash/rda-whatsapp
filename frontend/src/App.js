@@ -333,120 +333,205 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Modern Header */}
-      <header className="bg-white border-b border-slate-200 shadow-sm">
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                <MessageCircle className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-slate-900">Empresas Web</h1>
-                <p className="text-sm text-slate-500">CRM + WhatsApp + IA</p>
-              </div>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+      {/* Modern Top Bar */}
+      <header className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-b border-slate-200/50 shadow-sm z-50">
+        <div className="flex items-center justify-between px-4 py-3">
+          {/* Left Section */}
+          <div className="flex items-center space-x-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              className="lg:hidden"
+            >
+              <Menu className="w-5 h-5" />
+            </Button>
             
-            <div className="flex items-center space-x-4">
-              <Badge variant={whatsappStatus === 'connected' ? 'default' : 'destructive'} 
-                     className="flex items-center space-x-1 px-3 py-1">
-                {whatsappStatus === 'connected' ? 
-                  <CheckCircle className="w-3 h-3" /> : 
-                  <AlertCircle className="w-3 h-3" />
-                }
-                <span>WhatsApp {whatsappStatus === 'connected' ? 'Conectado' : 'Desconectado'}</span>
-              </Badge>
-              
-              <Button variant="outline" onClick={handleLogout} className="text-slate-600 hover:text-slate-900">
-                Sair
-              </Button>
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
+                <MessageCircle className="w-5 h-5 text-white" />
+              </div>
+              <div className="hidden sm:block">
+                <h1 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  Empresas Web
+                </h1>
+                <p className="text-xs text-slate-500">CRM + WhatsApp + IA</p>
+              </div>
             </div>
+          </div>
+
+          {/* Center Search */}
+          <div className="hidden md:flex flex-1 max-w-md mx-8">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Input
+                placeholder="Buscar contatos, conversas..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 bg-slate-50/50 border-slate-200 focus:bg-white transition-colors"
+              />
+            </div>
+          </div>
+
+          {/* Right Section */}
+          <div className="flex items-center space-x-4">
+            <Badge 
+              variant={whatsappStatus === 'connected' ? 'default' : 'destructive'} 
+              className={`flex items-center space-x-1 px-3 py-1 ${
+                whatsappStatus === 'connected' 
+                  ? 'bg-green-500 hover:bg-green-600' 
+                  : 'bg-red-500 hover:bg-red-600'
+              }`}
+            >
+              {whatsappStatus === 'connected' ? 
+                <CheckCircle className="w-3 h-3" /> : 
+                <AlertCircle className="w-3 h-3" />
+              }
+              <span className="hidden sm:inline">
+                WhatsApp {whatsappStatus === 'connected' ? 'Conectado' : 'Desconectado'}
+              </span>
+            </Badge>
+            
+            <Button variant="ghost" size="sm" className="p-2">
+              <User className="w-4 h-4" />
+            </Button>
+            
+            <Button variant="outline" onClick={handleLogout} size="sm">
+              Sair
+            </Button>
           </div>
         </div>
       </header>
 
-      <div className="flex h-[calc(100vh-80px)]">
-        {/* Modern Sidebar */}
-        <aside className="w-64 bg-white border-r border-slate-200 shadow-sm">
-          <nav className="p-4 space-y-1">
-            <Button
-              variant={currentTab === 'dashboard' ? 'default' : 'ghost'}
-              className={`w-full justify-start transition-all duration-200 ${
-                currentTab === 'dashboard' 
-                  ? 'bg-blue-600 text-white shadow-md hover:bg-blue-700' 
-                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-              }`}
-              onClick={() => setCurrentTab('dashboard')}
-            >
-              <BarChart3 className="w-4 h-4 mr-3" />
-              Dashboard
-            </Button>
+      <div className="flex pt-16">
+        {/* Floating Sidebar */}
+        <aside className={`fixed left-4 top-20 bottom-4 bg-white/90 backdrop-blur-xl border border-slate-200/50 rounded-2xl shadow-xl transition-all duration-300 z-40 ${
+          sidebarCollapsed ? 'w-16' : 'w-64'
+        }`}>
+          <div className="p-4 h-full flex flex-col">
+            {/* Sidebar Header */}
+            {!sidebarCollapsed && (
+              <div className="mb-6">
+                <h2 className="text-sm font-semibold text-slate-600 uppercase tracking-wide">Menu Principal</h2>
+              </div>
+            )}
             
-            <Button
-              variant={currentTab === 'whatsapp' ? 'default' : 'ghost'}
-              className={`w-full justify-start transition-all duration-200 ${
-                currentTab === 'whatsapp' 
-                  ? 'bg-green-600 text-white shadow-md hover:bg-green-700' 
-                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-              }`}
-              onClick={() => setCurrentTab('whatsapp')}
-            >
-              <MessageCircle className="w-4 h-4 mr-3" />
-              WhatsApp
-            </Button>
-            
-            <Button
-              variant={currentTab === 'contacts' ? 'default' : 'ghost'}
-              className={`w-full justify-start transition-all duration-200 ${
-                currentTab === 'contacts' 
-                  ? 'bg-purple-600 text-white shadow-md hover:bg-purple-700' 
-                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-              }`}
-              onClick={() => setCurrentTab('contacts')}
-            >
-              <Users className="w-4 h-4 mr-3" />
-              Contatos
-            </Button>
-            
-            <Button
-              variant={currentTab === 'ai' ? 'default' : 'ghost'}
-              className={`w-full justify-start transition-all duration-200 ${
-                currentTab === 'ai' 
-                  ? 'bg-orange-600 text-white shadow-md hover:bg-orange-700' 
-                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-              }`}
-              onClick={() => setCurrentTab('ai')}
-            >
-              <Bot className="w-4 h-4 mr-3" />
-              IA Assistant
-            </Button>
-            
-            <Button
-              variant={currentTab === 'departments' ? 'default' : 'ghost'}
-              className={`w-full justify-start transition-all duration-200 ${
-                currentTab === 'departments' 
-                  ? 'bg-indigo-600 text-white shadow-md hover:bg-indigo-700' 
-                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-              }`}
-              onClick={() => setCurrentTab('departments')}
-            >
-              <Building className="w-4 h-4 mr-3" />
-              Departamentos
-            </Button>
-          </nav>
-          
-          {/* Sidebar Footer */}
-          <div className="absolute bottom-4 left-4 right-4">
-            <div className="bg-slate-50 rounded-lg p-3">
-              <div className="text-xs text-slate-500 mb-1">Empresas Web CRM</div>
-              <div className="text-xs text-slate-400">v1.0 - Sistema Completo</div>
+            {/* Navigation */}
+            <nav className="flex-1 space-y-2">
+              <Button
+                variant="ghost"
+                className={`w-full transition-all duration-200 ${
+                  currentTab === 'dashboard' 
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg hover:shadow-xl' 
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                } ${sidebarCollapsed ? 'justify-center p-3' : 'justify-start'}`}
+                onClick={() => setCurrentTab('dashboard')}
+              >
+                <Home className="w-5 h-5" />
+                {!sidebarCollapsed && <span className="ml-3">Dashboard</span>}
+              </Button>
+              
+              <Button
+                variant="ghost"
+                className={`w-full transition-all duration-200 ${
+                  currentTab === 'whatsapp' 
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg hover:shadow-xl' 
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                } ${sidebarCollapsed ? 'justify-center p-3' : 'justify-start'}`}
+                onClick={() => setCurrentTab('whatsapp')}
+              >
+                <MessageSquare className="w-5 h-5" />
+                {!sidebarCollapsed && <span className="ml-3">Atendimentos</span>}
+              </Button>
+              
+              <Button
+                variant="ghost"
+                className={`w-full transition-all duration-200 ${
+                  currentTab === 'contacts' 
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg hover:shadow-xl' 
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                } ${sidebarCollapsed ? 'justify-center p-3' : 'justify-start'}`}
+                onClick={() => setCurrentTab('contacts')}
+              >
+                <Users className="w-5 h-5" />
+                {!sidebarCollapsed && <span className="ml-3">Contatos</span>}
+              </Button>
+              
+              <Button
+                variant="ghost"
+                className={`w-full transition-all duration-200 ${
+                  currentTab === 'ai' 
+                    ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg hover:shadow-xl' 
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                } ${sidebarCollapsed ? 'justify-center p-3' : 'justify-start'}`}
+                onClick={() => setCurrentTab('ai')}
+              >
+                <Bot className="w-5 h-5" />
+                {!sidebarCollapsed && <span className="ml-3">Assistentes IA</span>}
+              </Button>
+              
+              <Button
+                variant="ghost"
+                className={`w-full transition-all duration-200 ${
+                  currentTab === 'departments' 
+                    ? 'bg-gradient-to-r from-indigo-500 to-blue-600 text-white shadow-lg hover:shadow-xl' 
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                } ${sidebarCollapsed ? 'justify-center p-3' : 'justify-start'}`}
+                onClick={() => setCurrentTab('departments')}
+              >
+                <Briefcase className="w-5 h-5" />
+                {!sidebarCollapsed && <span className="ml-3">Departamentos</span>}
+              </Button>
+              
+              <Button
+                variant="ghost"
+                className={`w-full transition-all duration-200 ${
+                  currentTab === 'admin' 
+                    ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg hover:shadow-xl' 
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                } ${sidebarCollapsed ? 'justify-center p-3' : 'justify-start'}`}
+                onClick={() => setCurrentTab('admin')}
+              >
+                <UserCog className="w-5 h-5" />
+                {!sidebarCollapsed && <span className="ml-3">Administração</span>}
+              </Button>
+            </nav>
+
+            {/* Sidebar Footer */}
+            <div className="mt-auto pt-4 border-t border-slate-200/50">
+              <Button
+                variant="ghost"
+                className={`w-full text-slate-500 hover:text-slate-700 ${
+                  sidebarCollapsed ? 'justify-center p-2' : 'justify-start'
+                }`}
+                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              >
+                {sidebarCollapsed ? (
+                  <ChevronRight className="w-4 h-4" />
+                ) : (
+                  <>
+                    <ChevronLeft className="w-4 h-4" />
+                    <span className="ml-2 text-xs">Recolher</span>
+                  </>
+                )}
+              </Button>
+              
+              {!sidebarCollapsed && (
+                <div className="mt-3 text-center">
+                  <div className="text-xs text-slate-400">Empresas Web v2.0</div>
+                  <div className="text-xs text-slate-300">Sistema CRM Completo</div>
+                </div>
+              )}
             </div>
           </div>
         </aside>
 
-        {/* Modern Main Content */}
-        <main className="flex-1 overflow-hidden bg-slate-50">
+        {/* Main Content Area */}
+        <main className={`flex-1 transition-all duration-300 ${
+          sidebarCollapsed ? 'ml-24' : 'ml-72'
+        } mr-4 mb-4`}>
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl border border-slate-200/50 shadow-xl min-h-[calc(100vh-6rem)]">
           {currentTab === 'dashboard' && (
             <div className="p-6 space-y-6">
               <div className="flex items-center justify-between">
