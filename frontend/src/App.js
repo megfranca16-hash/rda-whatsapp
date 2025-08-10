@@ -359,6 +359,15 @@ function App() {
               <Bot className="w-4 h-4 mr-2" />
               IA Assistant
             </Button>
+            
+            <Button
+              variant={currentTab === 'departments' ? 'default' : 'ghost'}
+              className="w-full justify-start"
+              onClick={() => setCurrentTab('departments')}
+            >
+              <Building className="w-4 h-4 mr-2" />
+              Departamentos
+            </Button>
           </nav>
         </aside>
 
