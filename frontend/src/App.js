@@ -60,6 +60,25 @@ function App() {
   const [editingDepartment, setEditingDepartment] = useState(null);
   const [newSignature, setNewSignature] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [companyProfile, setCompanyProfile] = useState({
+    name: "Empresas Web",
+    about: "Especialistas em contabilidade e gestão empresarial",
+    logo_url: null,
+    website_url: "",
+    facebook_url: "",
+    linkedin_url: "",
+    business_hours: {
+      monday: { open: "08:00", close: "18:00", active: true },
+      tuesday: { open: "08:00", close: "18:00", active: true },
+      wednesday: { open: "08:00", close: "18:00", active: true },
+      thursday: { open: "08:00", close: "18:00", active: true },
+      friday: { open: "08:00", close: "18:00", active: true },
+      saturday: { open: "08:00", close: "12:00", active: false },
+      sunday: { open: "00:00", close: "00:00", active: false }
+    }
+  });
+  const [editingInstructions, setEditingInstructions] = useState(null);
+  const [newInstructions, setNewInstructions] = useState('');
 
   const API_BASE = process.env.REACT_APP_BACKEND_URL;
 
