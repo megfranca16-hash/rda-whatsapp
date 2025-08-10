@@ -12,7 +12,7 @@ import os
 from datetime import datetime
 
 # Get backend URL from frontend .env
-BACKEND_URL = "https://c8732d6a-534e-4473-962e-928bb15d3209.preview.emergentagent.com"
+BACKEND_URL = "https://76be9512-b195-4d8c-857b-fa8aaf182711.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 class BackendTester:
