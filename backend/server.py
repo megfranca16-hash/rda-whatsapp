@@ -227,8 +227,8 @@ async def handle_whatsapp_message(message_data: WhatsAppMessage, db=Depends(get_
                 "phone_number": message_data.phone_number,
                 "email": None,
                 "company": None,
-                "created_at": datetime.utcnow(),
-                "last_message": datetime.utcnow()
+                "created_at": datetime.utcnow().isoformat(),
+                "last_message": datetime.utcnow().isoformat()
             }
             await contacts_collection.insert_one(contact_data)
             contact = contact_data
@@ -236,7 +236,7 @@ async def handle_whatsapp_message(message_data: WhatsAppMessage, db=Depends(get_
             # Update last message time
             await contacts_collection.update_one(
                 {"phone_number": message_data.phone_number},
-                {"$set": {"last_message": datetime.utcnow()}}
+                {"$set": {"last_message": datetime.utcnow().isoformat()}}
             )
 
         # Store message in conversation history
