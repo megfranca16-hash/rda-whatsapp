@@ -462,8 +462,11 @@ class BackendTester:
                 
             # Test all systems
             await self.test_departments_system()
+            await self.test_department_signatures()
             await self.test_transfers_system()
             await self.test_ai_integration()
+            await self.test_whatsapp_qr_system()
+            await self.test_whatsapp_send_message()
             await self.test_dashboard_stats()
             await self.test_contacts_system()
             
