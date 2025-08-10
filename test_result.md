@@ -168,18 +168,6 @@ frontend:
 
   - task: "AI assistant interface"
     implemented: true
-    working: false
-    file: "App.js"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: true
-    status_history:
-        - working: false
-        - agent: "main"
-        - comment: "UI shows status but actual AI integration missing"
-
-  - task: "Department management interface"
-    implemented: false
     working: "NA"
     file: "App.js"
     stuck_count: 0
@@ -188,7 +176,19 @@ frontend:
     status_history:
         - working: "NA"
         - agent: "main"
-        - comment: "Need to create interface for department routing and management"
+        - comment: "UI updated with Emergent LLM integration status. Need to test with backend."
+
+  - task: "Department management interface"
+    implemented: true
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Department interface with transfers view implemented. Need to test integration with backend."
 
   - task: "CRM dashboard and contacts"
     implemented: true
