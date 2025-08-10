@@ -167,6 +167,33 @@ function App() {
     }
   };
 
+  const updateDepartmentSignature = async (departmentId, signature) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE}/api/departments/${departmentId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({ signature }),
+      });
+      
+      if (response.ok) {
+        // Refresh departments
+        await fetchDepartments();
+        setEditingDepartment(null);
+        setNewSignature('');
+        alert('Assinatura atualizada com sucesso!');
+      } else {
+        alert('Erro ao atualizar assinatura');
+      }
+    } catch (error) {
+      console.error('Error updating signature:', error);
+      alert('Erro ao atualizar assinatura');
+    }
+  };
+
   const checkWhatsAppStatus = async () => {
     try {
       const response = await fetch(`${API_BASE}/api/whatsapp/status`);
