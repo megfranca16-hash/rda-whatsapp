@@ -378,11 +378,11 @@ class BackendTester:
                     
                     # Now try to update it with the WhatsApp number from the first department
                     if another_dept_id and created_dept_id:
-                        duplicate_update = {
+                        duplicate_update_params = {
                             "whatsapp_number": new_whatsapp  # Same as the first department
                         }
                         
-                        async with self.session.put(f"{API_BASE}/departments/{another_dept_id}", headers=headers, json=duplicate_update) as dup_response:
+                        async with self.session.put(f"{API_BASE}/departments/{another_dept_id}", headers=headers, params=duplicate_update_params) as dup_response:
                             if dup_response.status == 400:
                                 dup_error = await dup_response.json()
                                 if "whatsapp number already in use" in dup_error.get("detail", "").lower():
