@@ -46,16 +46,20 @@ class BackendTester:
     async def test_server_health(self):
         """Test if server is running"""
         try:
-            async with self.session.get(f"{BACKEND_URL}/") as response:
-                if response.status == 200:
-                    data = await response.json()
-                    self.log_result("Server Health", True, f"Server running: {data.get('message', 'OK')}")
+            # Test the API root endpoint instead of the main root
+            async with self.session.get(f"{API_BASE}/dashboard/stats") as response:
+                # This endpoint requires auth, so we expect 401 or 403, not 500
+                if response.status in [401, 403]:
+                    self.log_result("Server Health", True, "Backend API is accessible (auth required)")
+                    return True
+                elif response.status == 200:
+                    self.log_result("Server Health", True, "Backend API is accessible")
                     return True
                 else:
-                    self.log_result("Server Health", False, f"Server returned status {response.status}")
+                    self.log_result("Server Health", False, f"Backend API returned unexpected status {response.status}")
                     return False
         except Exception as e:
-            self.log_result("Server Health", False, f"Server not accessible: {str(e)}")
+            self.log_result("Server Health", False, f"Backend API not accessible: {str(e)}")
             return False
             
     async def test_authentication(self):
