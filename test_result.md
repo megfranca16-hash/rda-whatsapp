@@ -266,7 +266,10 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Gestão IA functionality"
+    - "Department management improvements"
+    - "Menu principal enhancements"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
