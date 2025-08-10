@@ -295,6 +295,33 @@ function App() {
     }
   };
 
+  const updateDepartmentInstructions = async (departmentId, instructions) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE}/api/departments/${departmentId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({ manual_instructions: instructions }),
+      });
+      
+      if (response.ok) {
+        // Refresh departments
+        await fetchDepartments();
+        setEditingInstructions(null);
+        setNewInstructions('');
+        alert('Instruções da IA atualizadas com sucesso!');
+      } else {
+        alert('Erro ao atualizar instruções');
+      }
+    } catch (error) {
+      console.error('Error updating instructions:', error);
+      alert('Erro ao atualizar instruções');
+    }
+  };
+
   const checkWhatsAppStatus = async () => {
     try {
       const response = await fetch(`${API_BASE}/api/whatsapp/status`);
