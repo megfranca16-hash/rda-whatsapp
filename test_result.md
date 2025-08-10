@@ -261,7 +261,6 @@ metadata:
 
 test_plan:
   current_focus:
-    - "User registration endpoint"
     - "Landing page authentication modal integration"
     - "Demo page routing"
   stuck_tasks: []
