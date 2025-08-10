@@ -34,29 +34,55 @@ const LandingPage = ({ onLoginSuccess }) => {
     setLoading(true);
 
     try {
+      const API_BASE = process.env.REACT_APP_BACKEND_URL;
+
       if (authMode === 'register') {
         if (authData.password !== authData.confirmPassword) {
           alert('Senhas não coincidem!');
           setLoading(false);
           return;
         }
-        // Mock registration - in real app would call API
-        console.log('Registering:', authData);
-      }
+        
+        // Call register API
+        const response = await fetch(`${API_BASE}/api/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: authData.email, // Use email as username
+            email: authData.email,
+            password: authData.password,
+            name: authData.name
+          })
+        });
 
-      // Mock login - in real app would call API
-      if (authData.email && authData.password) {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Store mock token
-        localStorage.setItem('token', 'mock-jwt-token');
-        localStorage.setItem('user', JSON.stringify({
-          id: '1',
-          email: authData.email,
-          name: authData.name || authData.email.split('@')[0]
-        }));
-        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.detail || 'Erro no cadastro');
+        }
+
+        const data = await response.json();
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        onLoginSuccess();
+      } else {
+        // Call login API
+        const response = await fetch(`${API_BASE}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: authData.email, // Use email as username
+            password: authData.password
+          })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.detail || 'Credenciais inválidas');
+        }
+
+        const data = await response.json();
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
         onLoginSuccess();
       } else {
         alert('Preencha todos os campos!');
