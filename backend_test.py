@@ -132,10 +132,11 @@ class BackendTester:
             # Test POST new department
             new_dept_data = {
                 "name": "Teste Departamento",
-                "description": "Departamento criado para teste automatizado"
+                "description": "Departamento criado para teste automatizado",
+                "signature": "---\n🧪 Teste Departamento\n📧 teste@empresasweb.com\n📞 (11) 99999-0000\n\nDepartamento de teste!"
             }
             
-            async with self.session.post(f"{API_BASE}/departments", headers=headers, params=new_dept_data) as response:
+            async with self.session.post(f"{API_BASE}/departments", headers=headers, json=new_dept_data) as response:
                 if response.status == 200:
                     dept_data = await response.json()
                     if dept_data.get("name") == new_dept_data["name"]:
@@ -145,7 +146,8 @@ class BackendTester:
                         self.log_result("Departments POST", False, f"Department creation returned unexpected data: {dept_data}")
                         return False
                 else:
-                    self.log_result("Departments POST", False, f"Failed to create department: {response.status}")
+                    response_text = await response.text()
+                    self.log_result("Departments POST", False, f"Failed to create department: {response.status} - {response_text}")
                     return False
                     
         except Exception as e:
