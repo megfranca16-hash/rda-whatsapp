@@ -72,6 +72,23 @@ class Contact(BaseModel):
     created_at: datetime
     last_message: Optional[datetime] = None
 
+class Department(BaseModel):
+    id: str
+    name: str
+    description: str
+    active: bool = True
+    created_at: datetime
+
+class DepartmentTransfer(BaseModel):
+    id: str
+    from_contact: str  # phone_number
+    to_department: str  # department_id
+    message: str
+    status: str  # "pending", "accepted", "completed"
+    created_at: datetime
+    handled_by: Optional[str] = None
+    notes: Optional[str] = None
+
 # Utility functions
 def create_token(user_id: str):
     payload = {
