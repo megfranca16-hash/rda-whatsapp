@@ -7,6 +7,7 @@ import { Badge } from './components/ui/badge';
 import { Avatar, AvatarFallback } from './components/ui/avatar';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs';
 import { Alert, AlertDescription } from './components/ui/alert';
+import LandingPage from './components/LandingPage';
 import { 
   MessageCircle, 
   Users, 
