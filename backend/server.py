@@ -23,9 +23,57 @@ async def lifespan(app: FastAPI):
     mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017/')
     client = motor.motor_asyncio.AsyncIOMotorClient(mongo_url)
     database = client.empresas_web
+    
+    # Initialize default departments
+    await initialize_default_departments(database)
+    
     yield
     # Shutdown
     client.close()
+
+async def initialize_default_departments(db):
+    """Initialize default departments if they don't exist"""
+    try:
+        departments_collection = db.departments
+        existing_count = await departments_collection.count_documents({})
+        
+        if existing_count == 0:
+            default_departments = [
+                {
+                    "id": str(uuid.uuid4()),
+                    "name": "Vendas",
+                    "description": "Departamento de vendas e novos clientes",
+                    "active": True,
+                    "created_at": datetime.utcnow()
+                },
+                {
+                    "id": str(uuid.uuid4()),
+                    "name": "Suporte",
+                    "description": "Departamento de suporte técnico",
+                    "active": True,
+                    "created_at": datetime.utcnow()
+                },
+                {
+                    "id": str(uuid.uuid4()),
+                    "name": "Financeiro",
+                    "description": "Departamento financeiro e cobrança",
+                    "active": True,
+                    "created_at": datetime.utcnow()
+                },
+                {
+                    "id": str(uuid.uuid4()),
+                    "name": "Gerencial",
+                    "description": "Departamento gerencial e administrativo",
+                    "active": True,
+                    "created_at": datetime.utcnow()
+                }
+            ]
+            
+            await departments_collection.insert_many(default_departments)
+            logging.info("Default departments initialized")
+            
+    except Exception as e:
+        logging.error(f"Error initializing default departments: {str(e)}")
 
 app = FastAPI(title="Empresas Web CRM API", lifespan=lifespan)
 
