@@ -130,6 +130,7 @@ class Department(BaseModel):
     description: str
     active: bool = True
     created_at: datetime
+    signature: Optional[str] = None  # Assinatura automática do departamento
 
 class DepartmentTransfer(BaseModel):
     id: str
@@ -140,6 +141,11 @@ class DepartmentTransfer(BaseModel):
     created_at: datetime
     handled_by: Optional[str] = None
     notes: Optional[str] = None
+
+class DepartmentCreate(BaseModel):
+    name: str
+    description: str
+    signature: Optional[str] = None
 
 # Utility functions
 def create_token(user_id: str):
