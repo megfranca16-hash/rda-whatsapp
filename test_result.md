@@ -178,6 +178,30 @@ backend:
         - comment: "✅ CRM functionality confirmed working. Contacts CRUD operations functional. Dashboard stats showing correct metrics (contacts, conversations, messages). Conversation history properly stored and retrieved."
 
 frontend:
+  - task: "Landing page authentication modal integration"
+    implemented: false
+    working: "NA"
+    file: "LandingPage.js, App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Need to integrate landing page auth modal with App.js authentication system and add register functionality"
+
+  - task: "Demo page routing"
+    implemented: false
+    working: "NA"
+    file: "App.js, LandingPage.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Need to implement /demo routing for 'Ver demonstrativo' button"
+
   - task: "WhatsApp interface with QR Code display"
     implemented: true
     working: false
