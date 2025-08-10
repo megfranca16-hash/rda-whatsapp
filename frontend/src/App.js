@@ -222,16 +222,18 @@ function App() {
     }
   };
 
-  const updateDepartmentSignature = async (departmentId, signature) => {
+  const updateDepartmentSignature = async (departmentId, signature, additionalData = {}) => {
     try {
       const token = localStorage.getItem('token');
+      const updateData = { signature, ...additionalData };
+      
       const response = await fetch(`${API_BASE}/api/departments/${departmentId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: new URLSearchParams({ signature }),
+        body: new URLSearchParams(updateData),
       });
       
       if (response.ok) {
@@ -239,13 +241,15 @@ function App() {
         await fetchDepartments();
         setEditingDepartment(null);
         setNewSignature('');
-        alert('Assinatura atualizada com sucesso!');
+        setNewDepartment({ name: '', description: '', whatsapp_number: '', integration_mode: 'qr' });
+        alert('Departamento atualizado com sucesso!');
       } else {
-        alert('Erro ao atualizar assinatura');
+        const error = await response.json();
+        alert(error.detail || 'Erro ao atualizar departamento');
       }
     } catch (error) {
-      console.error('Error updating signature:', error);
-      alert('Erro ao atualizar assinatura');
+      console.error('Error updating department:', error);
+      alert('Erro ao atualizar departamento');
     }
   };
 
