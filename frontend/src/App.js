@@ -870,14 +870,75 @@ function App() {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     {departments.map((department) => (
-                      <div key={department.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div>
-                          <p className="font-medium text-gray-900">{department.name}</p>
-                          <p className="text-sm text-gray-600">{department.description}</p>
+                      <div key={department.id} className="border border-slate-200 rounded-lg p-4 bg-slate-50">
+                        <div className="flex items-center justify-between mb-3">
+                          <div>
+                            <p className="font-medium text-slate-900">{department.name}</p>
+                            <p className="text-sm text-slate-600">{department.description}</p>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Badge variant={department.active ? "default" : "secondary"}>
+                              {department.active ? "Ativo" : "Inativo"}
+                            </Badge>
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => {
+                                setEditingDepartment(department.id);
+                                setNewSignature(department.signature || '');
+                              }}
+                            >
+                              Editar
+                            </Button>
+                          </div>
                         </div>
-                        <Badge variant={department.active ? "default" : "secondary"}>
-                          {department.active ? "Ativo" : "Inativo"}
-                        </Badge>
+                        
+                        {editingDepartment === department.id ? (
+                          <div className="space-y-3">
+                            <div>
+                              <label className="block text-sm font-medium text-slate-700 mb-1">
+                                Assinatura Automática:
+                              </label>
+                              <textarea
+                                value={newSignature}
+                                onChange={(e) => setNewSignature(e.target.value)}
+                                placeholder="Digite a assinatura que aparecerá nas mensagens deste departamento..."
+                                className="w-full p-3 border border-slate-300 rounded-lg text-sm resize-none"
+                                rows={4}
+                              />
+                              <p className="text-xs text-slate-500 mt-1">
+                                Esta assinatura será adicionada automaticamente ao final de todas as mensagens do departamento.
+                              </p>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <Button 
+                                size="sm"
+                                onClick={() => updateDepartmentSignature(department.id, newSignature)}
+                              >
+                                Salvar
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => {
+                                  setEditingDepartment(null);
+                                  setNewSignature('');
+                                }}
+                              >
+                                Cancelar
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          department.signature && (
+                            <div className="mt-3 p-3 bg-white rounded border border-slate-200">
+                              <p className="text-xs font-medium text-slate-600 mb-1">Assinatura Atual:</p>
+                              <pre className="text-xs text-slate-700 whitespace-pre-wrap font-mono">
+                                {department.signature}
+                              </pre>
+                            </div>
+                          )
+                        )}
                       </div>
                     ))}
                   </CardContent>
