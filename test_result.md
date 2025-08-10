@@ -211,6 +211,42 @@ frontend:
         - agent: "main"
         - comment: "✅ Demo page routing implemented! 'Ver demonstração' button correctly redirects to /demo page with professional demo content showing all 7 specialized departments and system features. 'Criar Conta Gratuita' and 'Voltar ao Início' buttons work correctly."
 
+  - task: "Gestão IA functionality"
+    implemented: false
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Need to implement full AI management interface: listagem de assistentes com avatar/nome/departamento, botões editar/duplicar/ativar-desativar, formulário completo com upload de avatar, CRUD via /api/assistants"
+
+  - task: "Department management improvements"
+    implemented: false
+    working: "NA"
+    file: "App.js, server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Need to implement: edição do nome do departamento, botão 'Novo departamento' funcional with WhatsApp number and integration mode, administração dos IAs por departamento"
+
+  - task: "Menu principal enhancements"
+    implemented: false
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Need to: diminuir tamanho dos botões do menu, acrescentar botões/atalhos: CRM, Agenda, Mensagens Programadas"
+
   - task: "WhatsApp interface with QR Code display"
     implemented: true
     working: false
