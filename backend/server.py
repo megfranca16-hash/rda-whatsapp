@@ -339,7 +339,10 @@ async def generate_ai_response(message: str, phone_number: str) -> str:
         
         # Get API key from environment
         api_key = os.environ.get('EMERGENT_LLM_KEY')
+        logging.info(f"AI Response - API key found: {api_key is not None}")
+        
         if not api_key:
+            logging.warning("No EMERGENT_LLM_KEY found, using fallback response")
             return "Olá! Sou o assistente virtual da Empresas Web. Como posso ajudá-lo hoje?"
         
         # Initialize chat with session per phone number
@@ -377,12 +380,14 @@ Seja sempre cordial, útil e direto."""
         user_message = UserMessage(text=message)
         
         # Get AI response
+        logging.info(f"Sending message to AI: {message}")
         response = await chat.send_message(user_message)
+        logging.info(f"AI Response received: {response}")
         
         return response if response else "Desculpe, não consegui processar sua mensagem. Tente novamente."
         
     except Exception as e:
-        logging.error(f"Error generating AI response: {str(e)}")
+        logging.error(f"Error generating AI response: {str(e)}", exc_info=True)
         return "Olá! Sou o assistente virtual da Empresas Web. Como posso ajudá-lo hoje?"
 
 @app.post("/api/whatsapp/send")
