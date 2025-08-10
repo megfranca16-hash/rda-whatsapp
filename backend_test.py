@@ -99,6 +99,111 @@ class BackendTester:
             self.log_result("Authentication", False, f"Authentication test failed: {str(e)}")
             return False
             
+    async def test_user_registration(self):
+        """Test user registration functionality"""
+        try:
+            # Test 1: Register a new user with valid data
+            import time
+            unique_suffix = str(int(time.time()))
+            register_data = {
+                "username": f"testuser_{unique_suffix}",
+                "password": "testpass123",
+                "email": f"testuser_{unique_suffix}@empresasweb.com",
+                "name": "Test User Registration"
+            }
+            
+            async with self.session.post(f"{API_BASE}/auth/register", json=register_data) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if data.get("token") and data.get("user"):
+                        user_data = data["user"]
+                        if (user_data.get("username") == register_data["username"] and 
+                            user_data.get("email") == register_data["email"] and
+                            user_data.get("name") == register_data["name"]):
+                            self.log_result("User Registration - Valid Data", True, f"User registered successfully: {user_data['username']}")
+                            
+                            # Store the new user token for login test
+                            new_user_token = data.get("token")
+                            
+                            # Test 2: Try to register with same username (should fail)
+                            duplicate_data = {
+                                "username": register_data["username"],
+                                "password": "differentpass",
+                                "email": "different@email.com"
+                            }
+                            
+                            async with self.session.post(f"{API_BASE}/auth/register", json=duplicate_data) as dup_response:
+                                if dup_response.status == 400:
+                                    dup_error = await dup_response.json()
+                                    if "username already exists" in dup_error.get("detail", "").lower():
+                                        self.log_result("User Registration - Duplicate Username", True, "Correctly rejected duplicate username")
+                                    else:
+                                        self.log_result("User Registration - Duplicate Username", False, f"Wrong error message: {dup_error}")
+                                else:
+                                    self.log_result("User Registration - Duplicate Username", False, f"Should have failed with 400, got {dup_response.status}")
+                            
+                            # Test 3: Try to register with same email (should fail)
+                            duplicate_email_data = {
+                                "username": f"different_user_{unique_suffix}",
+                                "password": "testpass123",
+                                "email": register_data["email"]
+                            }
+                            
+                            async with self.session.post(f"{API_BASE}/auth/register", json=duplicate_email_data) as email_response:
+                                if email_response.status == 400:
+                                    email_error = await email_response.json()
+                                    if "email already registered" in email_error.get("detail", "").lower():
+                                        self.log_result("User Registration - Duplicate Email", True, "Correctly rejected duplicate email")
+                                    else:
+                                        self.log_result("User Registration - Duplicate Email", False, f"Wrong error message: {email_error}")
+                                else:
+                                    self.log_result("User Registration - Duplicate Email", False, f"Should have failed with 400, got {email_response.status}")
+                            
+                            # Test 4: Test login with newly registered user
+                            login_new_user = {
+                                "username": register_data["username"],
+                                "password": register_data["password"]
+                            }
+                            
+                            async with self.session.post(f"{API_BASE}/auth/login", json=login_new_user) as login_response:
+                                if login_response.status == 200:
+                                    login_data = await login_response.json()
+                                    if login_data.get("token") and login_data.get("user"):
+                                        login_user = login_data["user"]
+                                        if login_user.get("username") == register_data["username"]:
+                                            self.log_result("User Registration - Login Test", True, f"New user can login successfully: {login_user['username']}")
+                                            
+                                            # Test token verification for new user
+                                            headers = {"Authorization": f"Bearer {login_data['token']}"}
+                                            async with self.session.get(f"{API_BASE}/auth/verify", headers=headers) as verify_response:
+                                                if verify_response.status == 200:
+                                                    self.log_result("User Registration - Token Verify", True, "New user token verified successfully")
+                                                    return True
+                                                else:
+                                                    self.log_result("User Registration - Token Verify", False, f"New user token verification failed: {verify_response.status}")
+                                        else:
+                                            self.log_result("User Registration - Login Test", False, "Login returned wrong user data")
+                                    else:
+                                        self.log_result("User Registration - Login Test", False, "Login response missing token or user")
+                                else:
+                                    login_error = await login_response.text()
+                                    self.log_result("User Registration - Login Test", False, f"New user login failed: {login_response.status} - {login_error}")
+                            
+                        else:
+                            self.log_result("User Registration - Valid Data", False, f"Registration returned wrong user data: {user_data}")
+                    else:
+                        self.log_result("User Registration - Valid Data", False, f"Registration response missing token or user: {data}")
+                else:
+                    error_text = await response.text()
+                    self.log_result("User Registration - Valid Data", False, f"Registration failed: {response.status} - {error_text}")
+                    return False
+                    
+        except Exception as e:
+            self.log_result("User Registration", False, f"Registration test failed: {str(e)}")
+            return False
+            
+        return True
+            
     async def test_departments_system(self):
         """Test department CRUD operations"""
         if not self.auth_token:
