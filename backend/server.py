@@ -349,11 +349,20 @@ async def generate_ai_response(message: str, phone_number: str) -> str:
             logging.warning("No EMERGENT_LLM_KEY found, using fallback response")
             return "Olá! Sou o assistente virtual da Empresas Web. Como posso ajudá-lo hoje?"
         
-        # Initialize chat with session per phone number
-        chat = LlmChat(
-            api_key=api_key,
-            session_id=f"whatsapp_{phone_number}",
-            system_message="""Você é o assistente virtual da Empresas Web, uma empresa de CRM e automação.
+        # Try different models if one fails
+        models_to_try = [
+            ("openai", "gpt-4o-mini"),
+            ("openai", "gpt-3.5-turbo"),
+            ("gemini", "gemini-1.5-flash")
+        ]
+        
+        for provider, model in models_to_try:
+            try:
+                # Initialize chat with session per phone number
+                chat = LlmChat(
+                    api_key=api_key,
+                    session_id=f"whatsapp_{phone_number}",
+                    system_message="""Você é o assistente virtual da Empresas Web, uma empresa líder em CRM e automação.
 
 Seu papel:
 - Atender clientes via WhatsApp de forma profissional e amigável
@@ -377,18 +386,26 @@ Departamentos disponíveis:
 Para transferir, use comandos como:
 - "Vou transferir você para o departamento de [DEPARTAMENTO]"
 
-Seja sempre cordial, útil e direto."""
-        ).with_model("openai", "gpt-4o-mini")
+Seja sempre cordial, útil e direto. Mantenha respostas concisas."""
+                ).with_model(provider, model)
+                
+                # Create user message
+                user_message = UserMessage(text=message)
+                
+                # Get AI response
+                logging.info(f"Sending message to AI using {provider}/{model}: {message}")
+                response = await chat.send_message(user_message)
+                logging.info(f"AI Response received from {provider}/{model}: {response}")
+                
+                if response:
+                    return response
+                    
+            except Exception as model_error:
+                logging.warning(f"Failed with {provider}/{model}: {str(model_error)}")
+                continue
         
-        # Create user message
-        user_message = UserMessage(text=message)
-        
-        # Get AI response
-        logging.info(f"Sending message to AI: {message}")
-        response = await chat.send_message(user_message)
-        logging.info(f"AI Response received: {response}")
-        
-        return response if response else "Desculpe, não consegui processar sua mensagem. Tente novamente."
+        # If all models fail, return fallback
+        return "Olá! Sou o assistente virtual da Empresas Web. Como posso ajudá-lo hoje? 🤖\n\nEm que posso auxiliá-lo?"
         
     except Exception as e:
         logging.error(f"Error generating AI response: {str(e)}", exc_info=True)
