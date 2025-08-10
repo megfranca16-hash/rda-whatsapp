@@ -234,30 +234,63 @@ function App() {
     }
   };
 
-  const updateDepartmentInstructions = async (departmentId, instructions) => {
+  const fetchAssistants = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE}/api/departments/${departmentId}`, {
+      const response = await fetch(`${API_BASE}/api/assistants`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setAssistants(data);
+      }
+    } catch (error) {
+      console.error('Error fetching assistants:', error);
+    }
+  };
+
+  const updateAssistant = async (assistantId, updateData) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE}/api/assistants/${assistantId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: new URLSearchParams({ manual_instructions: instructions }),
+        body: new URLSearchParams(updateData),
       });
       
       if (response.ok) {
-        // Refresh departments
-        await fetchDepartments();
-        setEditingInstructions(null);
-        setNewInstructions('');
-        alert('Instruções da IA atualizadas com sucesso!');
+        await fetchAssistants();
+        setEditingAssistant(null);
+        alert('Assistente atualizado com sucesso!');
       } else {
-        alert('Erro ao atualizar instruções');
+        alert('Erro ao atualizar assistente');
       }
     } catch (error) {
-      console.error('Error updating instructions:', error);
-      alert('Erro ao atualizar instruções');
+      console.error('Error updating assistant:', error);
+      alert('Erro ao atualizar assistente');
+    }
+  };
+
+  const duplicateAssistant = async (assistantId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE}/api/assistants/${assistantId}/duplicate`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        await fetchAssistants();
+        alert('Assistente duplicado com sucesso!');
+      } else {
+        alert('Erro ao duplicar assistente');
+      }
+    } catch (error) {
+      console.error('Error duplicating assistant:', error);
+      alert('Erro ao duplicar assistente');
     }
   };
 
