@@ -581,6 +581,9 @@ class BackendTester:
                 print("❌ Authentication failed, stopping tests")
                 return False
                 
+            # Test user registration functionality
+            await self.test_user_registration()
+                
             # Test all systems
             await self.test_departments_system()
             await self.test_department_signatures()
