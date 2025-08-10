@@ -1261,6 +1261,373 @@ function App() {
             </div>
           )}
 
+          {currentTab === 'crm' && (
+            <div className="p-6 space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-3xl font-bold text-slate-900 mb-2">CRM</h2>
+                  <p className="text-slate-600">Gestão completa de relacionamento com clientes</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <Card className="shadow-lg border-slate-200">
+                  <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b border-slate-200">
+                    <CardTitle className="flex items-center space-x-2">
+                      <Users className="w-5 h-5 text-blue-500" />
+                      <span className="text-slate-900">Pipeline de Vendas</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-slate-600">Leads</span>
+                        <Badge variant="secondary">25</Badge>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-slate-600">Propostas</span>
+                        <Badge variant="secondary">12</Badge>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-slate-600">Fechamentos</span>
+                        <Badge variant="default">8</Badge>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="shadow-lg border-slate-200">
+                  <CardHeader className="bg-gradient-to-r from-green-50 to-blue-50 border-b border-slate-200">
+                    <CardTitle className="flex items-center space-x-2">
+                      <BarChart3 className="w-5 h-5 text-green-500" />
+                      <span className="text-slate-900">Métricas</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-slate-600">Taxa de Conversão</span>
+                        <span className="text-sm font-semibold text-green-600">32%</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-slate-600">Ticket Médio</span>
+                        <span className="text-sm font-semibold text-blue-600">R$ 2.450</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-slate-600">Tempo Médio</span>
+                        <span className="text-sm font-semibold text-purple-600">18 dias</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="shadow-lg border-slate-200">
+                  <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b border-slate-200">
+                    <CardTitle className="flex items-center space-x-2">
+                      <Zap className="w-5 h-5 text-purple-500" />
+                      <span className="text-slate-900">Automações</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-slate-600">Follow-ups</span>
+                        <Badge variant="default" className="bg-green-500">Ativo</Badge>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-slate-600">Nutrição</span>
+                        <Badge variant="default" className="bg-blue-500">Ativo</Badge>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-slate-600">Remarketing</span>
+                        <Badge variant="outline">Pausado</Badge>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <Card className="shadow-lg border-slate-200">
+                <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50 border-b border-slate-200">
+                  <CardTitle className="flex items-center space-x-2">
+                    <Users className="w-5 h-5 text-slate-600" />
+                    <span className="text-slate-900">Kanban - Pipeline de Vendas</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="bg-slate-50 rounded-lg p-4">
+                      <h4 className="font-semibold text-slate-700 mb-3">Leads (25)</h4>
+                      <div className="space-y-2">
+                        <div className="bg-white p-3 rounded border-l-4 border-l-blue-500 shadow-sm">
+                          <p className="text-sm font-medium">João Silva</p>
+                          <p className="text-xs text-slate-500">Contabilidade</p>
+                        </div>
+                        <div className="bg-white p-3 rounded border-l-4 border-l-blue-500 shadow-sm">
+                          <p className="text-sm font-medium">Maria Santos</p>
+                          <p className="text-xs text-slate-500">Abertura de Empresa</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-yellow-50 rounded-lg p-4">
+                      <h4 className="font-semibold text-yellow-700 mb-3">Propostas (12)</h4>
+                      <div className="space-y-2">
+                        <div className="bg-white p-3 rounded border-l-4 border-l-yellow-500 shadow-sm">
+                          <p className="text-sm font-medium">Pedro Costa</p>
+                          <p className="text-xs text-slate-500">R$ 2.500/mês</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-orange-50 rounded-lg p-4">
+                      <h4 className="font-semibold text-orange-700 mb-3">Negociação (8)</h4>
+                      <div className="space-y-2">
+                        <div className="bg-white p-3 rounded border-l-4 border-l-orange-500 shadow-sm">
+                          <p className="text-sm font-medium">Ana Lima</p>
+                          <p className="text-xs text-slate-500">Aguardando assinatura</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-green-50 rounded-lg p-4">
+                      <h4 className="font-semibold text-green-700 mb-3">Fechados (8)</h4>
+                      <div className="space-y-2">
+                        <div className="bg-white p-3 rounded border-l-4 border-l-green-500 shadow-sm">
+                          <p className="text-sm font-medium">Carlos Mendes</p>
+                          <p className="text-xs text-slate-500">Cliente ativo</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {currentTab === 'agenda' && (
+            <div className="p-6 space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-3xl font-bold text-slate-900 mb-2">Agenda</h2>
+                  <p className="text-slate-600">Agendamentos e compromissos</p>
+                </div>
+                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                  Novo Agendamento
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2">
+                  <Card className="shadow-lg border-slate-200">
+                    <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b border-slate-200">
+                      <CardTitle>Calendário - Janeiro 2025</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <div className="grid grid-cols-7 gap-2 text-center text-sm">
+                        <div className="font-semibold text-slate-600 p-2">Dom</div>
+                        <div className="font-semibold text-slate-600 p-2">Seg</div>
+                        <div className="font-semibold text-slate-600 p-2">Ter</div>
+                        <div className="font-semibold text-slate-600 p-2">Qua</div>
+                        <div className="font-semibold text-slate-600 p-2">Qui</div>
+                        <div className="font-semibold text-slate-600 p-2">Sex</div>
+                        <div className="font-semibold text-slate-600 p-2">Sáb</div>
+                        
+                        {Array.from({length: 31}, (_, i) => (
+                          <div key={i} className={`p-2 rounded cursor-pointer hover:bg-blue-50 ${
+                            i === 9 ? 'bg-blue-500 text-white' : 
+                            i === 15 || i === 22 ? 'bg-green-100 text-green-700' : ''
+                          }`}>
+                            {i + 1}
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div>
+                  <Card className="shadow-lg border-slate-200">
+                    <CardHeader className="bg-gradient-to-r from-green-50 to-blue-50 border-b border-slate-200">
+                      <CardTitle>Próximos Compromissos</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <div className="space-y-4">
+                        <div className="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                          <div>
+                            <p className="font-medium text-slate-900">Reunião João Silva</p>
+                            <p className="text-sm text-slate-600">Hoje, 14:00</p>
+                            <p className="text-xs text-slate-500">Revisão contábil</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-start space-x-3 p-3 bg-green-50 rounded-lg">
+                          <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                          <div>
+                            <p className="font-medium text-slate-900">Apresentação Proposta</p>
+                            <p className="text-sm text-slate-600">Amanhã, 10:00</p>
+                            <p className="text-xs text-slate-500">Maria Santos - Abertura empresa</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start space-x-3 p-3 bg-purple-50 rounded-lg">
+                          <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
+                          <div>
+                            <p className="font-medium text-slate-900">Follow-up Pedro</p>
+                            <p className="text-sm text-slate-600">Seg, 15:30</p>
+                            <p className="text-xs text-slate-500">Status da proposta</p>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="shadow-lg border-slate-200 mt-6">
+                    <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b border-slate-200">
+                      <CardTitle>Estatísticas</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-slate-600">Agendamentos hoje</span>
+                          <Badge variant="default" className="bg-blue-500">3</Badge>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-slate-600">Esta semana</span>
+                          <Badge variant="default" className="bg-green-500">12</Badge>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-slate-600">Taxa de comparecimento</span>
+                          <span className="text-sm font-semibold text-green-600">94%</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {currentTab === 'mensagens' && (
+            <div className="p-6 space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-3xl font-bold text-slate-900 mb-2">Mensagens Programadas</h2>
+                  <p className="text-slate-600">Gerencie envios agendados e campanhas</p>
+                </div>
+                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                  Nova Mensagem Programada
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+                  <CardContent className="p-6 text-center">
+                    <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                      <Clock className="w-6 h-6 text-white" />
+                    </div>
+                    <p className="text-2xl font-bold text-blue-900 mb-1">8</p>
+                    <p className="text-sm text-blue-700">Programadas</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+                  <CardContent className="p-6 text-center">
+                    <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                      <Send className="w-6 h-6 text-white" />
+                    </div>
+                    <p className="text-2xl font-bold text-green-900 mb-1">15</p>
+                    <p className="text-sm text-green-700">Enviadas Hoje</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+                  <CardContent className="p-6 text-center">
+                    <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                      <Users className="w-6 h-6 text-white" />
+                    </div>
+                    <p className="text-2xl font-bold text-purple-900 mb-1">142</p>
+                    <p className="text-sm text-purple-700">Destinatários</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
+                  <CardContent className="p-6 text-center">
+                    <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                      <BarChart3 className="w-6 h-6 text-white" />
+                    </div>
+                    <p className="text-2xl font-bold text-orange-900 mb-1">89%</p>
+                    <p className="text-sm text-orange-700">Taxa Entrega</p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <Card className="shadow-lg border-slate-200">
+                <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50 border-b border-slate-200">
+                  <CardTitle className="flex items-center space-x-2">
+                    <Send className="w-5 h-5 text-blue-500" />
+                    <span className="text-slate-900">Campanhas Programadas</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="flex items-start space-x-4">
+                        <div className="w-3 h-3 bg-blue-500 rounded-full mt-2"></div>
+                        <div>
+                          <h4 className="font-semibold text-slate-900">Follow-up Leads</h4>
+                          <p className="text-sm text-slate-600">Enviada para 45 contatos</p>
+                          <p className="text-xs text-slate-500">Programada para: Hoje, 16:00</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Badge variant="default" className="bg-blue-500">Aguardando</Badge>
+                        <Button variant="ghost" size="sm">
+                          <Settings className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+                      <div className="flex items-start space-x-4">
+                        <div className="w-3 h-3 bg-green-500 rounded-full mt-2"></div>
+                        <div>
+                          <h4 className="font-semibold text-slate-900">Newsletter Semanal</h4>
+                          <p className="text-sm text-slate-600">Enviada para 128 clientes</p>
+                          <p className="text-xs text-slate-500">Enviada: Ontem, 09:00</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Badge variant="default" className="bg-green-500">Enviada</Badge>
+                        <Button variant="ghost" size="sm">
+                          <BarChart3 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg border border-purple-200">
+                      <div className="flex items-start space-x-4">
+                        <div className="w-3 h-3 bg-purple-500 rounded-full mt-2"></div>
+                        <div>
+                          <h4 className="font-semibold text-slate-900">Promoção Fim de Ano</h4>
+                          <p className="text-sm text-slate-600">Será enviada para 89 leads</p>
+                          <p className="text-xs text-slate-500">Programada para: Amanhã, 10:00</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Badge variant="outline">Rascunho</Badge>
+                        <Button variant="ghost" size="sm">
+                          <Settings className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
           {currentTab === 'contacts' && (
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
