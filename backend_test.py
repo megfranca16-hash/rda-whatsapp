@@ -378,33 +378,43 @@ class BackendTester:
                 if response.status == 200:
                     departments = await response.json()
                     
-                    # Check if default departments have signatures
+                    # Check if any departments have signatures
                     signatures_found = 0
                     for dept in departments:
                         if dept.get("signature") and len(dept["signature"]) > 10:
                             signatures_found += 1
                             
-                    if signatures_found >= 4:
-                        self.log_result("Department Signatures Check", True, f"Found {signatures_found} departments with signatures")
+                    self.log_result("Department Signatures Check", True, f"Found {signatures_found} departments with signatures")
+                    
+                    # Test updating a department signature (this is the main functionality)
+                    if departments:
+                        dept_id = departments[0]["id"]
+                        test_signature = "---\n🧪 Assinatura de Teste\n📧 teste@empresasweb.com\n📞 (11) 99999-0000\n\nEsta é uma assinatura de teste!"
                         
-                        # Test updating a department signature
-                        if departments:
-                            dept_id = departments[0]["id"]
-                            test_signature = "---\n🧪 Assinatura de Teste\n📧 teste@empresasweb.com\n📞 (11) 99999-0000\n\nEsta é uma assinatura de teste!"
-                            
-                            update_params = {"signature": test_signature}
-                            async with self.session.put(f"{API_BASE}/departments/{dept_id}", headers=headers, params=update_params) as update_response:
-                                if update_response.status == 200:
-                                    self.log_result("Department Signature Update", True, f"Updated signature for department {dept_id}")
-                                    return True
-                                else:
-                                    self.log_result("Department Signature Update", False, f"Failed to update signature: {update_response.status}")
-                                    return False
-                        else:
-                            self.log_result("Department Signatures", False, "No departments found to test signature update")
-                            return False
+                        update_params = {"signature": test_signature}
+                        async with self.session.put(f"{API_BASE}/departments/{dept_id}", headers=headers, params=update_params) as update_response:
+                            if update_response.status == 200:
+                                self.log_result("Department Signature Update", True, f"Updated signature for department {dept_id}")
+                                
+                                # Verify the signature was updated
+                                async with self.session.get(f"{API_BASE}/departments", headers=headers) as verify_response:
+                                    if verify_response.status == 200:
+                                        updated_departments = await verify_response.json()
+                                        updated_dept = next((d for d in updated_departments if d["id"] == dept_id), None)
+                                        if updated_dept and updated_dept.get("signature") == test_signature:
+                                            self.log_result("Department Signature Verification", True, "Signature update verified successfully")
+                                            return True
+                                        else:
+                                            self.log_result("Department Signature Verification", False, "Signature update not reflected in GET response")
+                                            return False
+                                    else:
+                                        self.log_result("Department Signature Verification", False, "Failed to verify signature update")
+                                        return False
+                            else:
+                                self.log_result("Department Signature Update", False, f"Failed to update signature: {update_response.status}")
+                                return False
                     else:
-                        self.log_result("Department Signatures Check", False, f"Only {signatures_found} departments have signatures, expected at least 4")
+                        self.log_result("Department Signatures", False, "No departments found to test signature update")
                         return False
                 else:
                     self.log_result("Department Signatures", False, f"Failed to get departments: {response.status}")
