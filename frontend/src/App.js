@@ -59,6 +59,8 @@ function App() {
     if (isAuthenticated) {
       fetchDashboardData();
       fetchContacts();
+      fetchDepartments();
+      fetchTransfers();
       checkWhatsAppStatus();
     }
   }, [isAuthenticated]);
