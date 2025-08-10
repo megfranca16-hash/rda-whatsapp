@@ -191,35 +191,58 @@ async def handle_whatsapp_message(message_data: WhatsAppMessage, db=Depends(get_
         )
 
 async def generate_ai_response(message: str, phone_number: str) -> str:
-    """Generate AI response using Emergent LLM (to be implemented)"""
-    # Basic responses for now - will enhance with Emergent LLM
-    message_lower = message.lower()
-    
-    if any(greeting in message_lower for greeting in ["oi", "olá", "bom dia", "boa tarde", "boa noite"]):
-        return "Olá! Bem-vindo à Empresas Web! 👋\n\nSou seu assistente virtual e estou aqui para ajudá-lo. Como posso auxiliá-lo hoje?"
-    
-    elif any(help_word in message_lower for help_word in ["ajuda", "help", "serviços", "o que vocês fazem"]):
-        return """🏢 **Empresas Web - Seus serviços:**
+    """Generate AI response using Emergent LLM"""
+    try:
+        from emergentintegrations.llm.chat import LlmChat, UserMessage
+        import os
+        
+        # Get API key from environment
+        api_key = os.environ.get('EMERGENT_LLM_KEY')
+        if not api_key:
+            return "Olá! Sou o assistente virtual da Empresas Web. Como posso ajudá-lo hoje?"
+        
+        # Initialize chat with session per phone number
+        chat = LlmChat(
+            api_key=api_key,
+            session_id=f"whatsapp_{phone_number}",
+            system_message="""Você é o assistente virtual da Empresas Web, uma empresa de CRM e automação.
 
-🔹 Sistema CRM completo
-🔹 Integração WhatsApp Business
-🔹 Assistente virtual com IA
-🔹 Automação de atendimento
-🔹 Gestão de clientes e vendas
+Seu papel:
+- Atender clientes via WhatsApp de forma profissional e amigável
+- Fornecer informações sobre serviços CRM
+- Ajudar com transferências para departamentos
+- Responder em português brasileiro
 
-Digite "contato" para falar com nossa equipe!"""
-    
-    elif "contato" in message_lower:
-        return """📞 **Entre em contato conosco:**
+Serviços da Empresas Web:
+- Sistema CRM completo
+- Integração WhatsApp Business
+- Assistente virtual com IA
+- Automação de atendimento
+- Gestão de clientes e vendas
 
-✅ WhatsApp: Este chat
-✅ Email: contato@empresasweb.com
-✅ Horário: Segunda a Sexta, 8h às 18h
+Departamentos disponíveis:
+- Vendas: Para novos clientes e orçamentos
+- Suporte: Para problemas técnicos e dúvidas
+- Financeiro: Para questões de pagamento e cobrança
+- Gerencial: Para questões administrativas
 
-Nossa equipe responderá em breve! 😊"""
-    
-    else:
-        return f"Interessante! Recebi sua mensagem: '{message}'\n\nNosso assistente com IA está processando sua solicitação. Em breve você terá uma resposta personalizada! 🤖✨"
+Para transferir, use comandos como:
+- "Vou transferir você para o departamento de [DEPARTAMENTO]"
+
+Seja sempre cordial, útil e direto."""
+        ).with_model("openai", "gpt-4o-mini")
+        
+        # Create user message
+        user_message = UserMessage(text=message)
+        
+        # Get AI response
+        response = await chat.send_message(user_message)
+        
+        return response if response else "Desculpe, não consegui processar sua mensagem. Tente novamente."
+        
+    except Exception as e:
+        logging.error(f"Error generating AI response: {str(e)}")
+        return "Olá! Sou o assistente virtual da Empresas Web. Como posso ajudá-lo hoje?"
 
 @app.post("/api/whatsapp/send")
 async def send_whatsapp_message(phone_number: str, message: str):
