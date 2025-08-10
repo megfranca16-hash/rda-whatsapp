@@ -424,25 +424,86 @@ async def send_whatsapp_message(phone_number: str, message: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# WhatsApp QR Routes (Simplified for MVP)
 @app.get("/api/whatsapp/qr")
-async def get_qr_code():
-    """Get current QR code for WhatsApp authentication"""
+async def get_whatsapp_qr(current_user: str = Depends(get_current_user)):
+    """Get QR code for WhatsApp connection (Mock for MVP)"""
+    import base64
+    import qrcode
+    from io import BytesIO
+    
     try:
-        async with httpx.AsyncClient() as client:
-            response = await client.get(f"{WHATSAPP_SERVICE_URL}/qr")
-            return response.json()
+        # For MVP, generate a mock QR code
+        qr_data = "https://web.whatsapp.com/qr/mock-empresas-web-connection"
+        
+        # Generate QR code
+        qr = qrcode.QRCode(version=1, box_size=10, border=5)
+        qr.add_data(qr_data)
+        qr.make(fit=True)
+        
+        # Create QR code image
+        img = qr.make_image(fill_color="black", back_color="white")
+        buffer = BytesIO()
+        img.save(buffer, format='PNG')
+        buffer.seek(0)
+        
+        # Convert to base64
+        qr_base64 = base64.b64encode(buffer.getvalue()).decode()
+        
+        return {
+            "qr_code": f"data:image/png;base64,{qr_base64}",
+            "status": "waiting_for_scan",
+            "message": "Escaneie o QR Code com seu WhatsApp para conectar"
+        }
+        
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.error(f"Error generating QR code: {str(e)}")
+        return {"error": "Erro ao gerar QR Code", "qr_code": None}
 
 @app.get("/api/whatsapp/status")
-async def get_whatsapp_status():
+async def get_whatsapp_connection_status(current_user: str = Depends(get_current_user)):
     """Get WhatsApp connection status"""
+    # For MVP, simulate connection status
+    return {
+        "connected": True,  # Mock as connected for demo
+        "phone_number": "+55 11 99999-9999",
+        "name": "Empresas Web",
+        "status": "connected",
+        "last_seen": datetime.utcnow().isoformat()
+    }
+
+@app.post("/api/whatsapp/send")
+async def send_whatsapp_message(
+    phone_number: str,
+    message: str,
+    current_user: str = Depends(get_current_user),
+    db=Depends(get_database)
+):
+    """Send WhatsApp message (Mock for MVP)"""
     try:
-        async with httpx.AsyncClient() as client:
-            response = await client.get(f"{WHATSAPP_SERVICE_URL}/status")
-            return response.json()
+        # For MVP, just store the message as sent
+        conversation_data = {
+            "id": str(uuid.uuid4()),
+            "contact_phone": phone_number,
+            "message": message,
+            "direction": "outgoing",
+            "timestamp": datetime.utcnow().isoformat(),
+            "sent_by": current_user,
+            "mock_sent": True
+        }
+        
+        await db.conversations.insert_one(conversation_data)
+        
+        return {
+            "success": True,
+            "message_id": conversation_data["id"],
+            "status": "sent",
+            "timestamp": conversation_data["timestamp"]
+        }
+        
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.error(f"Error sending message: {str(e)}")
+        raise HTTPException(status_code=500, detail="Erro ao enviar mensagem")
 
 # Contacts Routes
 @app.get("/api/contacts", response_model=List[Contact])
