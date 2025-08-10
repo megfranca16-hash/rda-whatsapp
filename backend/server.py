@@ -388,7 +388,7 @@ async def check_and_handle_department_transfer(ai_response: str, phone_number: s
         logging.error(f"Error handling department transfer: {str(e)}")
 
 async def generate_ai_response(message: str, phone_number: str, department_id: Optional[str] = None) -> str:
-    """Generate AI response using Emergent LLM with department signature"""
+    """Generate AI response using Emergent LLM with specialized department context"""
     try:
         from emergentintegrations.llm.chat import LlmChat, UserMessage
         import os
@@ -402,16 +402,56 @@ async def generate_ai_response(message: str, phone_number: str, department_id: O
             base_response = "Olá! Sou o assistente virtual da Empresas Web. Como posso ajudá-lo hoje?"
             return await add_department_signature(base_response, department_id)
         
-        # Get department info for signature
-        department_info = ""
+        # Get department info for specialized context
+        department_context = ""
+        department_instructions = ""
         if department_id:
             try:
                 db = database
                 department = await db.departments.find_one({"id": department_id})
                 if department:
-                    department_info = f"\n\nDepartamento: {department['name']}"
+                    department_context = f"Departamento: {department['name']} - {department['description']}"
+                    department_instructions = department.get('manual_instructions', '')
             except:
                 pass
+        
+        # Build specialized system message
+        system_message = f"""Você é o assistente de IA especializado da Empresas Web, uma empresa líder em serviços contábeis e empresariais.
+
+{department_context}
+
+INSTRUÇÕES MANUAIS DO DEPARTAMENTO:
+{department_instructions}
+
+IMPORTANTE: Priorize sempre as instruções manuais acima em caso de conflito com outras orientações.
+
+Serviços da Empresas Web:
+- Abertura de empresa e MEI
+- Contabilidade completa
+- RH e folha de pagamento  
+- Tributos e impostos
+- Emissão de notas fiscais
+- Consultoria empresarial
+- Gestão financeira
+
+Departamentos disponíveis:
+- Abertura de Empresa: Constituição, MEI, CNPJ, documentação
+- Dúvidas Contábeis: Balanços, demonstrações, escrituração
+- RH e Folha: Admissões, cálculos trabalhistas, eSocial
+- Tributos e Impostos: Simples Nacional, planejamento tributário
+- Emissão de Notas Fiscais: NFe, NFSe, certificados digitais
+- Outros Assuntos: Consultoria geral empresarial
+- Financeiro: Contas, fluxo de caixa, cobrança
+
+Seu papel:
+- Responder de forma especializada conforme seu departamento
+- Transferir para departamento correto quando necessário: "Vou transferir você para [DEPARTAMENTO]"
+- Nunca inventar links ou informações
+- Responder sempre em português brasileiro
+- Ser cordial, profissional e direto
+- Manter respostas concisas e práticas
+
+NÃO inclua assinatura na resposta - ela será adicionada automaticamente."""
         
         # Try different models if one fails
         models_to_try = [
@@ -422,43 +462,19 @@ async def generate_ai_response(message: str, phone_number: str, department_id: O
         
         for provider, model in models_to_try:
             try:
-                # Initialize chat with session per phone number
+                # Initialize chat with session per phone number and department
+                session_id = f"whatsapp_{phone_number}_{department_id or 'general'}"
                 chat = LlmChat(
                     api_key=api_key,
-                    session_id=f"whatsapp_{phone_number}",
-                    system_message=f"""Você é o assistente virtual da Empresas Web, uma empresa líder em CRM e automação.{department_info}
-
-Seu papel:
-- Atender clientes via WhatsApp de forma profissional e amigável
-- Fornecer informações sobre serviços CRM
-- Ajudar com transferências para departamentos
-- Responder em português brasileiro
-
-Serviços da Empresas Web:
-- Sistema CRM completo
-- Integração WhatsApp Business
-- Assistente virtual com IA
-- Automação de atendimento
-- Gestão de clientes e vendas
-
-Departamentos disponíveis:
-- Vendas: Para novos clientes e orçamentos
-- Suporte: Para problemas técnicos e dúvidas
-- Financeiro: Para questões de pagamento e cobrança
-- Gerencial: Para questões administrativas
-
-Para transferir, use comandos como:
-- "Vou transferir você para o departamento de [DEPARTAMENTO]"
-
-Seja sempre cordial, útil e direto. Mantenha respostas concisas.
-NÃO inclua assinatura na resposta - ela será adicionada automaticamente."""
+                    session_id=session_id,
+                    system_message=system_message
                 ).with_model(provider, model)
                 
                 # Create user message
                 user_message = UserMessage(text=message)
                 
                 # Get AI response
-                logging.info(f"Sending message to AI using {provider}/{model}: {message}")
+                logging.info(f"Sending message to AI using {provider}/{model} for dept {department_id}: {message}")
                 response = await chat.send_message(user_message)
                 logging.info(f"AI Response received from {provider}/{model}: {response}")
                 
@@ -470,8 +486,27 @@ NÃO inclua assinatura na resposta - ela será adicionada automaticamente."""
                 logging.warning(f"Failed with {provider}/{model}: {str(model_error)}")
                 continue
         
-        # If all models fail, return fallback with signature
-        base_response = "Olá! Sou o assistente virtual da Empresas Web. Como posso ajudá-lo hoje? 🤖\n\nEm que posso auxiliá-lo?"
+        # If all models fail, return specialized fallback
+        fallback_responses = {
+            "Abertura de Empresa": "Olá! Sou especialista em abertura de empresas. Posso ajudar com MEI, CNPJ e toda documentação necessária!",
+            "Dúvidas Contábeis": "Olá! Sou especialista em contabilidade. Posso ajudar com balanços, demonstrações e escrituração contábil!",
+            "RH e Folha": "Olá! Sou especialista em RH e folha de pagamento. Posso ajudar com admissões, cálculos trabalhistas e eSocial!",
+            "Tributos e Impostos": "Olá! Sou especialista em tributos. Posso ajudar com Simples Nacional e planejamento tributário!",
+            "Emissão de Notas Fiscais": "Olá! Sou especialista em notas fiscais. Posso ajudar com NFe, NFSe e certificados digitais!",
+            "Outros Assuntos": "Olá! Sou consultor empresarial. Posso ajudar com orientações gerais e estratégicas!",
+            "Financeiro": "Olá! Sou especialista financeiro. Posso ajudar com contas, fluxo de caixa e cobrança!"
+        }
+        
+        # Get department name for fallback
+        dept_name = None
+        if department_id:
+            try:
+                department = await database.departments.find_one({"id": department_id})
+                dept_name = department.get('name') if department else None
+            except:
+                pass
+        
+        base_response = fallback_responses.get(dept_name, "Olá! Sou o assistente virtual da Empresas Web. Como posso ajudá-lo hoje? 🤖")
         return await add_department_signature(base_response, department_id)
         
     except Exception as e:
