@@ -310,7 +310,7 @@ async def check_and_handle_department_transfer(ai_response: str, phone_number: s
                         "name": detected_department.title(),
                         "description": f"Departamento de {detected_department}",
                         "active": True,
-                        "created_at": datetime.utcnow()
+                        "created_at": datetime.utcnow().isoformat()
                     }
                     await db.departments.insert_one(department_data)
                     department = department_data
@@ -322,7 +322,7 @@ async def check_and_handle_department_transfer(ai_response: str, phone_number: s
                     "to_department": department["id"],
                     "message": ai_response,
                     "status": "pending",
-                    "created_at": datetime.utcnow(),
+                    "created_at": datetime.utcnow().isoformat(),
                     "handled_by": None,
                     "notes": f"Transfer automático detectado pela IA para {detected_department}"
                 }
