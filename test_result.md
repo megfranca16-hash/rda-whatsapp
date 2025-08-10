@@ -319,7 +319,6 @@ metadata:
 test_plan:
   current_focus:
     - "Gestão IA functionality"
-    - "Department management improvements"
     - "Menu principal enhancements"
   stuck_tasks: []
   test_all: false
@@ -336,3 +335,7 @@ agent_communication:
     - message: "✅ FASE 1 COMPLETED SUCCESSFULLY! All goals achieved: 1) User registration endpoint fully functional in backend 2) Authentication modal integration working with real API calls 3) Demo page routing implemented and working 4) Complete authentication flow tested end-to-end 5) User can register and immediately access full dashboard. Ready for Phase 2 implementation."
     - agent: "testing"
     - message: "✅ USER REGISTRATION TESTING COMPLETED - All 24 tests passed! New registration functionality fully working: 1) /api/auth/register endpoint accepts username, password, email, name 2) Creates users with UUID and stores in database 3) Returns JWT token for immediate login 4) Validates duplicate username/email correctly 5) Enhanced /api/auth/login works with both admin credentials and database users 6) New users can login successfully after registration 7) All existing functionality still works perfectly. Registration system is production-ready!"
+    - agent: "main"
+    - message: "Enhanced Department model in server.py: Added whatsapp_number field with uniqueness validation, Added integration_mode field ('qr' or 'official'), Updated CRUD operations to handle new fields. Enhanced department creation endpoint: Validates WhatsApp number uniqueness, Supports integration mode selection, Proper error handling for duplicate numbers. Enhanced department update endpoint: Supports updating name, description, signature, WhatsApp number, integration mode, Validates WhatsApp number uniqueness on updates, Proper validation and error handling."
+    - agent: "testing"
+    - message: "✅ ENHANCED DEPARTMENT MANAGEMENT TESTING COMPLETED - All 31 tests passed! New department functionality fully working: 1) Department creation with WhatsApp number and integration mode working correctly 2) WhatsApp number uniqueness validation working on both creation and updates (returns 400 error for duplicates) 3) Integration mode validation working for both 'qr' and 'official' modes 4) Department updates with new fields working properly 5) All existing department functionality still works perfectly 6) Proper error handling implemented 7) CRUD operations enhanced successfully. Enhanced department management features are production-ready!"
