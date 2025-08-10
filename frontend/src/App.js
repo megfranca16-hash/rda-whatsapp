@@ -393,56 +393,64 @@ function App() {
     setLoading(false);
   };
 
+  // Show landing page if not authenticated
   if (!isAuthenticated) {
+    return <LandingPage onLoginClick={() => setCurrentTab('login')} />;
+  }
+
+  // Show login screen
+  if (currentTab === 'login') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 flex items-center justify-center p-4">
         <Card className="w-full max-w-md bg-white/10 backdrop-blur-lg border-white/20 shadow-2xl">
           <CardHeader className="text-center space-y-4">
-            <div className="flex justify-center mb-4">
-              <div className="relative">
-                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <MessageCircle className="w-8 h-8 text-white" />
-                </div>
-                <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                  <Crown className="w-3 h-3 text-white" />
-                </div>
-              </div>
+            <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg">
+              <MessageCircle className="w-8 h-8 text-white" />
             </div>
             <div>
-              <CardTitle className="text-2xl font-bold text-white mb-2">Empresas Web</CardTitle>
-              <p className="text-blue-200">Sistema CRM com WhatsApp e IA</p>
+              <CardTitle className="text-2xl text-white mb-2">Empresas Web</CardTitle>
+              <p className="text-slate-300">CRM + WhatsApp + IA</p>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-6 p-6">
             <form onSubmit={handleLogin} className="space-y-4">
-              <div>
+              <div className="space-y-2">
                 <Input
                   type="text"
-                  placeholder="Usuário"
+                  placeholder="Username"
                   value={loginData.username}
                   onChange={(e) => setLoginData({...loginData, username: e.target.value})}
-                  className="bg-white/10 border-white/20 text-white placeholder:text-blue-200"
+                  className="bg-white/10 border-white/20 text-white placeholder:text-slate-400 focus:bg-white/20"
+                  required
                 />
               </div>
-              <div>
+              <div className="space-y-2">
                 <Input
                   type="password"
-                  placeholder="Senha"
+                  placeholder="Password"
                   value={loginData.password}
                   onChange={(e) => setLoginData({...loginData, password: e.target.value})}
-                  className="bg-white/10 border-white/20 text-white placeholder:text-blue-200"
+                  className="bg-white/10 border-white/20 text-white placeholder:text-slate-400 focus:bg-white/20"
+                  required
                 />
               </div>
               <Button 
                 type="submit" 
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg"
                 disabled={loading}
               >
-                {loading ? 'Entrando...' : 'Entrar'}
+                {loading ? 'Entrando...' : 'Entrar no Sistema'}
               </Button>
             </form>
-            <div className="mt-6 text-center">
-              <p className="text-xs text-blue-200">Usuário padrão: admin / Senha: admin123</p>
+            
+            <div className="text-center">
+              <Button 
+                variant="ghost" 
+                onClick={() => setCurrentTab('dashboard')}
+                className="text-slate-300 hover:text-white hover:bg-white/10"
+              >
+                ← Voltar
+              </Button>
             </div>
           </CardContent>
         </Card>
