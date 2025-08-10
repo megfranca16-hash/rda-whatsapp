@@ -351,9 +351,9 @@ async def generate_ai_response(message: str, phone_number: str) -> str:
         
         # Try different models if one fails
         models_to_try = [
+            ("gemini", "gemini-1.5-flash"),
             ("openai", "gpt-4o-mini"),
-            ("openai", "gpt-3.5-turbo"),
-            ("gemini", "gemini-1.5-flash")
+            ("openai", "gpt-3.5-turbo")
         ]
         
         for provider, model in models_to_try:
