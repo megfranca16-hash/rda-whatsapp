@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { 
   MessageCircle, 
   Bot, 
@@ -9,10 +11,67 @@ import {
   Smartphone,
   Star,
   Users,
-  BarChart3
+  BarChart3,
+  X,
+  Mail,
+  Lock,
+  User
 } from 'lucide-react';
 
-const LandingPage = ({ onLoginClick }) => {
+const LandingPage = ({ onLoginSuccess }) => {
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authMode, setAuthMode] = useState('login'); // 'login' or 'register'
+  const [authData, setAuthData] = useState({
+    email: '',
+    password: '',
+    confirmPassword: '',
+    name: ''
+  });
+  const [loading, setLoading] = useState(false);
+
+  const handleAuth = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      if (authMode === 'register') {
+        if (authData.password !== authData.confirmPassword) {
+          alert('Senhas não coincidem!');
+          setLoading(false);
+          return;
+        }
+        // Mock registration - in real app would call API
+        console.log('Registering:', authData);
+      }
+
+      // Mock login - in real app would call API
+      if (authData.email && authData.password) {
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Store mock token
+        localStorage.setItem('token', 'mock-jwt-token');
+        localStorage.setItem('user', JSON.stringify({
+          id: '1',
+          email: authData.email,
+          name: authData.name || authData.email.split('@')[0]
+        }));
+        
+        onLoginSuccess();
+      } else {
+        alert('Preencha todos os campos!');
+      }
+    } catch (error) {
+      alert('Erro ao autenticar. Tente novamente.');
+    }
+    
+    setLoading(false);
+  };
+
+  const handleDemo = () => {
+    window.location.href = '/demo';
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-700 to-green-600 relative overflow-hidden">
       {/* Background Effects */}
@@ -31,14 +90,8 @@ const LandingPage = ({ onLoginClick }) => {
             <span className="text-2xl font-bold text-white">Empresas Web</span>
           </div>
           
-          <div className="hidden md:flex items-center space-x-8 text-white/90">
-            <a href="#recursos" className="hover:text-white transition-colors">Recursos</a>
-            <a href="#sobre" className="hover:text-white transition-colors">Sobre</a>
-            <a href="#contato" className="hover:text-white transition-colors">Contato</a>
-          </div>
-          
           <Button 
-            onClick={onLoginClick}
+            onClick={() => setShowAuthModal(true)}
             className="bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 transition-all duration-300 px-6 py-2 rounded-full"
           >
             Entrar no Sistema
@@ -75,7 +128,7 @@ const LandingPage = ({ onLoginClick }) => {
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button 
-                  onClick={onLoginClick}
+                  onClick={() => setShowAuthModal(true)}
                   className="bg-white text-slate-900 hover:bg-white/90 px-8 py-4 rounded-full text-lg font-semibold shadow-2xl hover:shadow-white/20 transition-all duration-300 flex items-center justify-center space-x-2"
                 >
                   <span>Começar Agora</span>
@@ -83,6 +136,7 @@ const LandingPage = ({ onLoginClick }) => {
                 </Button>
                 
                 <Button 
+                  onClick={handleDemo}
                   variant="outline"
                   className="border-2 border-white/30 text-white hover:bg-white/10 px-8 py-4 rounded-full text-lg font-semibold backdrop-blur-sm"
                 >
@@ -185,6 +239,108 @@ const LandingPage = ({ onLoginClick }) => {
           </div>
         </div>
       </div>
+
+      {/* Auth Modal */}
+      {showAuthModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <Card className="w-full max-w-md bg-white/95 backdrop-blur-xl border border-white/30 shadow-2xl">
+            <CardHeader className="text-center relative">
+              <Button
+                variant="ghost"
+                className="absolute right-0 top-0 p-2"
+                onClick={() => setShowAuthModal(false)}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+              
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <MessageCircle className="w-8 h-8 text-white" />
+              </div>
+              
+              <CardTitle className="text-2xl text-slate-900 mb-2">
+                {authMode === 'login' ? 'Entrar no Sistema' : 'Criar Conta'}
+              </CardTitle>
+              <p className="text-slate-600">
+                {authMode === 'login' ? 'Acesse sua conta' : 'Crie sua conta gratuita'}
+              </p>
+            </CardHeader>
+            
+            <CardContent className="space-y-6">
+              <form onSubmit={handleAuth} className="space-y-4">
+                {authMode === 'register' && (
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <Input
+                      type="text"
+                      placeholder="Seu nome"
+                      value={authData.name}
+                      onChange={(e) => setAuthData({...authData, name: e.target.value})}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                )}
+                
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <Input
+                    type="email"
+                    placeholder="Seu email"
+                    value={authData.email}
+                    onChange={(e) => setAuthData({...authData, email: e.target.value})}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+                
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <Input
+                    type="password"
+                    placeholder="Sua senha"
+                    value={authData.password}
+                    onChange={(e) => setAuthData({...authData, password: e.target.value})}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+                
+                {authMode === 'register' && (
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <Input
+                      type="password"
+                      placeholder="Confirme sua senha"
+                      value={authData.confirmPassword}
+                      onChange={(e) => setAuthData({...authData, confirmPassword: e.target.value})}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                )}
+                
+                <Button 
+                  type="submit" 
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                  disabled={loading}
+                >
+                  {loading ? 'Processando...' : (authMode === 'login' ? 'Entrar' : 'Criar Conta')}
+                </Button>
+              </form>
+              
+              <div className="text-center">
+                <Button 
+                  variant="ghost" 
+                  onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}
+                  className="text-slate-600 hover:text-slate-900"
+                >
+                  {authMode === 'login' ? 'Não tem conta? Cadastre-se' : 'Já tem conta? Faça login'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };
