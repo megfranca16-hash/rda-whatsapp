@@ -835,11 +835,21 @@ async def create_department(
     current_user: str = Depends(get_current_user),
     db=Depends(get_database)
 ):
+    # Check if WhatsApp number is unique (if provided)
+    if department.whatsapp_number:
+        existing_dept = await db.departments.find_one({"whatsapp_number": department.whatsapp_number})
+        if existing_dept:
+            raise HTTPException(status_code=400, detail="WhatsApp number already in use")
+
     department_data = {
         "id": str(uuid.uuid4()),
         "name": department.name,
         "description": department.description,
         "signature": department.signature,
+        "avatar_url": department.avatar_url,
+        "manual_instructions": department.manual_instructions,
+        "whatsapp_number": department.whatsapp_number,
+        "integration_mode": department.integration_mode,
         "active": True,
         "created_at": datetime.utcnow().isoformat()
     }
