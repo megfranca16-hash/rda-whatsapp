@@ -323,7 +323,7 @@ class BackendTester:
             # Test 3: Update department with new WhatsApp number and integration mode
             if created_dept_id:
                 new_whatsapp = f"+5511888{unique_suffix[-6:]}"
-                update_data = {
+                update_params = {
                     "name": f"Departamento Atualizado {unique_suffix}",
                     "description": "Departamento com dados atualizados",
                     "whatsapp_number": new_whatsapp,
@@ -331,7 +331,7 @@ class BackendTester:
                     "signature": "---\n📱 Departamento Atualizado\n📧 atualizado@empresasweb.com\n📞 (11) 99999-5678\n\nDepartamento atualizado!"
                 }
                 
-                async with self.session.put(f"{API_BASE}/departments/{created_dept_id}", headers=headers, json=update_data) as response:
+                async with self.session.put(f"{API_BASE}/departments/{created_dept_id}", headers=headers, params=update_params) as response:
                     if response.status == 200:
                         update_result = await response.json()
                         if update_result.get("success"):
@@ -345,10 +345,10 @@ class BackendTester:
                                     if (updated_dept and 
                                         updated_dept.get("whatsapp_number") == new_whatsapp and
                                         updated_dept.get("integration_mode") == "official" and
-                                        updated_dept.get("name") == update_data["name"]):
+                                        updated_dept.get("name") == update_params["name"]):
                                         self.log_result("Enhanced Department Update Verification", True, "Department update verified successfully")
                                     else:
-                                        self.log_result("Enhanced Department Update Verification", False, "Department update not reflected correctly")
+                                        self.log_result("Enhanced Department Update Verification", False, f"Department update not reflected correctly. Expected WhatsApp: {new_whatsapp}, Got: {updated_dept.get('whatsapp_number') if updated_dept else 'None'}")
                                         return False
                                 else:
                                     self.log_result("Enhanced Department Update Verification", False, "Failed to verify department update")
