@@ -47,6 +47,7 @@ async def initialize_default_departments(db):
                     "id": str(uuid.uuid4()),
                     "name": "Vendas",
                     "description": "Departamento de vendas e novos clientes",
+                    "signature": "---\n💼 Equipe de Vendas - Empresas Web\n📧 vendas@empresasweb.com\n📞 (11) 99999-1111\n\nEstamos aqui para ajudá-lo a escolher a melhor solução CRM!",
                     "active": True,
                     "created_at": datetime.utcnow().isoformat()
                 },
@@ -54,6 +55,7 @@ async def initialize_default_departments(db):
                     "id": str(uuid.uuid4()),
                     "name": "Suporte",
                     "description": "Departamento de suporte técnico",
+                    "signature": "---\n🛠️ Equipe de Suporte - Empresas Web\n📧 suporte@empresasweb.com\n📞 (11) 99999-2222\n\nSua satisfação é nossa prioridade!",
                     "active": True,
                     "created_at": datetime.utcnow().isoformat()
                 },
@@ -61,6 +63,7 @@ async def initialize_default_departments(db):
                     "id": str(uuid.uuid4()),
                     "name": "Financeiro",
                     "description": "Departamento financeiro e cobrança",
+                    "signature": "---\n💰 Equipe Financeira - Empresas Web\n📧 financeiro@empresasweb.com\n📞 (11) 99999-3333\n\nFacilitamos suas questões financeiras!",
                     "active": True,
                     "created_at": datetime.utcnow().isoformat()
                 },
@@ -68,13 +71,14 @@ async def initialize_default_departments(db):
                     "id": str(uuid.uuid4()),
                     "name": "Gerencial",
                     "description": "Departamento gerencial e administrativo",
+                    "signature": "---\n👔 Equipe Gerencial - Empresas Web\n📧 gerencia@empresasweb.com\n📞 (11) 99999-4444\n\nGestão estratégica para seu sucesso!",
                     "active": True,
                     "created_at": datetime.utcnow().isoformat()
                 }
             ]
             
             await departments_collection.insert_many(default_departments)
-            logging.info("Default departments initialized")
+            logging.info("Default departments with signatures initialized")
             
     except Exception as e:
         logging.error(f"Error initializing default departments: {str(e)}")
