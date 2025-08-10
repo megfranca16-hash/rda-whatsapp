@@ -293,28 +293,32 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+    <div className="min-h-screen bg-slate-50">
+      {/* Modern Header */}
+      <header className="bg-white border-b border-slate-200 shadow-sm">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
                 <MessageCircle className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Empresas Web</h1>
-                <p className="text-sm text-gray-500">CRM + WhatsApp + IA</p>
+                <h1 className="text-xl font-bold text-slate-900">Empresas Web</h1>
+                <p className="text-sm text-slate-500">CRM + WhatsApp + IA</p>
               </div>
             </div>
             
             <div className="flex items-center space-x-4">
-              <Badge variant={whatsappStatus === 'connected' ? 'default' : 'destructive'} className="flex items-center space-x-1">
-                {whatsappStatus === 'connected' ? <CheckCircle className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
+              <Badge variant={whatsappStatus === 'connected' ? 'default' : 'destructive'} 
+                     className="flex items-center space-x-1 px-3 py-1">
+                {whatsappStatus === 'connected' ? 
+                  <CheckCircle className="w-3 h-3" /> : 
+                  <AlertCircle className="w-3 h-3" />
+                }
                 <span>WhatsApp {whatsappStatus === 'connected' ? 'Conectado' : 'Desconectado'}</span>
               </Badge>
               
-              <Button variant="outline" onClick={handleLogout}>
+              <Button variant="outline" onClick={handleLogout} className="text-slate-600 hover:text-slate-900">
                 Sair
               </Button>
             </div>
@@ -323,58 +327,86 @@ function App() {
       </header>
 
       <div className="flex h-[calc(100vh-80px)]">
-        {/* Sidebar */}
-        <aside className="w-64 bg-white shadow-sm border-r">
-          <nav className="p-4 space-y-2">
+        {/* Modern Sidebar */}
+        <aside className="w-64 bg-white border-r border-slate-200 shadow-sm">
+          <nav className="p-4 space-y-1">
             <Button
               variant={currentTab === 'dashboard' ? 'default' : 'ghost'}
-              className="w-full justify-start"
+              className={`w-full justify-start transition-all duration-200 ${
+                currentTab === 'dashboard' 
+                  ? 'bg-blue-600 text-white shadow-md hover:bg-blue-700' 
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+              }`}
               onClick={() => setCurrentTab('dashboard')}
             >
-              <BarChart3 className="w-4 h-4 mr-2" />
+              <BarChart3 className="w-4 h-4 mr-3" />
               Dashboard
             </Button>
             
             <Button
               variant={currentTab === 'whatsapp' ? 'default' : 'ghost'}
-              className="w-full justify-start"
+              className={`w-full justify-start transition-all duration-200 ${
+                currentTab === 'whatsapp' 
+                  ? 'bg-green-600 text-white shadow-md hover:bg-green-700' 
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+              }`}
               onClick={() => setCurrentTab('whatsapp')}
             >
-              <MessageCircle className="w-4 h-4 mr-2" />
+              <MessageCircle className="w-4 h-4 mr-3" />
               WhatsApp
             </Button>
             
             <Button
               variant={currentTab === 'contacts' ? 'default' : 'ghost'}
-              className="w-full justify-start"
+              className={`w-full justify-start transition-all duration-200 ${
+                currentTab === 'contacts' 
+                  ? 'bg-purple-600 text-white shadow-md hover:bg-purple-700' 
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+              }`}
               onClick={() => setCurrentTab('contacts')}
             >
-              <Users className="w-4 h-4 mr-2" />
+              <Users className="w-4 h-4 mr-3" />
               Contatos
             </Button>
             
             <Button
               variant={currentTab === 'ai' ? 'default' : 'ghost'}
-              className="w-full justify-start"
+              className={`w-full justify-start transition-all duration-200 ${
+                currentTab === 'ai' 
+                  ? 'bg-orange-600 text-white shadow-md hover:bg-orange-700' 
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+              }`}
               onClick={() => setCurrentTab('ai')}
             >
-              <Bot className="w-4 h-4 mr-2" />
+              <Bot className="w-4 h-4 mr-3" />
               IA Assistant
             </Button>
             
             <Button
               variant={currentTab === 'departments' ? 'default' : 'ghost'}
-              className="w-full justify-start"
+              className={`w-full justify-start transition-all duration-200 ${
+                currentTab === 'departments' 
+                  ? 'bg-indigo-600 text-white shadow-md hover:bg-indigo-700' 
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+              }`}
               onClick={() => setCurrentTab('departments')}
             >
-              <Building className="w-4 h-4 mr-2" />
+              <Building className="w-4 h-4 mr-3" />
               Departamentos
             </Button>
           </nav>
+          
+          {/* Sidebar Footer */}
+          <div className="absolute bottom-4 left-4 right-4">
+            <div className="bg-slate-50 rounded-lg p-3">
+              <div className="text-xs text-slate-500 mb-1">Empresas Web CRM</div>
+              <div className="text-xs text-slate-400">v1.0 - Sistema Completo</div>
+            </div>
+          </div>
         </aside>
 
-        {/* Main Content */}
-        <main className="flex-1 overflow-hidden">
+        {/* Modern Main Content */}
+        <main className="flex-1 overflow-hidden bg-slate-50">
           {currentTab === 'dashboard' && (
             <div className="p-6 space-y-6">
               <div>
