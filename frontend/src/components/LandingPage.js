@@ -311,6 +311,13 @@ const LandingPage = ({ onLoginSuccess }) => {
             </CardHeader>
             
             <CardContent className="space-y-6">
+              {authMode === 'login' && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
+                  <p className="text-sm text-blue-800 font-medium mb-1">Credenciais de Demonstração:</p>
+                  <p className="text-xs text-blue-600">Email: <span className="font-mono">admin@admin.com</span></p>
+                  <p className="text-xs text-blue-600">Senha: <span className="font-mono">admin123</span></p>
+                </div>
+              )}
               <form onSubmit={handleAuth} className="space-y-4">
                 {authMode === 'register' && (
                   <div className="relative">
