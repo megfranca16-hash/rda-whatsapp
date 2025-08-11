@@ -736,7 +736,7 @@ async def list_scheduled_messages(db=Depends(get_database), user=Depends(get_cur
     """List all scheduled messages for the user"""
     try:
         messages_collection = db.scheduled_messages
-        cursor = messages_collection.find({"created_by": user})
+        cursor = messages_collection.find({"created_by": user["id"]})
         messages = await cursor.to_list(length=100)
         
         return [mongo_to_dict(message) for message in messages]
