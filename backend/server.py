@@ -162,6 +162,7 @@ class ContactCreate(BaseModel):
     phone_number: str
     email: Optional[str] = None
     company: Optional[str] = None
+    notes: Optional[str] = None
 
 class Contact(BaseModel):
     id: str
