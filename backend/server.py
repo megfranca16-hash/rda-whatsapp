@@ -12,6 +12,9 @@ import motor.motor_asyncio
 from contextlib import asynccontextmanager
 import logging
 from dotenv import load_dotenv
+import base64
+import qrcode
+from io import BytesIO
 
 # Load environment variables
 load_dotenv()
