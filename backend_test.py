@@ -901,6 +901,8 @@ class BackendTester:
             await self.test_whatsapp_send_message()
             await self.test_dashboard_stats()
             await self.test_contacts_system()
+            await self.test_appointments_system()
+            await self.test_scheduled_messages_system()
             
         finally:
             await self.teardown()
