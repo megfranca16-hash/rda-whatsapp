@@ -2151,7 +2151,7 @@ function App() {
             </div>
           )}
 
-          {currentTab === 'contacts' && (console.log('Rendering contacts section, showAddContact:', showAddContact) || true) && (
+          {currentTab === 'contacts' && (
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <div>
