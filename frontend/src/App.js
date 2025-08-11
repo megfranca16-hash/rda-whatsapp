@@ -2159,14 +2159,8 @@ function App() {
                   <p className="text-gray-600">Gerencie seus contatos do WhatsApp</p>
                 </div>
                 <Button onClick={() => {
-                  console.log('Adicionar Contato button clicked!');
-                  console.log('showAddContact before:', showAddContact);
+                  console.log('Opening Add Contact Modal');
                   setShowAddContact(true);
-                  console.log('setShowAddContact(true) called');
-                  // Force re-render
-                  setTimeout(() => {
-                    console.log('showAddContact after timeout:', showAddContact);
-                  }, 100);
                 }}>
                   <Users className="w-4 h-4 mr-2" />
                   Adicionar Contato
