@@ -634,8 +634,8 @@ async def add_department_signature(message: str, department_id: Optional[str] = 
 
 
 # WhatsApp QR Routes (Simplified for MVP)
-@app.get("/api/whatsapp/qr")
-async def get_whatsapp_qr(current_user: str = Depends(get_current_user)):
+@app.get("/api/whatsapp/qrcode")
+async def get_whatsapp_qr():
     """Get QR code for WhatsApp connection (Mock for MVP)"""
     import base64
     import qrcode
