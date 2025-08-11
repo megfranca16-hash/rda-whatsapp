@@ -415,6 +415,138 @@ function App() {
     setCreatingDepartment(false);
   };
 
+  const createContact = async () => {
+    if (!newContact.name.trim() || !newContact.phone.trim()) {
+      alert('Nome e telefone são obrigatórios');
+      return;
+    }
+    
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE}/api/contacts`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: newContact.name,
+          phone: newContact.phone,
+          email: newContact.email,
+          company: newContact.company,
+          notes: newContact.notes
+        })
+      });
+      
+      if (response.ok) {
+        await fetchContacts();
+        setNewContact({
+          name: '',
+          phone: '',
+          email: '',
+          company: '',
+          notes: ''
+        });
+        setShowAddContact(false);
+        alert('Contato adicionado com sucesso!');
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Erro ao criar contato');
+      }
+    } catch (error) {
+      console.error('Error creating contact:', error);
+      alert('Erro ao criar contato');
+    }
+  };
+
+  const createAppointment = async () => {
+    if (!newAppointment.title.trim() || !newAppointment.date || !newAppointment.time) {
+      alert('Título, data e horário são obrigatórios');
+      return;
+    }
+    
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE}/api/appointments`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          title: newAppointment.title,
+          description: newAppointment.description,
+          scheduled_date: `${newAppointment.date}T${newAppointment.time}:00`,
+          client_name: newAppointment.client,
+          appointment_type: newAppointment.type
+        })
+      });
+      
+      if (response.ok) {
+        setNewAppointment({
+          title: '',
+          description: '',
+          date: '',
+          time: '',
+          client: '',
+          type: 'meeting'
+        });
+        setShowNewAppointment(false);
+        alert('Agendamento criado com sucesso!');
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Erro ao criar agendamento');
+      }
+    } catch (error) {
+      console.error('Error creating appointment:', error);
+      alert('Erro ao criar agendamento');
+    }
+  };
+
+  const createScheduledMessage = async () => {
+    if (!newScheduledMessage.title.trim() || !newScheduledMessage.message.trim() || !newScheduledMessage.schedule_date) {
+      alert('Título, mensagem e data são obrigatórios');
+      return;
+    }
+    
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE}/api/scheduled-messages`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          title: newScheduledMessage.title,
+          message: newScheduledMessage.message,
+          recipients: newScheduledMessage.recipients.split(',').map(r => r.trim()),
+          scheduled_date: `${newScheduledMessage.schedule_date}T${newScheduledMessage.schedule_time || '09:00'}:00`,
+          campaign_type: newScheduledMessage.campaign_type
+        })
+      });
+      
+      if (response.ok) {
+        setNewScheduledMessage({
+          title: '',
+          message: '',
+          recipients: '',
+          schedule_date: '',
+          schedule_time: '',
+          campaign_type: 'individual'
+        });
+        setShowNewMessage(false);
+        alert('Mensagem programada criada com sucesso!');
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Erro ao criar mensagem programada');
+      }
+    } catch (error) {
+      console.error('Error creating scheduled message:', error);
+      alert('Erro ao criar mensagem programada');
+    }
+  };
+
   const updateDepartmentInstructions = async (departmentId, instructions) => {
     try {
       const token = localStorage.getItem('token');
