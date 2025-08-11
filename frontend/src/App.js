@@ -1999,6 +1999,151 @@ function App() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* New Scheduled Message Modal */}
+              {showNewMessage && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                  <Card className="w-full max-w-3xl bg-white shadow-2xl max-h-[90vh] overflow-y-auto">
+                    <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b border-slate-200">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="flex items-center space-x-2">
+                          <Send className="w-5 h-5 text-purple-500" />
+                          <span>Nova Mensagem Programada</span>
+                        </CardTitle>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowNewMessage(false)}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-6 space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Título da Campanha *
+                          </label>
+                          <Input
+                            value={newScheduledMessage.title}
+                            onChange={(e) => setNewScheduledMessage({...newScheduledMessage, title: e.target.value})}
+                            placeholder="Nome da campanha"
+                            className="bg-slate-50 border-slate-200"
+                            required
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Tipo de Campanha
+                          </label>
+                          <select
+                            value={newScheduledMessage.campaign_type}
+                            onChange={(e) => setNewScheduledMessage({...newScheduledMessage, campaign_type: e.target.value})}
+                            className="w-full px-3 py-2 border border-slate-300 rounded-md bg-slate-50"
+                          >
+                            <option value="individual">Mensagem Individual</option>
+                            <option value="broadcast">Broadcast</option>
+                            <option value="follow-up">Follow-up</option>
+                            <option value="newsletter">Newsletter</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Mensagem *
+                        </label>
+                        <textarea
+                          value={newScheduledMessage.message}
+                          onChange={(e) => setNewScheduledMessage({...newScheduledMessage, message: e.target.value})}
+                          placeholder="Digite a mensagem que será enviada..."
+                          className="w-full h-32 px-3 py-2 border border-slate-300 rounded-md bg-slate-50 resize-none"
+                          required
+                        />
+                        <p className="text-xs text-slate-500 mt-1">
+                          Caracteres: {newScheduledMessage.message.length}/1000
+                        </p>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Destinatários (números separados por vírgula)
+                        </label>
+                        <textarea
+                          value={newScheduledMessage.recipients}
+                          onChange={(e) => setNewScheduledMessage({...newScheduledMessage, recipients: e.target.value})}
+                          placeholder="+5511999999999, +5511888888888, +5511777777777"
+                          className="w-full h-20 px-3 py-2 border border-slate-300 rounded-md bg-slate-50 resize-none"
+                        />
+                        <p className="text-xs text-slate-500 mt-1">
+                          Quantidade de números: {newScheduledMessage.recipients.split(',').filter(r => r.trim()).length}
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Data de Envio *
+                          </label>
+                          <Input
+                            type="date"
+                            value={newScheduledMessage.schedule_date}
+                            onChange={(e) => setNewScheduledMessage({...newScheduledMessage, schedule_date: e.target.value})}
+                            className="bg-slate-50 border-slate-200"
+                            required
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Horário de Envio
+                          </label>
+                          <Input
+                            type="time"
+                            value={newScheduledMessage.schedule_time}
+                            onChange={(e) => setNewScheduledMessage({...newScheduledMessage, schedule_time: e.target.value})}
+                            className="bg-slate-50 border-slate-200"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <div className="flex items-start space-x-3">
+                          <div className="w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span className="text-white text-xs font-bold">!</span>
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-yellow-800 mb-1">Informações Importantes</h4>
+                            <ul className="text-sm text-yellow-700 space-y-1">
+                              <li>• As mensagens serão enviadas automaticamente na data/hora programada</li>
+                              <li>• Certifique-se de que todos os números estão no formato correto</li>
+                              <li>• Respeite as políticas do WhatsApp para evitar bloqueios</li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end space-x-3 pt-4 border-t border-slate-200">
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowNewMessage(false)}
+                        >
+                          Cancelar
+                        </Button>
+                        <Button
+                          onClick={createScheduledMessage}
+                          className="bg-gradient-to-r from-purple-600 to-pink-600 text-white"
+                        >
+                          <Send className="w-4 h-4 mr-2" />
+                          Programar Mensagem
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
             </div>
           )}
 
