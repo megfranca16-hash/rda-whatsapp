@@ -254,8 +254,9 @@ async def root():
 
 @app.post("/api/auth/login")
 async def login(request: LoginRequest, db=Depends(get_database)):
-    # Check admin credentials first
-    if request.username == "admin" and request.password == "admin123":
+    # Check admin credentials first (accept both "admin" and email formats)
+    admin_usernames = ["admin", "admin@admin.com", "admin@empresasweb.com"]
+    if request.username in admin_usernames and request.password == "admin123":
         token = create_token("admin")
         return {
             "token": token,
