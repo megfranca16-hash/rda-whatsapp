@@ -267,6 +267,10 @@ def convert_mongo_document(doc):
         return result
     return doc
 
+def mongo_to_dict(doc):
+    """Alias for convert_mongo_document for compatibility"""
+    return convert_mongo_document(doc)
+
 def get_database():
     return database
 
