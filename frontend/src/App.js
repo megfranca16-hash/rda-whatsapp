@@ -105,6 +105,9 @@ function App() {
   });
   const [creatingDepartment, setCreatingDepartment] = useState(false);
   const [showAddContact, setShowAddContact] = useState(false);
+  
+  // Debug: Force show modal for testing
+  // console.log('showAddContact state:', showAddContact);
   const [showNewAppointment, setShowNewAppointment] = useState(false);
   const [showNewMessage, setShowNewMessage] = useState(false);
   const [newContact, setNewContact] = useState({
