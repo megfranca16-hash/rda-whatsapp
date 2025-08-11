@@ -162,7 +162,7 @@ class MessageResponse(BaseModel):
 
 class ContactCreate(BaseModel):
     name: str
-    phone_number: str
+    phone: str
     email: Optional[str] = None
     company: Optional[str] = None
     notes: Optional[str] = None
