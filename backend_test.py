@@ -612,7 +612,7 @@ class BackendTester:
         
         try:
             # Test QR code generation
-            async with self.session.get(f"{API_BASE}/whatsapp/qr", headers=headers) as response:
+            async with self.session.get(f"{API_BASE}/whatsapp/qrcode", headers=headers) as response:
                 if response.status == 200:
                     qr_data = await response.json()
                     if qr_data.get("qr_code") and qr_data["qr_code"].startswith("data:image/png;base64,"):
