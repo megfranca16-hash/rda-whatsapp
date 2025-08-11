@@ -72,38 +72,60 @@ class EmpresasWebCRM {
   }
 
   async loadConfig() {
-    return new Promise(async (resolve) => {
-      try {
-        // Primeiro tentar carregar do backend se autenticado
-        if (window.empresasWebAPI && window.empresasWebAPI.isConnected()) {
-          console.log('🔗 Carregando configuração do backend...');
-          
-          try {
-            const backendConfig = await window.empresasWebAPI.getExtensionConfig();
-            this.config = backendConfig;
-            this.activeCompany = backendConfig.companies[backendConfig.activeCompany];
-            console.log('✅ Configurações carregadas do backend:', this.activeCompany?.name || 'Nenhuma empresa ativa');
-            resolve();
-            return;
-          } catch (error) {
-            console.log('⚠️ Erro ao carregar do backend, usando configuração local:', error.message);
-          }
-        }
+    try {
+      // Primeiro tentar carregar do backend se autenticado
+      if (window.empresasWebAPI && window.empresasWebAPI.isConnected()) {
+        console.log('🔗 Carregando configuração do backend...');
         
-        // Fallback para configuração local
-        chrome.runtime.sendMessage({ action: 'getConfig' }, (response) => {
-          if (response && response.success) {
-            this.config = response.data;
-            this.activeCompany = this.config.companies[this.config.activeCompany];
-            console.log('✅ Configurações locais carregadas:', this.activeCompany?.name || 'Nenhuma empresa ativa');
-          }
-          resolve();
-        });
-      } catch (error) {
-        console.error('❌ Erro ao carregar configurações:', error);
-        resolve();
+        try {
+          const backendConfig = await window.empresasWebAPI.getExtensionConfig();
+          this.config = backendConfig;
+          this.activeCompany = backendConfig.companies[backendConfig.activeCompany];
+          console.log('✅ Configurações carregadas do backend:', this.activeCompany?.name || 'Nenhuma empresa ativa');
+          return;
+        } catch (error) {
+          console.log('⚠️ Erro ao carregar do backend, usando configuração local:', error.message);
+        }
       }
-    });
+      
+      // Fallback para configuração local via background script
+      if (typeof chrome !== 'undefined' && chrome.runtime) {
+        const response = await new Promise((resolve) => {
+          chrome.runtime.sendMessage({ action: 'getConfig' }, resolve);
+        });
+        
+        if (response && response.success) {
+          this.config = response.data;
+          this.activeCompany = this.config.companies[this.config.activeCompany];
+          console.log('✅ Configurações locais carregadas:', this.activeCompany?.name || 'Nenhuma empresa ativa');
+        }
+      } else {
+        // Configuração de fallback para desenvolvimento
+        this.config = {
+          companies: {},
+          activeCompany: null,
+          globalSettings: {
+            autoSave: true,
+            notifications: true,
+            theme: 'light',
+            language: 'pt-BR'
+          },
+          crmConfig: {
+            kanbanStages: [
+              { id: 'lead', name: 'Leads', color: '#3B82F6' },
+              { id: 'contact', name: 'Primeiro Contato', color: '#EAB308' },
+              { id: 'proposal', name: 'Proposta', color: '#F97316' },
+              { id: 'negotiation', name: 'Negociação', color: '#8B5CF6' },
+              { id: 'closed', name: 'Fechado', color: '#10B981' },
+              { id: 'lost', name: 'Perdido', color: '#EF4444' }
+            ]
+          }
+        };
+        console.log('✅ Configuração de fallback carregada');
+      }
+    } catch (error) {
+      console.error('❌ Erro ao carregar configurações:', error);
+    }
   }
 
   createUI() {
