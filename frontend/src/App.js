@@ -1663,7 +1663,7 @@ function App() {
                   <h2 className="text-3xl font-bold text-slate-900 mb-2">Agenda</h2>
                   <p className="text-slate-600">Agendamentos e compromissos</p>
                 </div>
-                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                <Button onClick={() => setShowNewAppointment(true)} className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
                   Novo Agendamento
                 </Button>
               </div>
