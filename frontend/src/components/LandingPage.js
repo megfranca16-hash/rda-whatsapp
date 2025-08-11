@@ -66,6 +66,8 @@ const LandingPage = ({ onLoginSuccess }) => {
         onLoginSuccess();
       } else {
         // Call login API
+        console.log('Attempting login with:', { username: authData.email, API_BASE });
+        
         const response = await fetch(`${API_BASE}/api/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -75,19 +77,37 @@ const LandingPage = ({ onLoginSuccess }) => {
           })
         });
 
+        console.log('Login response status:', response.status);
+
         if (!response.ok) {
           const error = await response.json();
-          throw new Error(error.detail || 'Credenciais inválidas');
+          console.error('Login error response:', error);
+          
+          // More specific error messages
+          if (response.status === 401) {
+            throw new Error('Credenciais inválidas. Use: admin@admin.com / admin123');
+          } else if (response.status === 500) {
+            throw new Error('Erro interno do servidor. Tente novamente em alguns segundos.');
+          } else {
+            throw new Error(error.detail || 'Erro ao fazer login');
+          }
         }
 
         const data = await response.json();
+        console.log('Login successful:', data);
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         onLoginSuccess();
       }
     } catch (error) {
       console.error('Authentication error:', error);
-      alert(error.message || 'Erro ao autenticar. Tente novamente.');
+      
+      // Handle network errors specifically
+      if (error.name === 'TypeError' || error.message.includes('fetch')) {
+        alert('Erro de conexão. Verifique sua internet e tente novamente.');
+      } else {
+        alert(error.message || 'Erro ao autenticar. Tente novamente.');
+      }
     }
     
     setLoading(false);
