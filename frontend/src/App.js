@@ -35,7 +35,8 @@ import {
   Home,
   MessageSquare,
   UserCog,
-  Briefcase
+  Briefcase,
+  X
 } from 'lucide-react';
 
 function App() {
