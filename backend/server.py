@@ -695,7 +695,7 @@ async def list_appointments(db=Depends(get_database), user=Depends(get_current_u
     """List all appointments for the user"""
     try:
         appointments_collection = db.appointments
-        cursor = appointments_collection.find({"created_by": user["id"]})
+        cursor = appointments_collection.find({"created_by": user})
         appointments = await cursor.to_list(length=100)
         
         return [mongo_to_dict(appointment) for appointment in appointments]
