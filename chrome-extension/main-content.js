@@ -89,43 +89,84 @@ class EmpresasWebCRM {
       }
       
       // Fallback para configuração local via background script
-      if (typeof chrome !== 'undefined' && chrome.runtime) {
-        const response = await new Promise((resolve) => {
-          chrome.runtime.sendMessage({ action: 'getConfig' }, resolve);
-        });
+      if (this.isChromeExtension()) {
+        const response = await this.sendChromeMessage({ action: 'getConfig' });
         
         if (response && response.success) {
           this.config = response.data;
           this.activeCompany = this.config.companies[this.config.activeCompany];
           console.log('✅ Configurações locais carregadas:', this.activeCompany?.name || 'Nenhuma empresa ativa');
+          return;
         }
-      } else {
-        // Configuração de fallback para desenvolvimento
-        this.config = {
-          companies: {},
-          activeCompany: null,
-          globalSettings: {
-            autoSave: true,
-            notifications: true,
-            theme: 'light',
-            language: 'pt-BR'
-          },
-          crmConfig: {
-            kanbanStages: [
-              { id: 'lead', name: 'Leads', color: '#3B82F6' },
-              { id: 'contact', name: 'Primeiro Contato', color: '#EAB308' },
-              { id: 'proposal', name: 'Proposta', color: '#F97316' },
-              { id: 'negotiation', name: 'Negociação', color: '#8B5CF6' },
-              { id: 'closed', name: 'Fechado', color: '#10B981' },
-              { id: 'lost', name: 'Perdido', color: '#EF4444' }
-            ]
-          }
-        };
-        console.log('✅ Configuração de fallback carregada');
       }
+      
+      // Configuração de fallback para desenvolvimento
+      this.loadFallbackConfig();
+      
     } catch (error) {
       console.error('❌ Erro ao carregar configurações:', error);
+      this.loadFallbackConfig();
     }
+  }
+
+  isChromeExtension() {
+    return typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage;
+  }
+
+  async sendChromeMessage(message) {
+    if (!this.isChromeExtension()) return null;
+    
+    return new Promise((resolve) => {
+      chrome.runtime.sendMessage(message, resolve);
+    });
+  }
+
+  loadFallbackConfig() {
+    this.config = {
+      companies: {
+        'demo_company': {
+          id: 'demo_company',
+          name: 'Empresa Demonstração',
+          phone: '+55 11 99999-9999',
+          settings: {
+            autoResponder: {
+              enabled: false,
+              welcomeMessage: 'Olá! Obrigado por entrar em contato. Como posso ajudá-lo?',
+              businessHours: { start: '09:00', end: '18:00' },
+              weekdays: [1, 2, 3, 4, 5]
+            },
+            quickButtons: [
+              { text: '📋 Abertura de Empresa', action: 'send_message', value: 'Olá! Vou te ajudar com a abertura da sua empresa.' },
+              { text: '💰 Dúvidas Contábeis', action: 'send_message', value: 'Posso esclarecer suas dúvidas contábeis!' }
+            ],
+            labels: [
+              { id: 'hot_lead', name: 'Lead Quente', color: '#EF4444' },
+              { id: 'client', name: 'Cliente', color: '#10B981' }
+            ]
+          }
+        }
+      },
+      activeCompany: 'demo_company',
+      globalSettings: {
+        autoSave: true,
+        notifications: true,
+        theme: 'light',
+        language: 'pt-BR'
+      },
+      crmConfig: {
+        kanbanStages: [
+          { id: 'lead', name: 'Leads', color: '#3B82F6' },
+          { id: 'contact', name: 'Primeiro Contato', color: '#EAB308' },
+          { id: 'proposal', name: 'Proposta', color: '#F97316' },
+          { id: 'negotiation', name: 'Negociação', color: '#8B5CF6' },
+          { id: 'closed', name: 'Fechado', color: '#10B981' },
+          { id: 'lost', name: 'Perdido', color: '#EF4444' }
+        ]
+      }
+    };
+    
+    this.activeCompany = this.config.companies[this.config.activeCompany];
+    console.log('✅ Configuração de demonstração carregada');
   }
 
   createUI() {
