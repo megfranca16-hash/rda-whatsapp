@@ -2048,6 +2048,113 @@ function App() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Add Contact Modal */}
+              {showAddContact && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                  <Card className="w-full max-w-2xl bg-white shadow-2xl">
+                    <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b border-slate-200">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="flex items-center space-x-2">
+                          <User className="w-5 h-5 text-blue-500" />
+                          <span>Adicionar Novo Contato</span>
+                        </CardTitle>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowAddContact(false)}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-6 space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Nome Completo *
+                          </label>
+                          <Input
+                            value={newContact.name}
+                            onChange={(e) => setNewContact({...newContact, name: e.target.value})}
+                            placeholder="João Silva"
+                            className="bg-slate-50 border-slate-200"
+                            required
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Telefone/WhatsApp *
+                          </label>
+                          <Input
+                            value={newContact.phone}
+                            onChange={(e) => setNewContact({...newContact, phone: e.target.value})}
+                            placeholder="+55 11 99999-9999"
+                            className="bg-slate-50 border-slate-200"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Email
+                          </label>
+                          <Input
+                            type="email"
+                            value={newContact.email}
+                            onChange={(e) => setNewContact({...newContact, email: e.target.value})}
+                            placeholder="joao@empresa.com"
+                            className="bg-slate-50 border-slate-200"
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Empresa
+                          </label>
+                          <Input
+                            value={newContact.company}
+                            onChange={(e) => setNewContact({...newContact, company: e.target.value})}
+                            placeholder="Nome da Empresa"
+                            className="bg-slate-50 border-slate-200"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Observações
+                        </label>
+                        <textarea
+                          value={newContact.notes}
+                          onChange={(e) => setNewContact({...newContact, notes: e.target.value})}
+                          placeholder="Informações adicionais sobre o contato..."
+                          className="w-full h-24 px-3 py-2 border border-slate-300 rounded-md bg-slate-50 resize-none"
+                        />
+                      </div>
+
+                      <div className="flex justify-end space-x-3 pt-4 border-t border-slate-200">
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowAddContact(false)}
+                        >
+                          Cancelar
+                        </Button>
+                        <Button
+                          onClick={createContact}
+                          className="bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                        >
+                          <User className="w-4 h-4 mr-2" />
+                          Adicionar Contato
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
             </div>
           )}
 
