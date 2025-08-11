@@ -849,7 +849,7 @@ async def save_extension_crm_data(
             deals_collection = db.deals
             for deal_id, deal_data in crm_data["deals"].items():
                 deal_data["updated_at"] = datetime.utcnow().isoformat()
-                deal_data["updated_by"] = user["id"]
+                deal_data["updated_by"] = user
                 
                 await deals_collection.update_one(
                     {"id": deal_id},
