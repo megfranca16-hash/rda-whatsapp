@@ -745,6 +745,235 @@ async def list_scheduled_messages(db=Depends(get_database), user=Depends(get_cur
         logging.error(f"Error listing scheduled messages: {str(e)}")
         raise HTTPException(status_code=500, detail="Error retrieving scheduled messages")
 
+# Chrome Extension Integration Endpoints
+@app.get("/api/chrome-extension/config")
+async def get_extension_config(db=Depends(get_database), user=Depends(get_current_user)):
+    """Get complete configuration for Chrome Extension"""
+    try:
+        companies_collection = db.companies
+        cursor = companies_collection.find({})
+        companies = await cursor.to_list(length=100)
+        
+        # Convert companies to extension format
+        companies_dict = {}
+        for company in companies:
+            company_data = mongo_to_dict(company)
+            companies_dict[company_data["id"]] = {
+                "id": company_data["id"],
+                "name": company_data["name"],
+                "phone": company_data.get("whatsapp_number", ""),
+                "settings": {
+                    "autoResponder": {
+                        "enabled": False,
+                        "welcomeMessage": "Olá! Obrigado por entrar em contato. Como posso ajudá-lo?",
+                        "businessHours": {"start": "09:00", "end": "18:00"},
+                        "weekdays": [1, 2, 3, 4, 5]
+                    },
+                    "quickButtons": [
+                        {"text": "📋 Abertura de Empresa", "action": "send_message", "value": "Olá! Vou te ajudar com a abertura da sua empresa."},
+                        {"text": "💰 Dúvidas Contábeis", "action": "send_message", "value": "Posso esclarecer suas dúvidas contábeis!"},
+                        {"text": "👥 RH e Folha", "action": "send_message", "value": "Vamos resolver suas questões de RH e folha de pagamento."},
+                        {"text": "📊 Impostos", "action": "send_message", "value": "Te ajudo com questões tributárias e impostos."}
+                    ],
+                    "labels": [
+                        {"id": "hot_lead", "name": "Lead Quente", "color": "#EF4444"},
+                        {"id": "warm_lead", "name": "Lead Morno", "color": "#F97316"},
+                        {"id": "cold_lead", "name": "Lead Frio", "color": "#3B82F6"},
+                        {"id": "client", "name": "Cliente", "color": "#10B981"},
+                        {"id": "prospect", "name": "Prospect", "color": "#8B5CF6"}
+                    ],
+                    "signatures": {
+                        "default": f"\n\n---\n📞 {company_data['name']}\n🌐 www.empresasweb.com.br\n📧 contato@empresasweb.com.br"
+                    }
+                },
+                "crmData": {
+                    "contacts": {},
+                    "conversations": {},
+                    "deals": {},
+                    "campaigns": []
+                }
+            }
+        
+        return {
+            "companies": companies_dict,
+            "activeCompany": user.get("activeCompanyId", list(companies_dict.keys())[0] if companies_dict else None),
+            "globalSettings": {
+                "autoSave": True,
+                "notifications": True,
+                "theme": "light",
+                "language": "pt-BR"
+            },
+            "crmConfig": {
+                "kanbanStages": [
+                    {"id": "lead", "name": "Leads", "color": "#3B82F6"},
+                    {"id": "contact", "name": "Primeiro Contato", "color": "#EAB308"},
+                    {"id": "proposal", "name": "Proposta", "color": "#F97316"},
+                    {"id": "negotiation", "name": "Negociação", "color": "#8B5CF6"},
+                    {"id": "closed", "name": "Fechado", "color": "#10B981"},
+                    {"id": "lost", "name": "Perdido", "color": "#EF4444"}
+                ]
+            },
+            "automationRules": [],
+            "quickButtons": [],
+            "scheduledMessages": [],
+            "massMessageCampaigns": []
+        }
+        
+    except Exception as e:
+        logging.error(f"Error getting extension config: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error retrieving extension configuration")
+
+@app.post("/api/chrome-extension/crm-data")
+async def save_extension_crm_data(
+    crm_data: dict, 
+    db=Depends(get_database), 
+    user=Depends(get_current_user)
+):
+    """Save CRM data from Chrome Extension"""
+    try:
+        # Save contacts
+        if "contacts" in crm_data:
+            contacts_collection = db.contacts
+            for contact_id, contact_data in crm_data["contacts"].items():
+                contact_data["updated_at"] = datetime.utcnow().isoformat()
+                contact_data["updated_by"] = user["id"]
+                
+                await contacts_collection.update_one(
+                    {"id": contact_id},
+                    {"$set": contact_data},
+                    upsert=True
+                )
+
+        # Save deals/opportunities
+        if "deals" in crm_data:
+            deals_collection = db.deals
+            for deal_id, deal_data in crm_data["deals"].items():
+                deal_data["updated_at"] = datetime.utcnow().isoformat()
+                deal_data["updated_by"] = user["id"]
+                
+                await deals_collection.update_one(
+                    {"id": deal_id},
+                    {"$set": deal_data},
+                    upsert=True
+                )
+
+        # Save conversation data
+        if "conversations" in crm_data:
+            conversations_collection = db.conversations
+            for conv_id, conv_data in crm_data["conversations"].items():
+                conv_data["updated_at"] = datetime.utcnow().isoformat()
+                conv_data["updated_by"] = user["id"]
+                
+                await conversations_collection.update_one(
+                    {"id": conv_id},
+                    {"$set": conv_data},
+                    upsert=True
+                )
+
+        return {"success": True, "message": "CRM data saved successfully"}
+        
+    except Exception as e:
+        logging.error(f"Error saving CRM data from extension: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error saving CRM data")
+
+@app.post("/api/chrome-extension/mass-message")
+async def send_mass_message_extension(
+    message_data: dict,
+    db=Depends(get_database),
+    user=Depends(get_current_user)
+):
+    """Handle mass message sending from Chrome Extension"""
+    try:
+        required_fields = ["message", "recipients", "campaign_type"]
+        if not all(field in message_data for field in required_fields):
+            raise HTTPException(status_code=400, detail="Missing required fields")
+
+        # Create campaign record
+        campaigns_collection = db.mass_campaigns
+        campaign_id = str(uuid.uuid4())
+        
+        campaign_record = {
+            "id": campaign_id,
+            "title": message_data.get("title", f"Campanha {datetime.utcnow().strftime('%d/%m/%Y %H:%M')}"),
+            "message": message_data["message"],
+            "recipients": message_data["recipients"],
+            "campaign_type": message_data["campaign_type"],
+            "status": "processing",
+            "created_by": user["id"],
+            "created_at": datetime.utcnow().isoformat(),
+            "total_recipients": len(message_data["recipients"]),
+            "sent_count": 0,
+            "failed_count": 0
+        }
+        
+        await campaigns_collection.insert_one(campaign_record)
+        
+        # Here you would integrate with actual WhatsApp sending logic
+        # For now, we'll return success
+        
+        return {
+            "success": True,
+            "campaign_id": campaign_id,
+            "message": f"Campanha criada com sucesso para {len(message_data['recipients'])} destinatários"
+        }
+        
+    except Exception as e:
+        logging.error(f"Error processing mass message from extension: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error processing mass message")
+
+@app.get("/api/chrome-extension/analytics")
+async def get_extension_analytics(
+    company_id: str = None,
+    db=Depends(get_database), 
+    user=Depends(get_current_user)
+):
+    """Get analytics data for Chrome Extension dashboard"""
+    try:
+        # Get contacts count
+        contacts_collection = db.contacts
+        total_contacts = await contacts_collection.count_documents({})
+        
+        # Get deals count
+        deals_collection = db.deals
+        total_deals = await deals_collection.count_documents({})
+        active_deals = await deals_collection.count_documents({"stage": {"$nin": ["closed", "lost"]}})
+        
+        # Get conversations count
+        conversations_collection = db.conversations
+        total_conversations = await conversations_collection.count_documents({})
+        
+        # Calculate conversion rate
+        conversion_rate = round((active_deals / total_contacts * 100) if total_contacts > 0 else 0, 1)
+        
+        # Get recent activity (last 7 days)
+        seven_days_ago = (datetime.utcnow() - timedelta(days=7)).isoformat()
+        recent_contacts = await contacts_collection.count_documents({
+            "created_at": {"$gte": seven_days_ago}
+        })
+        
+        return {
+            "summary": {
+                "total_contacts": total_contacts,
+                "total_deals": total_deals,
+                "active_deals": active_deals,
+                "total_conversations": total_conversations,
+                "conversion_rate": f"{conversion_rate}%",
+                "recent_contacts": recent_contacts
+            },
+            "kanban_data": {
+                "lead": await deals_collection.count_documents({"stage": "lead"}),
+                "contact": await deals_collection.count_documents({"stage": "contact"}),
+                "proposal": await deals_collection.count_documents({"stage": "proposal"}),
+                "negotiation": await deals_collection.count_documents({"stage": "negotiation"}),
+                "closed": await deals_collection.count_documents({"stage": "closed"}),
+                "lost": await deals_collection.count_documents({"stage": "lost"})
+            }
+        }
+        
+    except Exception as e:
+        logging.error(f"Error getting analytics for extension: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error retrieving analytics")
+
 @app.get("/api/whatsapp/status")
 async def get_whatsapp_connection_status(current_user: str = Depends(get_current_user)):
     """Get WhatsApp connection status"""
