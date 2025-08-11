@@ -552,7 +552,7 @@ class BackendTester:
             return False
             
     async def test_contacts_system(self):
-        """Test contacts CRUD operations"""
+        """Test contacts CRUD operations with enhanced fields"""
         if not self.auth_token:
             self.log_result("Contacts System", False, "No auth token available")
             return False
@@ -569,25 +569,33 @@ class BackendTester:
                     self.log_result("Contacts GET", False, f"Failed to get contacts: {response.status}")
                     return False
                     
-            # Test POST new contact
+            # Test POST new contact with enhanced fields (company, notes)
+            import time
+            unique_suffix = str(int(time.time()))
             contact_data = {
-                "name": "João Silva Teste",
-                "phone_number": "+5511999888777",
-                "email": "joao.teste@empresasweb.com",
-                "company": "Empresa Teste Ltda"
+                "name": f"Maria Santos Teste {unique_suffix}",
+                "phone": f"+551199988{unique_suffix[-4:]}",
+                "email": f"maria.teste{unique_suffix}@empresasweb.com",
+                "company": "Inovação Empresarial Ltda",
+                "notes": "Cliente interessado em abertura de empresa e contabilidade completa. Contato preferencial por WhatsApp."
             }
             
             async with self.session.post(f"{API_BASE}/contacts", json=contact_data, headers=headers) as response:
                 if response.status == 200:
                     contact_result = await response.json()
-                    if contact_result.get("name") == contact_data["name"]:
-                        self.log_result("Contacts POST", True, f"Created contact: {contact_result.get('name')}")
+                    if (contact_result.get("name") == contact_data["name"] and
+                        contact_result.get("phone_number") == contact_data["phone"] and
+                        contact_result.get("email") == contact_data["email"] and
+                        contact_result.get("company") == contact_data["company"] and
+                        contact_result.get("notes") == contact_data["notes"]):
+                        self.log_result("Enhanced Contacts POST", True, f"Created contact with all fields: {contact_result.get('name')}")
                         return True
                     else:
-                        self.log_result("Contacts POST", False, f"Contact creation returned unexpected data")
+                        self.log_result("Enhanced Contacts POST", False, f"Contact creation missing fields. Expected company: {contact_data['company']}, Got: {contact_result.get('company')}")
                         return False
                 else:
-                    self.log_result("Contacts POST", False, f"Failed to create contact: {response.status}")
+                    response_text = await response.text()
+                    self.log_result("Enhanced Contacts POST", False, f"Failed to create contact: {response.status} - {response_text}")
                     return False
                     
         except Exception as e:
