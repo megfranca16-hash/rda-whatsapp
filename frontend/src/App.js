@@ -2325,7 +2325,7 @@ function App() {
               </Card>
 
               {/* Add Contact Modal */}
-              {showAddContact && (
+              {showAddContact && (console.log('Rendering Add Contact Modal') || true) && (
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                   <Card className="w-full max-w-2xl bg-white shadow-2xl">
                     <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b border-slate-200">
