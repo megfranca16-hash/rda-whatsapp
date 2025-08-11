@@ -86,7 +86,8 @@ const LandingPage = ({ onLoginSuccess }) => {
         onLoginSuccess();
       }
     } catch (error) {
-      alert('Erro ao autenticar. Tente novamente.');
+      console.error('Authentication error:', error);
+      alert(error.message || 'Erro ao autenticar. Tente novamente.');
     }
     
     setLoading(false);
