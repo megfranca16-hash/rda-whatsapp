@@ -639,38 +639,25 @@ async def add_department_signature(message: str, department_id: Optional[str] = 
 # WhatsApp QR Routes (Simplified for MVP)
 @app.get("/api/whatsapp/qrcode")
 async def get_whatsapp_qr():
-    """Get QR code for WhatsApp connection (Mock for MVP)"""
-    import base64
-    import qrcode
-    from io import BytesIO
+    """Generate QR code for WhatsApp Web connection"""
+    # Generate a mock QR code for demonstration
+    qr = qrcode.QRCode(version=1, box_size=10, border=5)
+    qr.add_data("https://web.whatsapp.com/mock-session-12345")
+    qr.make(fit=True)
     
-    try:
-        # For MVP, generate a mock QR code
-        qr_data = "https://web.whatsapp.com/qr/mock-empresas-web-connection"
-        
-        # Generate QR code
-        qr = qrcode.QRCode(version=1, box_size=10, border=5)
-        qr.add_data(qr_data)
-        qr.make(fit=True)
-        
-        # Create QR code image
-        img = qr.make_image(fill_color="black", back_color="white")
-        buffer = BytesIO()
-        img.save(buffer, format='PNG')
-        buffer.seek(0)
-        
-        # Convert to base64
-        qr_base64 = base64.b64encode(buffer.getvalue()).decode()
-        
-        return {
-            "qr_code": f"data:image/png;base64,{qr_base64}",
-            "status": "waiting_for_scan",
-            "message": "Escaneie o QR Code com seu WhatsApp para conectar"
-        }
-        
-    except Exception as e:
-        logging.error(f"Error generating QR code: {str(e)}")
-        return {"error": "Erro ao gerar QR Code", "qr_code": None}
+    # Create QR code image
+    img = qr.make_image(fill_color="black", back_color="white")
+    
+    # Convert to base64
+    buffered = BytesIO()
+    img.save(buffered, format="PNG")
+    img_str = base64.b64encode(buffered.getvalue()).decode()
+    
+    return {
+        "qr_code": f"data:image/png;base64,{img_str}",
+        "status": "disconnected",
+        "session_id": "mock-session-12345"
+    }
 
 @app.get("/api/whatsapp/status")
 async def get_whatsapp_connection_status(current_user: str = Depends(get_current_user)):
