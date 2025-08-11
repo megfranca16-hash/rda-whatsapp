@@ -202,6 +202,25 @@ class DepartmentCreate(BaseModel):
     whatsapp_number: Optional[str] = None
     integration_mode: Optional[str] = "qr"  # "qr" or "official"
 
+class MessageRequest(BaseModel):
+    to: str
+    message: str
+    department_id: Optional[str] = None
+
+class AppointmentCreate(BaseModel):
+    title: str
+    description: Optional[str] = None
+    scheduled_date: str  # ISO format datetime
+    client_name: Optional[str] = None
+    appointment_type: str = "meeting"
+
+class ScheduledMessageCreate(BaseModel):
+    title: str
+    message: str
+    recipients: List[str]
+    scheduled_date: str  # ISO format datetime
+    campaign_type: str = "individual"
+
 # Utility functions
 def create_token(user_id: str):
     payload = {
