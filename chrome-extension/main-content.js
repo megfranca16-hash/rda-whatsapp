@@ -404,7 +404,7 @@ class EmpresasWebCRM {
 
   setupMessageListeners() {
     // Chrome runtime message listener
-    if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage) {
+    if (this.isChromeExtension()) {
       chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         this.handleRuntimeMessage(request, sender, sendResponse);
         return true;
