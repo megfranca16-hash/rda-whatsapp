@@ -903,6 +903,7 @@ class BackendTester:
             await self.test_contacts_system()
             await self.test_appointments_system()
             await self.test_scheduled_messages_system()
+            await self.test_chrome_extension_endpoints()
             
         finally:
             await self.teardown()
