@@ -1886,7 +1886,7 @@ function App() {
                   <h2 className="text-2xl font-bold text-gray-900">Contatos</h2>
                   <p className="text-gray-600">Gerencie seus contatos do WhatsApp</p>
                 </div>
-                <Button>
+                <Button onClick={() => setShowAddContact(true)}>
                   <Users className="w-4 h-4 mr-2" />
                   Adicionar Contato
                 </Button>
