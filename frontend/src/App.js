@@ -103,6 +103,32 @@ function App() {
     integration_mode: 'qr'
   });
   const [creatingDepartment, setCreatingDepartment] = useState(false);
+  const [showAddContact, setShowAddContact] = useState(false);
+  const [showNewAppointment, setShowNewAppointment] = useState(false);
+  const [showNewMessage, setShowNewMessage] = useState(false);
+  const [newContact, setNewContact] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    company: '',
+    notes: ''
+  });
+  const [newAppointment, setNewAppointment] = useState({
+    title: '',
+    description: '',
+    date: '',
+    time: '',
+    client: '',
+    type: 'meeting'
+  });
+  const [newScheduledMessage, setNewScheduledMessage] = useState({
+    title: '',
+    message: '',
+    recipients: '',
+    schedule_date: '',
+    schedule_time: '',
+    campaign_type: 'individual'
+  });
 
   const API_BASE = process.env.REACT_APP_BACKEND_URL;
 
