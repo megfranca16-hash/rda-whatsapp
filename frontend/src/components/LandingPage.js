@@ -68,36 +68,64 @@ const LandingPage = ({ onLoginSuccess }) => {
         // Call login API
         console.log('Attempting login with:', { username: authData.email, API_BASE });
         
-        const response = await fetch(`${API_BASE}/api/auth/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            username: authData.email, // Use email as username
-            password: authData.password
-          })
-        });
+        try {
+          const response = await fetch(`${API_BASE}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username: authData.email, // Use email as username
+              password: authData.password
+            })
+          });
 
-        console.log('Login response status:', response.status);
+          console.log('Login response received:', response.status, response.statusText);
 
-        if (!response.ok) {
-          const error = await response.json();
-          console.error('Login error response:', error);
+          if (!response.ok) {
+            let errorData;
+            try {
+              errorData = await response.json();
+            } catch (parseError) {
+              console.error('Error parsing response JSON:', parseError);
+              throw new Error(`Erro HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            console.error('Login error response:', errorData);
+            
+            // More specific error messages
+            if (response.status === 401) {
+              throw new Error('Credenciais inválidas. Use: admin@admin.com / admin123');
+            } else if (response.status === 500) {
+              throw new Error('Erro interno do servidor. Tente novamente em alguns segundos.');
+            } else {
+              throw new Error(errorData.detail || `Erro HTTP ${response.status}`);
+            }
+          }
+
+          let data;
+          try {
+            data = await response.json();
+            console.log('Login successful:', data);
+          } catch (parseError) {
+            console.error('Error parsing success response JSON:', parseError);
+            throw new Error('Erro ao processar resposta do servidor');
+          }
+
+          if (!data.token || !data.user) {
+            throw new Error('Resposta inválida do servidor - token ou dados do usuário ausentes');
+          }
+
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          onLoginSuccess();
           
-          // More specific error messages
-          if (response.status === 401) {
-            throw new Error('Credenciais inválidas. Use: admin@admin.com / admin123');
-          } else if (response.status === 500) {
-            throw new Error('Erro interno do servidor. Tente novamente em alguns segundos.');
+        } catch (fetchError) {
+          console.error('Fetch error:', fetchError);
+          if (fetchError.name === 'TypeError' && fetchError.message.includes('fetch')) {
+            throw new Error('Erro de conexão. Verifique sua internet e tente novamente.');
           } else {
-            throw new Error(error.detail || 'Erro ao fazer login');
+            throw fetchError;
           }
         }
-
-        const data = await response.json();
-        console.log('Login successful:', data);
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        onLoginSuccess();
       }
     } catch (error) {
       console.error('Authentication error:', error);
