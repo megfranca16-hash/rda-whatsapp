@@ -899,7 +899,7 @@ async def send_mass_message_extension(
             "recipients": message_data["recipients"],
             "campaign_type": message_data["campaign_type"],
             "status": "processing",
-            "created_by": user["id"],
+            "created_by": user,
             "created_at": datetime.utcnow().isoformat(),
             "total_recipients": len(message_data["recipients"]),
             "sent_count": 0,
