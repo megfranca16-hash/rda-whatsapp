@@ -796,7 +796,7 @@ async def get_extension_config(db=Depends(get_database), user=Depends(get_curren
         
         return {
             "companies": companies_dict,
-            "activeCompany": user.get("activeCompanyId", list(companies_dict.keys())[0] if companies_dict else None),
+            "activeCompany": list(companies_dict.keys())[0] if companies_dict else None,
             "globalSettings": {
                 "autoSave": True,
                 "notifications": True,
