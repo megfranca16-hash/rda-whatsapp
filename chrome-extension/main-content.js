@@ -72,15 +72,37 @@ class EmpresasWebCRM {
   }
 
   async loadConfig() {
-    return new Promise((resolve) => {
-      chrome.runtime.sendMessage({ action: 'getConfig' }, (response) => {
-        if (response && response.success) {
-          this.config = response.data;
-          this.activeCompany = this.config.companies[this.config.activeCompany];
-          console.log('✅ Configurações carregadas:', this.activeCompany?.name || 'Nenhuma empresa ativa');
+    return new Promise(async (resolve) => {
+      try {
+        // Primeiro tentar carregar do backend se autenticado
+        if (window.empresasWebAPI && window.empresasWebAPI.isConnected()) {
+          console.log('🔗 Carregando configuração do backend...');
+          
+          try {
+            const backendConfig = await window.empresasWebAPI.getExtensionConfig();
+            this.config = backendConfig;
+            this.activeCompany = backendConfig.companies[backendConfig.activeCompany];
+            console.log('✅ Configurações carregadas do backend:', this.activeCompany?.name || 'Nenhuma empresa ativa');
+            resolve();
+            return;
+          } catch (error) {
+            console.log('⚠️ Erro ao carregar do backend, usando configuração local:', error.message);
+          }
         }
+        
+        // Fallback para configuração local
+        chrome.runtime.sendMessage({ action: 'getConfig' }, (response) => {
+          if (response && response.success) {
+            this.config = response.data;
+            this.activeCompany = this.config.companies[this.config.activeCompany];
+            console.log('✅ Configurações locais carregadas:', this.activeCompany?.name || 'Nenhuma empresa ativa');
+          }
+          resolve();
+        });
+      } catch (error) {
+        console.error('❌ Erro ao carregar configurações:', error);
         resolve();
-      });
+      }
     });
   }
 
