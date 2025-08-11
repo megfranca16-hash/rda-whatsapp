@@ -718,7 +718,7 @@ async def create_scheduled_message(message: ScheduledMessageCreate, db=Depends(g
             "scheduled_date": message.scheduled_date,
             "campaign_type": message.campaign_type,
             "status": "scheduled",
-            "created_by": user["id"],
+            "created_by": user,
             "created_at": datetime.utcnow().isoformat(),
         }
         
