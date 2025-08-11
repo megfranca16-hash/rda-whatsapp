@@ -362,10 +362,13 @@ class EmpresasWebCRM {
   }
 
   setupMessageListeners() {
-    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-      this.handleRuntimeMessage(request, sender, sendResponse);
-      return true;
-    });
+    // Chrome runtime message listener
+    if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage) {
+      chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        this.handleRuntimeMessage(request, sender, sendResponse);
+        return true;
+      });
+    }
 
     // Listener para eventos personalizados
     window.addEventListener('empresasWebCRMInit', () => {
