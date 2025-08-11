@@ -26,6 +26,7 @@
       "matches": ["https://web.whatsapp.com/*"],
       "js": [
         "libs/jquery-3.6.0.min.js",
+        "api-integration.js",
         "content-scripts/whatsapp-injector.js",
         "content-scripts/crm-kanban.js",
         "content-scripts/mass-sender.js",
