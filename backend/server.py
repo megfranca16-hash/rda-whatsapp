@@ -862,7 +862,7 @@ async def save_extension_crm_data(
             conversations_collection = db.conversations
             for conv_id, conv_data in crm_data["conversations"].items():
                 conv_data["updated_at"] = datetime.utcnow().isoformat()
-                conv_data["updated_by"] = user["id"]
+                conv_data["updated_by"] = user
                 
                 await conversations_collection.update_one(
                     {"id": conv_id},
