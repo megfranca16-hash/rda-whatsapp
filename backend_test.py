@@ -736,6 +736,138 @@ class BackendTester:
             self.log_result("WhatsApp Send Message", False, f"WhatsApp send test failed: {str(e)}")
             return False
             
+    async def test_appointments_system(self):
+        """Test appointments CRUD operations"""
+        if not self.auth_token:
+            self.log_result("Appointments System", False, "No auth token available")
+            return False
+            
+        headers = {"Authorization": f"Bearer {self.auth_token}"}
+        
+        try:
+            import time
+            unique_suffix = str(int(time.time()))
+            
+            # Test POST new appointment
+            appointment_data = {
+                "title": f"Reunião de Planejamento {unique_suffix}",
+                "description": "Reunião para discutir estratégias de crescimento da empresa e planejamento tributário para 2025",
+                "scheduled_date": "2025-02-15T14:30:00",
+                "client_name": "Carlos Eduardo Silva",
+                "appointment_type": "consultation"
+            }
+            
+            created_appointment_id = None
+            async with self.session.post(f"{API_BASE}/appointments", json=appointment_data, headers=headers) as response:
+                if response.status == 200:
+                    appointment_result = await response.json()
+                    created_appointment_id = appointment_result.get("id")
+                    if (appointment_result.get("title") == appointment_data["title"] and
+                        appointment_result.get("description") == appointment_data["description"] and
+                        appointment_result.get("scheduled_date") == appointment_data["scheduled_date"] and
+                        appointment_result.get("client_name") == appointment_data["client_name"] and
+                        appointment_result.get("appointment_type") == appointment_data["appointment_type"] and
+                        appointment_result.get("status") == "scheduled"):
+                        self.log_result("Appointments POST", True, f"Created appointment: {appointment_result.get('title')}")
+                    else:
+                        self.log_result("Appointments POST", False, f"Appointment creation returned unexpected data: {appointment_result}")
+                        return False
+                else:
+                    response_text = await response.text()
+                    self.log_result("Appointments POST", False, f"Failed to create appointment: {response.status} - {response_text}")
+                    return False
+            
+            # Test GET appointments
+            async with self.session.get(f"{API_BASE}/appointments", headers=headers) as response:
+                if response.status == 200:
+                    appointments = await response.json()
+                    self.log_result("Appointments GET", True, f"Retrieved {len(appointments)} appointments")
+                    
+                    # Verify our created appointment is in the list
+                    if created_appointment_id:
+                        found_appointment = next((apt for apt in appointments if apt.get("id") == created_appointment_id), None)
+                        if found_appointment:
+                            self.log_result("Appointments GET Verification", True, f"Created appointment found in list: {found_appointment.get('title')}")
+                            return True
+                        else:
+                            self.log_result("Appointments GET Verification", False, "Created appointment not found in appointments list")
+                            return False
+                    else:
+                        return True
+                else:
+                    self.log_result("Appointments GET", False, f"Failed to get appointments: {response.status}")
+                    return False
+                    
+        except Exception as e:
+            self.log_result("Appointments System", False, f"Appointments tests failed: {str(e)}")
+            return False
+            
+    async def test_scheduled_messages_system(self):
+        """Test scheduled messages CRUD operations"""
+        if not self.auth_token:
+            self.log_result("Scheduled Messages System", False, "No auth token available")
+            return False
+            
+        headers = {"Authorization": f"Bearer {self.auth_token}"}
+        
+        try:
+            import time
+            unique_suffix = str(int(time.time()))
+            
+            # Test POST new scheduled message
+            message_data = {
+                "title": f"Campanha Fim de Ano {unique_suffix}",
+                "message": "🎉 Oferta especial de fim de ano! Abertura de empresa com 50% de desconto. Aproveite esta oportunidade única para formalizar seu negócio. Entre em contato conosco!",
+                "recipients": ["+5511999887766", "+5511888776655", "+5511777665544"],
+                "scheduled_date": "2025-01-15T09:00:00",
+                "campaign_type": "promotional"
+            }
+            
+            created_message_id = None
+            async with self.session.post(f"{API_BASE}/scheduled-messages", json=message_data, headers=headers) as response:
+                if response.status == 200:
+                    message_result = await response.json()
+                    created_message_id = message_result.get("id")
+                    if (message_result.get("title") == message_data["title"] and
+                        message_result.get("message") == message_data["message"] and
+                        message_result.get("recipients") == message_data["recipients"] and
+                        message_result.get("scheduled_date") == message_data["scheduled_date"] and
+                        message_result.get("campaign_type") == message_data["campaign_type"] and
+                        message_result.get("status") == "scheduled"):
+                        self.log_result("Scheduled Messages POST", True, f"Created scheduled message: {message_result.get('title')}")
+                    else:
+                        self.log_result("Scheduled Messages POST", False, f"Scheduled message creation returned unexpected data: {message_result}")
+                        return False
+                else:
+                    response_text = await response.text()
+                    self.log_result("Scheduled Messages POST", False, f"Failed to create scheduled message: {response.status} - {response_text}")
+                    return False
+            
+            # Test GET scheduled messages
+            async with self.session.get(f"{API_BASE}/scheduled-messages", headers=headers) as response:
+                if response.status == 200:
+                    messages = await response.json()
+                    self.log_result("Scheduled Messages GET", True, f"Retrieved {len(messages)} scheduled messages")
+                    
+                    # Verify our created message is in the list
+                    if created_message_id:
+                        found_message = next((msg for msg in messages if msg.get("id") == created_message_id), None)
+                        if found_message:
+                            self.log_result("Scheduled Messages GET Verification", True, f"Created message found in list: {found_message.get('title')}")
+                            return True
+                        else:
+                            self.log_result("Scheduled Messages GET Verification", False, "Created scheduled message not found in messages list")
+                            return False
+                    else:
+                        return True
+                else:
+                    self.log_result("Scheduled Messages GET", False, f"Failed to get scheduled messages: {response.status}")
+                    return False
+                    
+        except Exception as e:
+            self.log_result("Scheduled Messages System", False, f"Scheduled messages tests failed: {str(e)}")
+            return False
+            
     async def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Empresas Web CRM Backend Tests")
