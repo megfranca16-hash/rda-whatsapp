@@ -677,7 +677,7 @@ async def create_appointment(appointment: AppointmentCreate, db=Depends(get_data
             "client_name": appointment.client_name,
             "appointment_type": appointment.appointment_type,
             "status": "scheduled",
-            "created_by": user,
+            "created_by": user["id"],
             "created_at": datetime.utcnow().isoformat(),
         }
         
