@@ -663,6 +663,88 @@ async def get_whatsapp_qr():
         "session_id": "mock-session-12345"
     }
 
+@app.post("/api/appointments")
+async def create_appointment(appointment: AppointmentCreate, db=Depends(get_database), user=Depends(get_current_user)):
+    """Create a new appointment"""
+    try:
+        appointments_collection = db.appointments
+        
+        appointment_data = {
+            "id": str(uuid.uuid4()),
+            "title": appointment.title,
+            "description": appointment.description,
+            "scheduled_date": appointment.scheduled_date,
+            "client_name": appointment.client_name,
+            "appointment_type": appointment.appointment_type,
+            "status": "scheduled",
+            "created_by": user,
+            "created_at": datetime.utcnow().isoformat(),
+        }
+        
+        result = await appointments_collection.insert_one(appointment_data)
+        appointment_data["_id"] = str(result.inserted_id)
+        
+        return mongo_to_dict(appointment_data)
+        
+    except Exception as e:
+        logging.error(f"Error creating appointment: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error creating appointment")
+
+@app.get("/api/appointments")
+async def list_appointments(db=Depends(get_database), user=Depends(get_current_user)):
+    """List all appointments for the user"""
+    try:
+        appointments_collection = db.appointments
+        cursor = appointments_collection.find({"created_by": user})
+        appointments = await cursor.to_list(length=100)
+        
+        return [mongo_to_dict(appointment) for appointment in appointments]
+        
+    except Exception as e:
+        logging.error(f"Error listing appointments: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error retrieving appointments")
+
+@app.post("/api/scheduled-messages")
+async def create_scheduled_message(message: ScheduledMessageCreate, db=Depends(get_database), user=Depends(get_current_user)):
+    """Create a new scheduled message"""
+    try:
+        messages_collection = db.scheduled_messages
+        
+        message_data = {
+            "id": str(uuid.uuid4()),
+            "title": message.title,
+            "message": message.message,
+            "recipients": message.recipients,
+            "scheduled_date": message.scheduled_date,
+            "campaign_type": message.campaign_type,
+            "status": "scheduled",
+            "created_by": user,
+            "created_at": datetime.utcnow().isoformat(),
+        }
+        
+        result = await messages_collection.insert_one(message_data)
+        message_data["_id"] = str(result.inserted_id)
+        
+        return mongo_to_dict(message_data)
+        
+    except Exception as e:
+        logging.error(f"Error creating scheduled message: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error creating scheduled message")
+
+@app.get("/api/scheduled-messages")
+async def list_scheduled_messages(db=Depends(get_database), user=Depends(get_current_user)):
+    """List all scheduled messages for the user"""
+    try:
+        messages_collection = db.scheduled_messages
+        cursor = messages_collection.find({"created_by": user})
+        messages = await cursor.to_list(length=100)
+        
+        return [mongo_to_dict(message) for message in messages]
+        
+    except Exception as e:
+        logging.error(f"Error listing scheduled messages: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error retrieving scheduled messages")
+
 @app.get("/api/whatsapp/status")
 async def get_whatsapp_connection_status(current_user: str = Depends(get_current_user)):
     """Get WhatsApp connection status"""
