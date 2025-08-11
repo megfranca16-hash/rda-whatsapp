@@ -1767,7 +1767,7 @@ function App() {
                   <h2 className="text-3xl font-bold text-slate-900 mb-2">Mensagens Programadas</h2>
                   <p className="text-slate-600">Gerencie envios agendados e campanhas</p>
                 </div>
-                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                <Button onClick={() => setShowNewMessage(true)} className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
                   Nova Mensagem Programada
                 </Button>
               </div>
