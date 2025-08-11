@@ -1757,6 +1757,129 @@ function App() {
                   </Card>
                 </div>
               </div>
+
+              {/* New Appointment Modal */}
+              {showNewAppointment && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                  <Card className="w-full max-w-2xl bg-white shadow-2xl">
+                    <CardHeader className="bg-gradient-to-r from-green-50 to-blue-50 border-b border-slate-200">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="flex items-center space-x-2">
+                          <Clock className="w-5 h-5 text-green-500" />
+                          <span>Novo Agendamento</span>
+                        </CardTitle>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowNewAppointment(false)}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-6 space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Título do Agendamento *
+                          </label>
+                          <Input
+                            value={newAppointment.title}
+                            onChange={(e) => setNewAppointment({...newAppointment, title: e.target.value})}
+                            placeholder="Reunião com cliente"
+                            className="bg-slate-50 border-slate-200"
+                            required
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Cliente/Participante
+                          </label>
+                          <Input
+                            value={newAppointment.client}
+                            onChange={(e) => setNewAppointment({...newAppointment, client: e.target.value})}
+                            placeholder="Nome do cliente"
+                            className="bg-slate-50 border-slate-200"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Data *
+                          </label>
+                          <Input
+                            type="date"
+                            value={newAppointment.date}
+                            onChange={(e) => setNewAppointment({...newAppointment, date: e.target.value})}
+                            className="bg-slate-50 border-slate-200"
+                            required
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Horário *
+                          </label>
+                          <Input
+                            type="time"
+                            value={newAppointment.time}
+                            onChange={(e) => setNewAppointment({...newAppointment, time: e.target.value})}
+                            className="bg-slate-50 border-slate-200"
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Tipo
+                          </label>
+                          <select
+                            value={newAppointment.type}
+                            onChange={(e) => setNewAppointment({...newAppointment, type: e.target.value})}
+                            className="w-full px-3 py-2 border border-slate-300 rounded-md bg-slate-50"
+                          >
+                            <option value="meeting">Reunião</option>
+                            <option value="consultation">Consultoria</option>
+                            <option value="presentation">Apresentação</option>
+                            <option value="follow-up">Follow-up</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Descrição
+                        </label>
+                        <textarea
+                          value={newAppointment.description}
+                          onChange={(e) => setNewAppointment({...newAppointment, description: e.target.value})}
+                          placeholder="Detalhes do agendamento..."
+                          className="w-full h-24 px-3 py-2 border border-slate-300 rounded-md bg-slate-50 resize-none"
+                        />
+                      </div>
+
+                      <div className="flex justify-end space-x-3 pt-4 border-t border-slate-200">
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowNewAppointment(false)}
+                        >
+                          Cancelar
+                        </Button>
+                        <Button
+                          onClick={createAppointment}
+                          className="bg-gradient-to-r from-green-600 to-blue-600 text-white"
+                        >
+                          <Clock className="w-4 h-4 mr-2" />
+                          Criar Agendamento
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
             </div>
           )}
 
