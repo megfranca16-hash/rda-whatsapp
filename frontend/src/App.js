@@ -2155,8 +2155,8 @@ function App() {
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900">Contatos</h2>
-                  <p className="text-gray-600">Gerencie seus contatos do WhatsApp</p>
+                  <h2 className="text-4xl font-bold text-red-900">🔴 NOVA INTERFACE DE CONTATOS - TESTE 123 🔴</h2>
+                  <p className="text-red-600 text-xl">SE VOCÊ VÊ ISTO, MEU CÓDIGO ESTÁ FUNCIONANDO!</p>
                 </div>
                 <Button onClick={() => {
                   console.log('Adicionar Contato button clicked!');
