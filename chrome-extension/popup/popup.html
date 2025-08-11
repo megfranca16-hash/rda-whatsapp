@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empresas Web CRM</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="popup-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <img src="../icons/icon32.png" alt="Empresas Web">
+                <h1>Empresas Web CRM</h1>
+            </div>
+            <div class="status-indicator" id="statusIndicator">
+                <span class="status-dot"></span>
+                <span class="status-text">Conectando...</span>
+            </div>
+        </div>
+
+        <!-- Empresa Ativa -->
+        <div class="active-company" id="activeCompanySection">
+            <div class="company-info">
+                <h3 id="companyName">Selecione uma Empresa</h3>
+                <p id="companyPhone">-</p>
+            </div>
+            <button class="btn-switch" id="switchCompanyBtn">
+                <span>🔄</span>
+            </button>
+        </div>
+
+        <!-- Navegação Rápida -->
+        <div class="quick-nav">
+            <button class="nav-btn" id="crmBtn" title="CRM Kanban">
+                <span class="icon">📊</span>
+                <span class="label">CRM</span>
+            </button>
+            <button class="nav-btn" id="automationBtn" title="Automação">
+                <span class="icon">🤖</span>
+                <span class="label">Automação</span>
+            </button>
+            <button class="nav-btn" id="massMessageBtn" title="Envio em Massa">
+                <span class="icon">📢</span>
+                <span class="label">Massa</span>
+            </button>
+            <button class="nav-btn" id="scheduleBtn" title="Agendamento">
+                <span class="icon">⏰</span>
+                <span class="label">Agenda</span>
+            </button>
+        </div>
+
+        <!-- Estatísticas Rápidas -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalContacts">-</div>
+                <div class="stat-label">Contatos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="activeDeals">-</div>
+                <div class="stat-label">Negócios</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="todayMessages">-</div>
+                <div class="stat-label">Mensagens Hoje</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="conversionRate">-</div>
+                <div class="stat-label">Conversão</div>
+            </div>
+        </div>
+
+        <!-- Ações Rápidas -->
+        <div class="quick-actions">
+            <h4>Ações Rápidas</h4>
+            <div class="action-buttons">
+                <button class="action-btn" id="newCompanyBtn">
+                    <span class="icon">🏢</span>
+                    <span class="text">Nova Empresa</span>
+                </button>
+                <button class="action-btn" id="importDataBtn">
+                    <span class="icon">📥</span>
+                    <span class="text">Importar Dados</span>
+                </button>
+                <button class="action-btn" id="exportDataBtn">
+                    <span class="icon">📤</span>
+                    <span class="text">Exportar Dados</span>
+                </button>
+                <button class="action-btn" id="settingsBtn">
+                    <span class="icon">⚙️</span>
+                    <span class="text">Configurações</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mensagens Agendadas Pendentes -->
+        <div class="scheduled-messages" id="scheduledSection" style="display: none;">
+            <h4>Mensagens Agendadas</h4>
+            <div class="scheduled-list" id="scheduledList">
+                <!-- Mensagens agendadas serão inseridas aqui -->
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-links">
+                <a href="#" id="helpBtn">Ajuda</a>
+                <a href="#" id="feedbackBtn">Feedback</a>
+                <a href="#" id="versionBtn">v2.0.0</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modais -->
+    
+    <!-- Modal Nova Empresa -->
+    <div class="modal" id="newCompanyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Nova Empresa</h3>
+                <button class="modal-close" id="closeNewCompanyModal">&times;</button>
+            </div>
+            <form id="newCompanyForm">
+                <div class="form-group">
+                    <label for="companyNameInput">Nome da Empresa *</label>
+                    <input type="text" id="companyNameInput" required placeholder="Ex: Contabilidade Silva & Associados">
+                </div>
+                <div class="form-group">
+                    <label for="companyPhoneInput">Número do WhatsApp *</label>
+                    <input type="tel" id="companyPhoneInput" required placeholder="Ex: +55 11 99999-9999">
+                </div>
+                <div class="form-group">
+                    <label for="companySegmentInput">Segmento</label>
+                    <select id="companySegmentInput">
+                        <option value="contabilidade">Contabilidade</option>
+                        <option value="consultoria">Consultoria</option>
+                        <option value="servicos">Serviços</option>
+                        <option value="comercio">Comércio</option>
+                        <option value="outros">Outros</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelNewCompany">Cancelar</button>
+                    <button type="submit" class="btn-primary">Criar Empresa</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Seleção de Empresa -->
+    <div class="modal" id="switchCompanyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Selecionar Empresa</h3>
+                <button class="modal-close" id="closeSwitchModal">&times;</button>
+            </div>
+            <div class="companies-list" id="companiesList">
+                <!-- Lista de empresas será inserida aqui -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Configurações -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Configurações</h3>
+                <button class="modal-close" id="closeSettingsModal">&times;</button>
+            </div>
+            <div class="settings-tabs">
+                <button class="tab-btn active" data-tab="general">Geral</button>
+                <button class="tab-btn" data-tab="automation">Automação</button>
+                <button class="tab-btn" data-tab="buttons">Botões</button>
+                <button class="tab-btn" data-tab="labels">Etiquetas</button>
+            </div>
+            <div class="settings-content" id="settingsContent">
+                <!-- Conteúdo das configurações será inserido aqui -->
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
