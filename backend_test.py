@@ -868,6 +868,435 @@ class BackendTester:
             self.log_result("Scheduled Messages System", False, f"Scheduled messages tests failed: {str(e)}")
             return False
             
+    async def test_chrome_extension_endpoints(self):
+        """Test Chrome Extension backend endpoints"""
+        if not self.auth_token:
+            self.log_result("Chrome Extension Endpoints", False, "No auth token available")
+            return False
+            
+        headers = {"Authorization": f"Bearer {self.auth_token}"}
+        
+        try:
+            # Test 1: GET /api/chrome-extension/config
+            await self.test_chrome_extension_config(headers)
+            
+            # Test 2: POST /api/chrome-extension/crm-data
+            await self.test_chrome_extension_crm_data(headers)
+            
+            # Test 3: POST /api/chrome-extension/mass-message
+            await self.test_chrome_extension_mass_message(headers)
+            
+            # Test 4: GET /api/chrome-extension/analytics
+            await self.test_chrome_extension_analytics(headers)
+            
+            return True
+            
+        except Exception as e:
+            self.log_result("Chrome Extension Endpoints", False, f"Chrome extension tests failed: {str(e)}")
+            return False
+            
+    async def test_chrome_extension_config(self, headers):
+        """Test GET /api/chrome-extension/config endpoint"""
+        try:
+            async with self.session.get(f"{API_BASE}/chrome-extension/config", headers=headers) as response:
+                if response.status == 200:
+                    config_data = await response.json()
+                    
+                    # Check required top-level fields
+                    required_fields = ["companies", "activeCompany", "globalSettings", "crmConfig", "automationRules", "quickButtons", "scheduledMessages", "massMessageCampaigns"]
+                    missing_fields = [field for field in required_fields if field not in config_data]
+                    
+                    if missing_fields:
+                        self.log_result("Chrome Extension Config - Structure", False, f"Missing required fields: {missing_fields}")
+                        return False
+                    
+                    # Check globalSettings structure
+                    global_settings = config_data.get("globalSettings", {})
+                    required_global = ["autoSave", "notifications", "theme", "language"]
+                    missing_global = [field for field in required_global if field not in global_settings]
+                    
+                    if missing_global:
+                        self.log_result("Chrome Extension Config - Global Settings", False, f"Missing global settings: {missing_global}")
+                        return False
+                    
+                    # Check crmConfig structure
+                    crm_config = config_data.get("crmConfig", {})
+                    if "kanbanStages" not in crm_config:
+                        self.log_result("Chrome Extension Config - CRM Config", False, "Missing kanbanStages in crmConfig")
+                        return False
+                    
+                    kanban_stages = crm_config["kanbanStages"]
+                    if not isinstance(kanban_stages, list) or len(kanban_stages) < 5:
+                        self.log_result("Chrome Extension Config - Kanban Stages", False, f"Invalid kanban stages: expected list with 5+ items, got {len(kanban_stages) if isinstance(kanban_stages, list) else type(kanban_stages)}")
+                        return False
+                    
+                    # Check kanban stage structure
+                    stage_fields = ["id", "name", "color"]
+                    for stage in kanban_stages:
+                        missing_stage_fields = [field for field in stage_fields if field not in stage]
+                        if missing_stage_fields:
+                            self.log_result("Chrome Extension Config - Kanban Stage Structure", False, f"Missing stage fields: {missing_stage_fields}")
+                            return False
+                    
+                    # Check companies structure (if any exist)
+                    companies = config_data.get("companies", {})
+                    if companies:
+                        # Check first company structure
+                        first_company = next(iter(companies.values()))
+                        company_fields = ["id", "name", "phone", "settings", "crmData"]
+                        missing_company_fields = [field for field in company_fields if field not in first_company]
+                        
+                        if missing_company_fields:
+                            self.log_result("Chrome Extension Config - Company Structure", False, f"Missing company fields: {missing_company_fields}")
+                            return False
+                        
+                        # Check company settings structure
+                        company_settings = first_company.get("settings", {})
+                        settings_fields = ["autoResponder", "quickButtons", "labels", "signatures"]
+                        missing_settings = [field for field in settings_fields if field not in company_settings]
+                        
+                        if missing_settings:
+                            self.log_result("Chrome Extension Config - Company Settings", False, f"Missing company settings: {missing_settings}")
+                            return False
+                    
+                    self.log_result("Chrome Extension Config", True, f"Configuration retrieved successfully with {len(companies)} companies and {len(kanban_stages)} Kanban stages")
+                    return True
+                    
+                else:
+                    response_text = await response.text()
+                    self.log_result("Chrome Extension Config", False, f"Failed to get config: {response.status} - {response_text}")
+                    return False
+                    
+        except Exception as e:
+            self.log_result("Chrome Extension Config", False, f"Config test failed: {str(e)}")
+            return False
+            
+    async def test_chrome_extension_crm_data(self, headers):
+        """Test POST /api/chrome-extension/crm-data endpoint"""
+        try:
+            import time
+            unique_suffix = str(int(time.time()))
+            
+            # Test saving contacts data
+            contacts_data = {
+                "contacts": {
+                    f"contact_{unique_suffix}_1": {
+                        "id": f"contact_{unique_suffix}_1",
+                        "name": "João Silva Extensão",
+                        "phone": f"+5511999{unique_suffix[-6:]}",
+                        "email": f"joao.extensao{unique_suffix}@empresasweb.com",
+                        "company": "Tech Solutions Ltda",
+                        "labels": ["hot_lead"],
+                        "created_at": "2025-01-10T10:00:00Z",
+                        "last_message": "2025-01-10T15:30:00Z"
+                    },
+                    f"contact_{unique_suffix}_2": {
+                        "id": f"contact_{unique_suffix}_2",
+                        "name": "Maria Santos Extensão",
+                        "phone": f"+5511888{unique_suffix[-6:]}",
+                        "email": f"maria.extensao{unique_suffix}@empresasweb.com",
+                        "company": "Inovação Digital",
+                        "labels": ["warm_lead"],
+                        "created_at": "2025-01-10T11:00:00Z"
+                    }
+                }
+            }
+            
+            async with self.session.post(f"{API_BASE}/chrome-extension/crm-data", json=contacts_data, headers=headers) as response:
+                if response.status == 200:
+                    result = await response.json()
+                    if result.get("success") and "CRM data saved successfully" in result.get("message", ""):
+                        self.log_result("Chrome Extension CRM Data - Contacts", True, f"Contacts data saved successfully: {len(contacts_data['contacts'])} contacts")
+                    else:
+                        self.log_result("Chrome Extension CRM Data - Contacts", False, f"Unexpected response: {result}")
+                        return False
+                else:
+                    response_text = await response.text()
+                    self.log_result("Chrome Extension CRM Data - Contacts", False, f"Failed to save contacts: {response.status} - {response_text}")
+                    return False
+            
+            # Test saving deals data
+            deals_data = {
+                "deals": {
+                    f"deal_{unique_suffix}_1": {
+                        "id": f"deal_{unique_suffix}_1",
+                        "title": "Abertura de Empresa - Tech Solutions",
+                        "contact_id": f"contact_{unique_suffix}_1",
+                        "stage": "proposal",
+                        "value": 2500.00,
+                        "created_at": "2025-01-10T10:30:00Z",
+                        "notes": "Cliente interessado em abertura de empresa com contabilidade completa"
+                    },
+                    f"deal_{unique_suffix}_2": {
+                        "id": f"deal_{unique_suffix}_2",
+                        "title": "Consultoria Tributária - Inovação Digital",
+                        "contact_id": f"contact_{unique_suffix}_2",
+                        "stage": "negotiation",
+                        "value": 1800.00,
+                        "created_at": "2025-01-10T11:30:00Z",
+                        "notes": "Planejamento tributário para otimização fiscal"
+                    }
+                }
+            }
+            
+            async with self.session.post(f"{API_BASE}/chrome-extension/crm-data", json=deals_data, headers=headers) as response:
+                if response.status == 200:
+                    result = await response.json()
+                    if result.get("success"):
+                        self.log_result("Chrome Extension CRM Data - Deals", True, f"Deals data saved successfully: {len(deals_data['deals'])} deals")
+                    else:
+                        self.log_result("Chrome Extension CRM Data - Deals", False, f"Unexpected response: {result}")
+                        return False
+                else:
+                    response_text = await response.text()
+                    self.log_result("Chrome Extension CRM Data - Deals", False, f"Failed to save deals: {response.status} - {response_text}")
+                    return False
+            
+            # Test saving conversations data
+            conversations_data = {
+                "conversations": {
+                    f"conv_{unique_suffix}_1": {
+                        "id": f"conv_{unique_suffix}_1",
+                        "contact_id": f"contact_{unique_suffix}_1",
+                        "messages": [
+                            {
+                                "id": f"msg_{unique_suffix}_1",
+                                "text": "Olá, gostaria de informações sobre abertura de empresa",
+                                "direction": "incoming",
+                                "timestamp": "2025-01-10T15:30:00Z"
+                            },
+                            {
+                                "id": f"msg_{unique_suffix}_2",
+                                "text": "Olá! Posso ajudá-lo com a abertura da sua empresa. Que tipo de negócio você pretende abrir?",
+                                "direction": "outgoing",
+                                "timestamp": "2025-01-10T15:32:00Z"
+                            }
+                        ],
+                        "last_message": "2025-01-10T15:32:00Z"
+                    }
+                }
+            }
+            
+            async with self.session.post(f"{API_BASE}/chrome-extension/crm-data", json=conversations_data, headers=headers) as response:
+                if response.status == 200:
+                    result = await response.json()
+                    if result.get("success"):
+                        self.log_result("Chrome Extension CRM Data - Conversations", True, f"Conversations data saved successfully: {len(conversations_data['conversations'])} conversations")
+                    else:
+                        self.log_result("Chrome Extension CRM Data - Conversations", False, f"Unexpected response: {result}")
+                        return False
+                else:
+                    response_text = await response.text()
+                    self.log_result("Chrome Extension CRM Data - Conversations", False, f"Failed to save conversations: {response.status} - {response_text}")
+                    return False
+            
+            # Test error handling with malformed data
+            malformed_data = {
+                "invalid_section": {
+                    "test": "data"
+                }
+            }
+            
+            async with self.session.post(f"{API_BASE}/chrome-extension/crm-data", json=malformed_data, headers=headers) as response:
+                if response.status == 200:
+                    result = await response.json()
+                    if result.get("success"):
+                        self.log_result("Chrome Extension CRM Data - Error Handling", True, "Malformed data handled gracefully")
+                        return True
+                    else:
+                        self.log_result("Chrome Extension CRM Data - Error Handling", False, f"Unexpected response to malformed data: {result}")
+                        return False
+                else:
+                    self.log_result("Chrome Extension CRM Data - Error Handling", False, f"Malformed data caused error: {response.status}")
+                    return False
+                    
+        except Exception as e:
+            self.log_result("Chrome Extension CRM Data", False, f"CRM data test failed: {str(e)}")
+            return False
+            
+    async def test_chrome_extension_mass_message(self, headers):
+        """Test POST /api/chrome-extension/mass-message endpoint"""
+        try:
+            import time
+            unique_suffix = str(int(time.time()))
+            
+            # Test 1: Valid mass message campaign
+            campaign_data = {
+                "title": f"Campanha Extensão {unique_suffix}",
+                "message": "🎉 Oferta especial! Abertura de empresa com desconto de 30%. Entre em contato conosco para mais informações!",
+                "recipients": [
+                    "+5511999887766",
+                    "+5511888776655", 
+                    "+5511777665544",
+                    "+5511666554433"
+                ],
+                "campaign_type": "promotional"
+            }
+            
+            async with self.session.post(f"{API_BASE}/chrome-extension/mass-message", json=campaign_data, headers=headers) as response:
+                if response.status == 200:
+                    result = await response.json()
+                    if (result.get("success") and 
+                        result.get("campaign_id") and 
+                        "Campanha criada com sucesso" in result.get("message", "") and
+                        "4 destinatários" in result.get("message", "")):
+                        self.log_result("Chrome Extension Mass Message - Valid Campaign", True, f"Campaign created successfully: {result['campaign_id']}")
+                        
+                        # Store campaign ID for verification
+                        campaign_id = result["campaign_id"]
+                        
+                    else:
+                        self.log_result("Chrome Extension Mass Message - Valid Campaign", False, f"Unexpected response: {result}")
+                        return False
+                else:
+                    response_text = await response.text()
+                    self.log_result("Chrome Extension Mass Message - Valid Campaign", False, f"Failed to create campaign: {response.status} - {response_text}")
+                    return False
+            
+            # Test 2: Campaign with minimal required fields
+            minimal_campaign = {
+                "message": "Mensagem de teste mínima",
+                "recipients": ["+5511999887766"],
+                "campaign_type": "informational"
+            }
+            
+            async with self.session.post(f"{API_BASE}/chrome-extension/mass-message", json=minimal_campaign, headers=headers) as response:
+                if response.status == 200:
+                    result = await response.json()
+                    if result.get("success") and result.get("campaign_id"):
+                        self.log_result("Chrome Extension Mass Message - Minimal Campaign", True, f"Minimal campaign created: {result['campaign_id']}")
+                    else:
+                        self.log_result("Chrome Extension Mass Message - Minimal Campaign", False, f"Minimal campaign failed: {result}")
+                        return False
+                else:
+                    response_text = await response.text()
+                    self.log_result("Chrome Extension Mass Message - Minimal Campaign", False, f"Minimal campaign request failed: {response.status} - {response_text}")
+                    return False
+            
+            # Test 3: Error handling - missing required fields
+            invalid_campaign = {
+                "title": "Campanha Inválida",
+                "message": "Mensagem sem destinatários"
+                # Missing recipients and campaign_type
+            }
+            
+            async with self.session.post(f"{API_BASE}/chrome-extension/mass-message", json=invalid_campaign, headers=headers) as response:
+                if response.status == 400:
+                    error_result = await response.json()
+                    if "Missing required fields" in error_result.get("detail", ""):
+                        self.log_result("Chrome Extension Mass Message - Error Handling", True, "Correctly rejected campaign with missing fields")
+                    else:
+                        self.log_result("Chrome Extension Mass Message - Error Handling", False, f"Wrong error message: {error_result}")
+                        return False
+                else:
+                    self.log_result("Chrome Extension Mass Message - Error Handling", False, f"Should have failed with 400, got {response.status}")
+                    return False
+            
+            # Test 4: Empty recipients array
+            empty_recipients_campaign = {
+                "message": "Mensagem sem destinatários",
+                "recipients": [],
+                "campaign_type": "test"
+            }
+            
+            async with self.session.post(f"{API_BASE}/chrome-extension/mass-message", json=empty_recipients_campaign, headers=headers) as response:
+                if response.status == 200:
+                    result = await response.json()
+                    if result.get("success") and "0 destinatários" in result.get("message", ""):
+                        self.log_result("Chrome Extension Mass Message - Empty Recipients", True, "Empty recipients handled correctly")
+                        return True
+                    else:
+                        self.log_result("Chrome Extension Mass Message - Empty Recipients", False, f"Empty recipients not handled correctly: {result}")
+                        return False
+                else:
+                    self.log_result("Chrome Extension Mass Message - Empty Recipients", False, f"Empty recipients caused error: {response.status}")
+                    return False
+                    
+        except Exception as e:
+            self.log_result("Chrome Extension Mass Message", False, f"Mass message test failed: {str(e)}")
+            return False
+            
+    async def test_chrome_extension_analytics(self, headers):
+        """Test GET /api/chrome-extension/analytics endpoint"""
+        try:
+            # Test analytics endpoint
+            async with self.session.get(f"{API_BASE}/chrome-extension/analytics", headers=headers) as response:
+                if response.status == 200:
+                    analytics_data = await response.json()
+                    
+                    # Check summary structure
+                    if "summary" not in analytics_data:
+                        self.log_result("Chrome Extension Analytics - Structure", False, "Missing summary section")
+                        return False
+                    
+                    summary = analytics_data["summary"]
+                    required_summary_fields = ["total_contacts", "total_deals", "active_deals", "total_conversations", "conversion_rate", "recent_contacts"]
+                    missing_summary = [field for field in required_summary_fields if field not in summary]
+                    
+                    if missing_summary:
+                        self.log_result("Chrome Extension Analytics - Summary Fields", False, f"Missing summary fields: {missing_summary}")
+                        return False
+                    
+                    # Check kanban_data structure
+                    if "kanban_data" not in analytics_data:
+                        self.log_result("Chrome Extension Analytics - Structure", False, "Missing kanban_data section")
+                        return False
+                    
+                    kanban_data = analytics_data["kanban_data"]
+                    required_kanban_fields = ["lead", "contact", "proposal", "negotiation", "closed", "lost"]
+                    missing_kanban = [field for field in required_kanban_fields if field not in kanban_data]
+                    
+                    if missing_kanban:
+                        self.log_result("Chrome Extension Analytics - Kanban Fields", False, f"Missing kanban fields: {missing_kanban}")
+                        return False
+                    
+                    # Validate data types
+                    numeric_fields = ["total_contacts", "total_deals", "active_deals", "total_conversations", "recent_contacts"]
+                    for field in numeric_fields:
+                        if not isinstance(summary[field], int):
+                            self.log_result("Chrome Extension Analytics - Data Types", False, f"Field {field} should be integer, got {type(summary[field])}")
+                            return False
+                    
+                    # Check conversion rate format
+                    conversion_rate = summary["conversion_rate"]
+                    if not isinstance(conversion_rate, str) or not conversion_rate.endswith("%"):
+                        self.log_result("Chrome Extension Analytics - Conversion Rate", False, f"Conversion rate should be string with %, got {conversion_rate}")
+                        return False
+                    
+                    # Validate kanban data types
+                    for stage, count in kanban_data.items():
+                        if not isinstance(count, int):
+                            self.log_result("Chrome Extension Analytics - Kanban Data Types", False, f"Kanban stage {stage} should be integer, got {type(count)}")
+                            return False
+                    
+                    # Log analytics summary
+                    self.log_result("Chrome Extension Analytics", True, 
+                        f"Analytics retrieved: {summary['total_contacts']} contacts, {summary['total_deals']} deals, "
+                        f"{summary['active_deals']} active deals, {summary['conversion_rate']} conversion rate")
+                    
+                    # Test with company_id parameter
+                    async with self.session.get(f"{API_BASE}/chrome-extension/analytics?company_id=test-company", headers=headers) as company_response:
+                        if company_response.status == 200:
+                            company_analytics = await company_response.json()
+                            if "summary" in company_analytics and "kanban_data" in company_analytics:
+                                self.log_result("Chrome Extension Analytics - Company Filter", True, "Analytics with company filter working")
+                                return True
+                            else:
+                                self.log_result("Chrome Extension Analytics - Company Filter", False, "Company filter returned invalid structure")
+                                return False
+                        else:
+                            self.log_result("Chrome Extension Analytics - Company Filter", False, f"Company filter failed: {company_response.status}")
+                            return False
+                    
+                else:
+                    response_text = await response.text()
+                    self.log_result("Chrome Extension Analytics", False, f"Failed to get analytics: {response.status} - {response_text}")
+                    return False
+                    
+        except Exception as e:
+            self.log_result("Chrome Extension Analytics", False, f"Analytics test failed: {str(e)}")
+            return False
+            
     async def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Empresas Web CRM Backend Tests")
