@@ -800,8 +800,15 @@ async def get_contacts(current_user: str = Depends(get_current_user), db=Depends
 async def create_contact(contact: ContactCreate, current_user: str = Depends(get_current_user), db=Depends(get_database)):
     contact_data = {
         "id": str(uuid.uuid4()),
-        **contact.dict(),
-        "created_at": datetime.utcnow().isoformat()
+        "name": contact.name,
+        "phone_number": contact.phone,
+        "email": contact.email,
+        "company": contact.company,
+        "notes": contact.notes or "",
+        "labels": [],
+        "created_at": datetime.utcnow().isoformat(),
+        "last_message": None,
+        "whatsapp_connected": False
     }
     await db.contacts.insert_one(contact_data)
     return convert_mongo_document(contact_data)
