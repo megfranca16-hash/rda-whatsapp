@@ -1646,6 +1646,7 @@ class BackendTester:
             await self.test_department_signatures()
             await self.test_transfers_system()
             await self.test_ai_integration()
+            await self.test_ai_response_endpoint()
             await self.test_whatsapp_qr_system()
             await self.test_whatsapp_send_message()
             await self.test_dashboard_stats()
@@ -1653,6 +1654,9 @@ class BackendTester:
             await self.test_appointments_system()
             await self.test_scheduled_messages_system()
             await self.test_chrome_extension_endpoints()
+            await self.test_data_persistence()
+            await self.test_error_handling()
+            await self.test_uuid_validation()
             
         finally:
             await self.teardown()
