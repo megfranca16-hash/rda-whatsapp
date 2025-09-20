@@ -1020,9 +1020,15 @@ async def send_whatsapp_message(
         raise HTTPException(status_code=500, detail="Erro ao enviar mensagem")
 
 # Contacts Routes
-@app.get("/api/contacts", response_model=List[Contact])
+@app.get("/api/contacts")
 async def get_contacts(current_user: str = Depends(get_current_user), db=Depends(get_database)):
     contacts = await db.contacts.find().to_list(length=100)
+    # Fix phone field inconsistency
+    for contact in contacts:
+        if 'phone' in contact and 'phone_number' not in contact:
+            contact['phone_number'] = contact['phone']
+        if 'created_at' not in contact:
+            contact['created_at'] = datetime.utcnow().isoformat()
     return convert_mongo_document(contacts)
 
 @app.post("/api/contacts")
