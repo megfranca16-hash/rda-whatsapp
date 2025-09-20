@@ -463,8 +463,7 @@ test_plan:
     - "WhatsApp interface with QR Code display"
     - "AI assistant interface"
     - "Department management interface"
-  stuck_tasks:
-    - "Landing page authentication modal integration"
+  stuck_tasks: []
   test_all: true
   test_priority: "high_first"
 
