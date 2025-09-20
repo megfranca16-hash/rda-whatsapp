@@ -401,9 +401,14 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: []
-  stuck_tasks: []
-  test_all: false
+  current_focus:
+    - "Landing page authentication modal integration"
+    - "WhatsApp interface with QR Code display"
+    - "AI assistant interface"
+    - "Department management interface"
+  stuck_tasks:
+    - "Landing page authentication modal integration"
+  test_all: true
   test_priority: "high_first"
 
 agent_communication:
