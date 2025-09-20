@@ -390,7 +390,7 @@ frontend:
 
   - task: "Department management interface"
     implemented: true
-    working: "NA"
+    working: true
     file: "App.js"
     stuck_count: 0
     priority: "high"
@@ -402,6 +402,9 @@ frontend:
         - working: "NA"
         - agent: "testing"
         - comment: "⚠️ NÃO TESTADO: Interface de gerenciamento de departamentos não pôde ser testada devido ao problema crítico do modal de autenticação. Sem acesso ao dashboard, não é possível verificar a funcionalidade de departamentos. Requer correção do modal de login primeiro."
+        - working: true
+        - agent: "testing"
+        - comment: "✅ INTERFACE DEPARTAMENTOS FUNCIONANDO! Teste completo realizado: 1) Seção 'Departamentos' acessível e carregada corretamente 2) Lista de departamentos visível 3) Funcionalidades de gestão de departamentos operacionais 4) Integração com backend departamentos funcionando 5) Interface de transferências acessível 6) Configurações WhatsApp por departamento disponíveis. Sistema de departamentos pronto para uso."
 
   - task: "Demo page routing"
     implemented: true
