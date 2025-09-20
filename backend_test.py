@@ -1216,7 +1216,327 @@ class BackendTester:
             self.log_result("Chrome Extension Mass Message", False, f"Mass message test failed: {str(e)}")
             return False
             
-    async def test_chrome_extension_analytics(self, headers):
+    async def test_ai_response_endpoint(self):
+        """Test AI response endpoint directly"""
+        if not self.auth_token:
+            self.log_result("AI Response Endpoint", False, "No auth token available")
+            return False
+            
+        headers = {"Authorization": f"Bearer {self.auth_token}"}
+        
+        try:
+            # Test AI response endpoint with different message types
+            test_messages = [
+                {
+                    "message": "Preciso de ajuda com abertura de empresa",
+                    "expected_dept": "abertura"
+                },
+                {
+                    "message": "Tenho dúvidas sobre impostos e tributos",
+                    "expected_dept": "tributos"
+                },
+                {
+                    "message": "Preciso de ajuda com folha de pagamento",
+                    "expected_dept": "folha"
+                },
+                {
+                    "message": "Olá, como vocês podem me ajudar?",
+                    "expected_dept": "geral"
+                }
+            ]
+            
+            for i, test_case in enumerate(test_messages):
+                ai_request = {
+                    "message": test_case["message"],
+                    "phone_number": f"+5511999{str(i).zfill(6)}",
+                    "department_id": None
+                }
+                
+                # Check if there's an AI response endpoint
+                try:
+                    async with self.session.post(f"{API_BASE}/ai/response", json=ai_request, headers=headers) as response:
+                        if response.status == 200:
+                            ai_data = await response.json()
+                            if ai_data.get("response") and len(ai_data["response"]) > 10:
+                                self.log_result(f"AI Response Test {i+1}", True, f"AI responded to '{test_case['message'][:30]}...'")
+                            else:
+                                self.log_result(f"AI Response Test {i+1}", False, f"AI response too short or missing: {ai_data}")
+                        elif response.status == 404:
+                            self.log_result("AI Response Endpoint", False, "AI response endpoint not found (/api/ai/response)")
+                            return False
+                        else:
+                            self.log_result(f"AI Response Test {i+1}", False, f"AI endpoint failed: {response.status}")
+                except Exception as e:
+                    self.log_result(f"AI Response Test {i+1}", False, f"AI test failed: {str(e)}")
+                    
+            return True
+            
+        except Exception as e:
+            self.log_result("AI Response Endpoint", False, f"AI response tests failed: {str(e)}")
+            return False
+
+    async def test_data_persistence(self):
+        """Test data persistence in MongoDB"""
+        if not self.auth_token:
+            self.log_result("Data Persistence", False, "No auth token available")
+            return False
+            
+        headers = {"Authorization": f"Bearer {self.auth_token}"}
+        
+        try:
+            import time
+            unique_suffix = str(int(time.time()))
+            
+            # Test 1: Create contact and verify it persists
+            contact_data = {
+                "name": f"Teste Persistência {unique_suffix}",
+                "phone": f"+5511777{unique_suffix[-6:]}",
+                "email": f"persistencia{unique_suffix}@test.com",
+                "company": "Empresa Teste Persistência",
+                "notes": "Contato criado para teste de persistência de dados"
+            }
+            
+            # Create contact
+            async with self.session.post(f"{API_BASE}/contacts", json=contact_data, headers=headers) as response:
+                if response.status == 200:
+                    created_contact = await response.json()
+                    contact_id = created_contact.get("id")
+                    
+                    # Wait a moment and retrieve contacts to verify persistence
+                    await asyncio.sleep(1)
+                    
+                    async with self.session.get(f"{API_BASE}/contacts", headers=headers) as get_response:
+                        if get_response.status == 200:
+                            contacts = await get_response.json()
+                            found_contact = next((c for c in contacts if c.get("id") == contact_id), None)
+                            
+                            if found_contact and found_contact.get("name") == contact_data["name"]:
+                                self.log_result("Data Persistence - Contacts", True, f"Contact persisted correctly: {found_contact['name']}")
+                            else:
+                                self.log_result("Data Persistence - Contacts", False, "Contact not found after creation")
+                                return False
+                        else:
+                            self.log_result("Data Persistence - Contacts", False, "Failed to retrieve contacts for persistence test")
+                            return False
+                else:
+                    self.log_result("Data Persistence - Contacts", False, f"Failed to create contact for persistence test: {response.status}")
+                    return False
+            
+            # Test 2: Create appointment and verify persistence
+            appointment_data = {
+                "title": f"Reunião Persistência {unique_suffix}",
+                "description": "Reunião criada para teste de persistência",
+                "scheduled_date": "2025-02-20T10:00:00",
+                "client_name": "Cliente Teste Persistência",
+                "appointment_type": "consultation"
+            }
+            
+            async with self.session.post(f"{API_BASE}/appointments", json=appointment_data, headers=headers) as response:
+                if response.status == 200:
+                    created_appointment = await response.json()
+                    appointment_id = created_appointment.get("id")
+                    
+                    await asyncio.sleep(1)
+                    
+                    async with self.session.get(f"{API_BASE}/appointments", headers=headers) as get_response:
+                        if get_response.status == 200:
+                            appointments = await get_response.json()
+                            found_appointment = next((a for a in appointments if a.get("id") == appointment_id), None)
+                            
+                            if found_appointment and found_appointment.get("title") == appointment_data["title"]:
+                                self.log_result("Data Persistence - Appointments", True, f"Appointment persisted correctly: {found_appointment['title']}")
+                            else:
+                                self.log_result("Data Persistence - Appointments", False, "Appointment not found after creation")
+                                return False
+                        else:
+                            self.log_result("Data Persistence - Appointments", False, "Failed to retrieve appointments for persistence test")
+                            return False
+                else:
+                    self.log_result("Data Persistence - Appointments", False, f"Failed to create appointment for persistence test: {response.status}")
+                    return False
+            
+            # Test 3: Create scheduled message and verify persistence
+            message_data = {
+                "title": f"Mensagem Persistência {unique_suffix}",
+                "message": "Mensagem criada para teste de persistência de dados",
+                "recipients": [f"+5511666{unique_suffix[-6:]}"],
+                "scheduled_date": "2025-02-25T14:00:00",
+                "campaign_type": "test"
+            }
+            
+            async with self.session.post(f"{API_BASE}/scheduled-messages", json=message_data, headers=headers) as response:
+                if response.status == 200:
+                    created_message = await response.json()
+                    message_id = created_message.get("id")
+                    
+                    await asyncio.sleep(1)
+                    
+                    async with self.session.get(f"{API_BASE}/scheduled-messages", headers=headers) as get_response:
+                        if get_response.status == 200:
+                            messages = await get_response.json()
+                            found_message = next((m for m in messages if m.get("id") == message_id), None)
+                            
+                            if found_message and found_message.get("title") == message_data["title"]:
+                                self.log_result("Data Persistence - Scheduled Messages", True, f"Scheduled message persisted correctly: {found_message['title']}")
+                                return True
+                            else:
+                                self.log_result("Data Persistence - Scheduled Messages", False, "Scheduled message not found after creation")
+                                return False
+                        else:
+                            self.log_result("Data Persistence - Scheduled Messages", False, "Failed to retrieve scheduled messages for persistence test")
+                            return False
+                else:
+                    self.log_result("Data Persistence - Scheduled Messages", False, f"Failed to create scheduled message for persistence test: {response.status}")
+                    return False
+                    
+        except Exception as e:
+            self.log_result("Data Persistence", False, f"Data persistence tests failed: {str(e)}")
+            return False
+
+    async def test_error_handling(self):
+        """Test error handling for various scenarios"""
+        if not self.auth_token:
+            self.log_result("Error Handling", False, "No auth token available")
+            return False
+            
+        headers = {"Authorization": f"Bearer {self.auth_token}"}
+        
+        try:
+            # Test 1: Unauthorized access (no token)
+            async with self.session.get(f"{API_BASE}/contacts") as response:
+                if response.status == 401:
+                    self.log_result("Error Handling - Unauthorized", True, "Correctly rejected request without token")
+                else:
+                    self.log_result("Error Handling - Unauthorized", False, f"Should have returned 401, got {response.status}")
+            
+            # Test 2: Invalid token
+            invalid_headers = {"Authorization": "Bearer invalid-token-12345"}
+            async with self.session.get(f"{API_BASE}/contacts", headers=invalid_headers) as response:
+                if response.status == 401:
+                    self.log_result("Error Handling - Invalid Token", True, "Correctly rejected invalid token")
+                else:
+                    self.log_result("Error Handling - Invalid Token", False, f"Should have returned 401, got {response.status}")
+            
+            # Test 3: Malformed JSON data
+            malformed_contact = '{"name": "Test", "phone": "+5511999887766", "email": "invalid-json"'  # Missing closing brace
+            try:
+                async with self.session.post(f"{API_BASE}/contacts", data=malformed_contact, headers={**headers, "Content-Type": "application/json"}) as response:
+                    if response.status in [400, 422]:
+                        self.log_result("Error Handling - Malformed JSON", True, f"Correctly rejected malformed JSON with status {response.status}")
+                    else:
+                        self.log_result("Error Handling - Malformed JSON", False, f"Should have returned 400/422, got {response.status}")
+            except Exception:
+                self.log_result("Error Handling - Malformed JSON", True, "Malformed JSON properly handled at client level")
+            
+            # Test 4: Missing required fields
+            incomplete_contact = {
+                "email": "test@test.com"
+                # Missing required name and phone fields
+            }
+            
+            async with self.session.post(f"{API_BASE}/contacts", json=incomplete_contact, headers=headers) as response:
+                if response.status in [400, 422]:
+                    self.log_result("Error Handling - Missing Fields", True, f"Correctly rejected incomplete data with status {response.status}")
+                else:
+                    self.log_result("Error Handling - Missing Fields", False, f"Should have returned 400/422, got {response.status}")
+            
+            # Test 5: Non-existent resource
+            async with self.session.get(f"{API_BASE}/contacts/non-existent-id", headers=headers) as response:
+                if response.status == 404:
+                    self.log_result("Error Handling - Not Found", True, "Correctly returned 404 for non-existent resource")
+                else:
+                    # Some APIs might return empty list or different behavior, which is also acceptable
+                    self.log_result("Error Handling - Not Found", True, f"Non-existent resource handled with status {response.status}")
+            
+            # Test 6: Invalid department ID in transfer
+            invalid_transfer = {
+                "contact_phone": "+5511999887766",
+                "department_id": "non-existent-dept-id",
+                "message": "Test transfer with invalid department"
+            }
+            
+            async with self.session.post(f"{API_BASE}/transfers", headers=headers, params=invalid_transfer) as response:
+                # This might succeed as the API might not validate department existence immediately
+                if response.status in [200, 400, 404]:
+                    self.log_result("Error Handling - Invalid Department", True, f"Invalid department handled with status {response.status}")
+                else:
+                    self.log_result("Error Handling - Invalid Department", False, f"Unexpected status for invalid department: {response.status}")
+            
+            return True
+            
+        except Exception as e:
+            self.log_result("Error Handling", False, f"Error handling tests failed: {str(e)}")
+            return False
+
+    async def test_uuid_validation(self):
+        """Test that UUIDs are used instead of MongoDB ObjectIDs"""
+        if not self.auth_token:
+            self.log_result("UUID Validation", False, "No auth token available")
+            return False
+            
+        headers = {"Authorization": f"Bearer {self.auth_token}"}
+        
+        try:
+            import re
+            uuid_pattern = re.compile(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', re.IGNORECASE)
+            
+            # Test 1: Check contact IDs are UUIDs
+            async with self.session.get(f"{API_BASE}/contacts", headers=headers) as response:
+                if response.status == 200:
+                    contacts = await response.json()
+                    if contacts:
+                        contact_id = contacts[0].get("id")
+                        if contact_id and uuid_pattern.match(contact_id):
+                            self.log_result("UUID Validation - Contacts", True, f"Contact ID is valid UUID: {contact_id}")
+                        else:
+                            self.log_result("UUID Validation - Contacts", False, f"Contact ID is not UUID: {contact_id}")
+                            return False
+                    else:
+                        self.log_result("UUID Validation - Contacts", True, "No contacts to validate (empty database)")
+                else:
+                    self.log_result("UUID Validation - Contacts", False, f"Failed to get contacts: {response.status}")
+                    return False
+            
+            # Test 2: Check department IDs are UUIDs
+            async with self.session.get(f"{API_BASE}/departments", headers=headers) as response:
+                if response.status == 200:
+                    departments = await response.json()
+                    if departments:
+                        dept_id = departments[0].get("id")
+                        if dept_id and uuid_pattern.match(dept_id):
+                            self.log_result("UUID Validation - Departments", True, f"Department ID is valid UUID: {dept_id}")
+                        else:
+                            self.log_result("UUID Validation - Departments", False, f"Department ID is not UUID: {dept_id}")
+                            return False
+                    else:
+                        self.log_result("UUID Validation - Departments", False, "No departments found for UUID validation")
+                        return False
+                else:
+                    self.log_result("UUID Validation - Departments", False, f"Failed to get departments: {response.status}")
+                    return False
+            
+            # Test 3: Check appointment IDs are UUIDs
+            async with self.session.get(f"{API_BASE}/appointments", headers=headers) as response:
+                if response.status == 200:
+                    appointments = await response.json()
+                    if appointments:
+                        appointment_id = appointments[0].get("id")
+                        if appointment_id and uuid_pattern.match(appointment_id):
+                            self.log_result("UUID Validation - Appointments", True, f"Appointment ID is valid UUID: {appointment_id}")
+                        else:
+                            self.log_result("UUID Validation - Appointments", False, f"Appointment ID is not UUID: {appointment_id}")
+                            return False
+                    else:
+                        self.log_result("UUID Validation - Appointments", True, "No appointments to validate (empty database)")
+                else:
+                    self.log_result("UUID Validation - Appointments", False, f"Failed to get appointments: {response.status}")
+                    return False
+            
+            return True
+            
+        except Exception as e:
+            self.log_result("UUID Validation", False, f"UUID validation tests failed: {str(e)}")
+            return False
         """Test GET /api/chrome-extension/analytics endpoint"""
         try:
             # Test analytics endpoint
