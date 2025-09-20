@@ -166,6 +166,7 @@ const LandingPage = ({ onLoginSuccess }) => {
           <Button 
             onClick={() => setShowAuthModal(true)}
             className="bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30 transition-all duration-300 px-6 py-2 rounded-full"
+            data-testid="entrar-sistema-button"
           >
             Entrar no Sistema
           </Button>
