@@ -273,9 +273,9 @@ backend:
 frontend:
   - task: "Landing page authentication modal integration"
     implemented: true
-    working: true
+    working: false
     file: "LandingPage.js, App.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
@@ -285,6 +285,9 @@ frontend:
         - working: true
         - agent: "main"
         - comment: "✅ Authentication modal integration complete! Both login and register flows working perfectly. User registration with real backend API calls implemented. Modal opens from both 'Entrar no Sistema' and 'Começar Agora' buttons. Registration successfully creates user and redirects to dashboard with full authentication."
+        - working: false
+        - agent: "testing"
+        - comment: "❌ CRÍTICO: Modal de autenticação não funciona corretamente. Problemas identificados: 1) Modal aparece visualmente mas não é interativo via automação 2) Campos de input não são detectáveis/preenchíveis pelos testes automatizados 3) Impossível realizar login através da interface automatizada 4) Possível problema com z-index, overlay ou estrutura DOM do modal 5) Backend está funcionando (APIs testadas separadamente) mas frontend modal tem problemas de interatividade. REQUER CORREÇÃO URGENTE."
 
   - task: "Demo page routing"
     implemented: true
