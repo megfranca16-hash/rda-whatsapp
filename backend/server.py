@@ -917,6 +917,8 @@ async def send_mass_message_extension(
             "message": f"Campanha criada com sucesso para {len(message_data['recipients'])} destinatários"
         }
         
+    except HTTPException:
+        raise  # Re-raise HTTPException to maintain proper status codes
     except Exception as e:
         logging.error(f"Error processing mass message from extension: {str(e)}")
         raise HTTPException(status_code=500, detail="Error processing mass message")
