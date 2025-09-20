@@ -204,6 +204,7 @@ const LandingPage = ({ onLoginSuccess }) => {
                 <Button 
                   onClick={() => setShowAuthModal(true)}
                   className="bg-white text-slate-900 hover:bg-white/90 px-8 py-4 rounded-full text-lg font-semibold shadow-2xl hover:shadow-white/20 transition-all duration-300 flex items-center justify-center space-x-2"
+                  data-testid="comecar-agora-button"
                 >
                   <span>Começar Agora</span>
                   <ArrowRight className="w-5 h-5" />
