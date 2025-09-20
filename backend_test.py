@@ -1537,6 +1537,8 @@ class BackendTester:
         except Exception as e:
             self.log_result("UUID Validation", False, f"UUID validation tests failed: {str(e)}")
             return False
+
+    async def test_chrome_extension_analytics(self, headers):
         """Test GET /api/chrome-extension/analytics endpoint"""
         try:
             # Test analytics endpoint
