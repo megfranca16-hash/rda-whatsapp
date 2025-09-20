@@ -315,13 +315,17 @@ const LandingPage = ({ onLoginSuccess }) => {
 
       {/* Auth Modal */}
       {showAuthModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          data-testid="auth-modal-overlay"
+        >
           <Card className="w-full max-w-md bg-white/95 backdrop-blur-xl border border-white/30 shadow-2xl">
             <CardHeader className="text-center relative">
               <Button
                 variant="ghost"
                 className="absolute right-0 top-0 p-2"
                 onClick={() => setShowAuthModal(false)}
+                data-testid="close-modal-button"
               >
                 <X className="w-4 h-4" />
               </Button>
@@ -346,7 +350,7 @@ const LandingPage = ({ onLoginSuccess }) => {
                   <p className="text-xs text-blue-600">Senha: <span className="font-mono">admin123</span></p>
                 </div>
               )}
-              <form onSubmit={handleAuth} className="space-y-4">
+              <form onSubmit={handleAuth} className="space-y-4" data-testid="auth-form">
                 {authMode === 'register' && (
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -356,6 +360,7 @@ const LandingPage = ({ onLoginSuccess }) => {
                       value={authData.name}
                       onChange={(e) => setAuthData({...authData, name: e.target.value})}
                       className="pl-10"
+                      data-testid="name-input"
                       required
                     />
                   </div>
@@ -369,6 +374,7 @@ const LandingPage = ({ onLoginSuccess }) => {
                     value={authData.email}
                     onChange={(e) => setAuthData({...authData, email: e.target.value})}
                     className="pl-10"
+                    data-testid="email-input"
                     required
                   />
                 </div>
@@ -381,6 +387,7 @@ const LandingPage = ({ onLoginSuccess }) => {
                     value={authData.password}
                     onChange={(e) => setAuthData({...authData, password: e.target.value})}
                     className="pl-10"
+                    data-testid="password-input"
                     required
                   />
                 </div>
@@ -394,6 +401,7 @@ const LandingPage = ({ onLoginSuccess }) => {
                       value={authData.confirmPassword}
                       onChange={(e) => setAuthData({...authData, confirmPassword: e.target.value})}
                       className="pl-10"
+                      data-testid="confirm-password-input"
                       required
                     />
                   </div>
@@ -403,6 +411,7 @@ const LandingPage = ({ onLoginSuccess }) => {
                   type="submit" 
                   className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                   disabled={loading}
+                  data-testid="auth-submit-button"
                 >
                   {loading ? 'Processando...' : (authMode === 'login' ? 'Entrar' : 'Criar Conta')}
                 </Button>
@@ -413,6 +422,7 @@ const LandingPage = ({ onLoginSuccess }) => {
                   variant="ghost" 
                   onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}
                   className="text-slate-600 hover:text-slate-900"
+                  data-testid="toggle-auth-mode"
                 >
                   {authMode === 'login' ? 'Não tem conta? Cadastre-se' : 'Já tem conta? Faça login'}
                 </Button>
