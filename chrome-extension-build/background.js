@@ -36,12 +36,13 @@ class BotNinjaBackground {
 
   async initializeStorage() {
     const defaultConfig = {
-      companies: {},
-      activeCompany: null,
+      bots: {},
+      activeBot: null,
       globalSettings: {
-        autoSave: true,
+        aiMode: 'intelligent',
+        autoResponse: true,
         notifications: true,
-        theme: 'light',
+        theme: 'botninja',
         language: 'pt-BR'
       },
       crmConfig: {
