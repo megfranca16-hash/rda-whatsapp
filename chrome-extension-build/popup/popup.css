@@ -125,8 +125,8 @@ body {
   50% { opacity: 0.5; }
 }
 
-/* Empresa Ativa */
-.active-company {
+/* Bot Ativo */
+.active-bot {
   display: flex;
   align-items: center;
   justify-content: space-between;
