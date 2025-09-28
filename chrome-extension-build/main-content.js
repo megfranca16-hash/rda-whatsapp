@@ -1,7 +1,7 @@
-// Empresas Web CRM - Main Content Script
-// Script principal que injeta a interface CRM no WhatsApp Web
+// BotNinja 3.0 - Main Content Script
+// Script principal que injeta a IA no WhatsApp Web
 
-class EmpresasWebCRM {
+class BotNinjaCRM {
   constructor() {
     this.config = null;
     this.activeCompany = null;
