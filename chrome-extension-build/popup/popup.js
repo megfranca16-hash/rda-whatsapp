@@ -540,19 +540,19 @@ class BotNinjaPopup {
   }
 
   openHelp() {
-    chrome.tabs.create({ url: 'https://empresasweb.com.br/help' });
+    chrome.tabs.create({ url: 'https://botninja.com.br/help' });
   }
 
   openFeedback() {
-    chrome.tabs.create({ url: 'https://empresasweb.com.br/feedback' });
+    chrome.tabs.create({ url: 'https://botninja.com.br/feedback' });
   }
 
   showVersionInfo() {
-    this.showNotification('Empresas Web CRM v2.0.0', 'info');
+    this.showNotification('BotNinja v3.0.0 - IA WhatsApp Automação', 'info');
   }
 }
 
 // Inicializar quando o DOM estiver pronto
 document.addEventListener('DOMContentLoaded', () => {
-  new EmpresasWebPopup();
+  new BotNinjaPopup();
 });
