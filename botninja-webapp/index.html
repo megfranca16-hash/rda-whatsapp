@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BotNinja 3.0 - IA WhatsApp Automação</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+    <meta name="description" content="Venda no piloto automático com Inteligência Artificial no WhatsApp. Atendimento 24/7, disparo em massa e CRM completo.">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#6366F1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="BotNinja IA">
+    
+    <!-- Manifest for PWA -->
+    <link rel="manifest" href="manifest.webmanifest">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="botninja-logo">
+                <img src="assets/logo.png" alt="BotNinja" class="logo-image">
+                <h1>BotNinja</h1>
+                <span class="version">3.0</span>
+            </div>
+            <div class="loading-spinner"></div>
+            <p>Inicializando IA...</p>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="app-container" class="app-container hidden">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="logo">
+                    <img src="assets/logo.png" alt="BotNinja" class="logo-image">
+                    <h1>BotNinja</h1>
+                    <span class="version">3.0</span>
+                </div>
+            </div>
+            <div class="header-center">
+                <div class="connection-status" id="connectionStatus">
+                    <span class="status-dot" id="statusDot"></span>
+                    <span class="status-text" id="statusText">Conectando...</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="btn-icon" id="settingsBtn" title="Configurações">
+                    <span>⚙️</span>
+                </button>
+                <button class="btn-icon" id="helpBtn" title="Ajuda">
+                    <span>❓</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="bot-info" id="botInfo">
+                    <div class="bot-avatar">
+                        <img src="assets/bot-avatar.png" alt="IA Avatar" class="avatar-image">
+                        <div class="status-indicator active"></div>
+                    </div>
+                    <div class="bot-details">
+                        <h3 id="botName">IA Personalizada</h3>
+                        <p id="botStatus">Atendimento Automático 24/7</p>
+                    </div>
+                    <button class="btn-config" id="configBotBtn">
+                        <span>⚙️</span>
+                    </button>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="nav-menu">
+                    <button class="nav-item active" data-section="dashboard">
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-label">Dashboard</span>
+                    </button>
+                    <button class="nav-item" data-section="whatsapp">
+                        <span class="nav-icon">📱</span>
+                        <span class="nav-label">WhatsApp</span>
+                    </button>
+                    <button class="nav-item" data-section="ai-chat">
+                        <span class="nav-icon">🧠</span>
+                        <span class="nav-label">IA Chat</span>
+                    </button>
+                    <button class="nav-item" data-section="mass-dispatch">
+                        <span class="nav-icon">🚀</span>
+                        <span class="nav-label">Disparo</span>
+                    </button>
+                    <button class="nav-item" data-section="crm-kanban">
+                        <span class="nav-icon">📋</span>
+                        <span class="nav-label">Kanban</span>
+                    </button>
+                    <button class="nav-item" data-section="agenda">
+                        <span class="nav-icon">📅</span>
+                        <span class="nav-label">Agenda</span>
+                    </button>
+                </nav>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <h4>Configurar IA</h4>
+                    <div class="action-buttons">
+                        <button class="action-btn" id="trainAiBtn">
+                            <span class="icon">🎓</span>
+                            <span class="text">Treinar IA</span>
+                        </button>
+                        <button class="action-btn" id="knowledgeBaseBtn">
+                            <span class="icon">📚</span>
+                            <span class="text">Base de Conhecimento</span>
+                        </button>
+                        <button class="action-btn" id="simulateBtn">
+                            <span class="icon">🎭</span>
+                            <span class="text">Simular</span>
+                        </button>
+                        <button class="action-btn" id="reportsBtn">
+                            <span class="icon">📊</span>
+                            <span class="text">Relatórios</span>
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Content Area -->
+            <section class="content-area">
+                <!-- Dashboard Section -->
+                <div id="dashboard-section" class="content-section active">
+                    <div class="section-header">
+                        <h2>Dashboard IA</h2>
+                        <p>Métricas em tempo real da sua inteligência artificial</p>
+                    </div>
+
+                    <!-- AI Metrics -->
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-icon">🧠</div>
+                            <div class="metric-content">
+                                <div class="metric-number" id="aiResponses">-</div>
+                                <div class="metric-label">Respostas IA</div>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon">🎯</div>
+                            <div class="metric-content">
+                                <div class="metric-number" id="leadsQualified">-</div>
+                                <div class="metric-label">Leads Qualificados</div>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon">📅</div>
+                            <div class="metric-content">
+                                <div class="metric-number" id="scheduledMeetings">-</div>
+                                <div class="metric-label">Reuniões Agendadas</div>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon">💰</div>
+                            <div class="metric-content">
+                                <div class="metric-number" id="conversionsToday">-</div>
+                                <div class="metric-label">Conversões Hoje</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Activity Feed -->
+                    <div class="activity-section">
+                        <h3>Atividade Recente da IA</h3>
+                        <div class="activity-feed" id="activityFeed">
+                            <!-- Activities will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WhatsApp Section -->
+                <div id="whatsapp-section" class="content-section">
+                    <div class="section-header">
+                        <h2>WhatsApp Connection</h2>
+                        <p>Conecte seu WhatsApp Web para ativar a IA</p>
+                    </div>
+
+                    <div class="whatsapp-connection">
+                        <div class="connection-card">
+                            <div class="qr-container" id="qrContainer">
+                                <div class="qr-placeholder" id="qrPlaceholder">
+                                    <div class="qr-icon">📱</div>
+                                    <h3>Conectar WhatsApp</h3>
+                                    <p>Clique no botão abaixo para gerar o QR Code</p>
+                                    <button class="btn-primary" id="generateQrBtn">
+                                        <span>📲</span>
+                                        Gerar QR Code
+                                    </button>
+                                </div>
+                                <canvas id="qrCode" class="qr-code hidden"></canvas>
+                            </div>
+                            <div class="connection-instructions">
+                                <h4>Como conectar:</h4>
+                                <ol>
+                                    <li>Abra o WhatsApp no seu celular</li>
+                                    <li>Toque em "Menu" (3 pontos) e selecione "WhatsApp Web"</li>
+                                    <li>Aponte a câmera para este código QR</li>
+                                    <li>Aguarde a conexão ser estabelecida</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Chat Section -->
+                <div id="ai-chat-section" class="content-section">
+                    <div class="section-header">
+                        <h2>IA de Conversas</h2>
+                        <p>Configure e monitore suas conversas automáticas</p>
+                    </div>
+                    
+                    <div class="ai-chat-content">
+                        <div class="chat-simulator">
+                            <h3>Simulador de Conversas</h3>
+                            <div class="chat-window" id="chatWindow">
+                                <div class="chat-messages" id="chatMessages">
+                                    <!-- Simulated messages will appear here -->
+                                </div>
+                                <div class="chat-input">
+                                    <input type="text" id="simulatorInput" placeholder="Simule uma mensagem de cliente...">
+                                    <button id="sendSimulatorBtn">Enviar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mass Dispatch Section -->
+                <div id="mass-dispatch-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Disparo em Massa</h2>
+                        <p>Envie campanhas personalizadas para seus contatos</p>
+                    </div>
+                    
+                    <div class="mass-dispatch-content">
+                        <div class="campaign-creator">
+                            <h3>Nova Campanha</h3>
+                            <form id="campaignForm">
+                                <div class="form-group">
+                                    <label for="campaignName">Nome da Campanha</label>
+                                    <input type="text" id="campaignName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="campaignMessage">Mensagem</label>
+                                    <textarea id="campaignMessage" rows="4" required></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="targetAudience">Público Alvo</label>
+                                    <select id="targetAudience">
+                                        <option value="all">Todos os Contatos</option>
+                                        <option value="leads">Apenas Leads</option>
+                                        <option value="clients">Apenas Clientes</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn-primary">Criar Campanha</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CRM Kanban Section -->
+                <div id="crm-kanban-section" class="content-section">
+                    <div class="section-header">
+                        <h2>CRM Kanban</h2>
+                        <p>Organize seus leads e oportunidades visualmente</p>
+                    </div>
+                    
+                    <div class="kanban-board" id="kanbanBoard">
+                        <!-- Kanban columns will be generated here -->
+                    </div>
+                </div>
+
+                <!-- Agenda Section -->
+                <div id="agenda-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Agenda Automática</h2>
+                        <p>Gerenciamento automático de reuniões e compromissos</p>
+                    </div>
+                    
+                    <div class="agenda-content">
+                        <div class="calendar-view" id="calendarView">
+                            <!-- Calendar will be rendered here -->
+                        </div>
+                        <div class="agenda-sidebar">
+                            <h3>Próximos Compromissos</h3>
+                            <div class="upcoming-meetings" id="upcomingMeetings">
+                                <!-- Upcoming meetings will be listed here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Configurações</h3>
+                <button class="modal-close" id="closeSettingsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-tabs">
+                    <button class="tab-btn active" data-tab="general">Geral</button>
+                    <button class="tab-btn" data-tab="ai">IA</button>
+                    <button class="tab-btn" data-tab="notifications">Notificações</button>
+                </div>
+                <div class="settings-content" id="settingsContent">
+                    <!-- Settings content will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/qrcode.min.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/whatsapp.js"></script>
+    <script src="js/ai-engine.js"></script>
+    <script src="js/ui-manager.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
