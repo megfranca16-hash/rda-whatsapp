@@ -1,5 +1,5 @@
-// Empresas Web CRM - Popup Script
-// Interface principal da extensão
+// BotNinja 3.0 - Popup Script
+// Interface principal da IA para WhatsApp
 
 class EmpresasWebPopup {
   constructor() {
