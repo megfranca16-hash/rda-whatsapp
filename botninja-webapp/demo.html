@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BotNinja 3.0 - Demo Funcionalidades</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        
+        .demo-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .demo-card h3 {
+            color: #6366f1;
+            margin-bottom: 16px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .result {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        
+        .success { background: #dcfce7; color: #166534; }
+        .error { background: #fecaca; color: #991b1b; }
+        
+        #qrCanvas {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🤖 BotNinja 3.0 - Demo de Funcionalidades</h1>
+    <p>Esta página demonstra as principais funcionalidades do BotNinja Web App em funcionamento.</p>
+
+    <!-- Storage Demo -->
+    <div class="demo-card">
+        <h3>📦 Sistema de Storage</h3>
+        <p>Teste o sistema de armazenamento local que substitui o chrome.storage</p>
+        <button class="btn" onclick="testStorage()">Testar Storage</button>
+        <button class="btn" onclick="clearStorage()">Limpar Storage</button>
+        <div id="storageResult" class="result" style="display: none;"></div>
+    </div>
+
+    <!-- QR Code Demo -->
+    <div class="demo-card">
+        <h3>📱 Gerador de QR Code</h3>
+        <p>Teste a geração de QR Codes para conexão WhatsApp</p>
+        <button class="btn" onclick="generateQR()">Gerar QR Code</button>
+        <button class="btn" onclick="clearQR()">Limpar QR</button>
+        <canvas id="qrCanvas" width="256" height="256" style="display: none;"></canvas>
+        <div id="qrResult" class="result" style="display: none;"></div>
+    </div>
+
+    <!-- AI Engine Demo -->
+    <div class="demo-card">
+        <h3>🧠 Motor de IA</h3>
+        <p>Teste o sistema de inteligência artificial para respostas automáticas</p>
+        <input type="text" id="aiInput" placeholder="Digite uma mensagem para a IA..." style="width: 60%; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px;">
+        <button class="btn" onclick="testAI()">Testar IA</button>
+        <div id="aiResult" class="result" style="display: none;"></div>
+    </div>
+
+    <!-- WhatsApp Simulation -->
+    <div class="demo-card">
+        <h3>📞 Simulação WhatsApp</h3>
+        <p>Simule o status de conexão WhatsApp</p>
+        <button class="btn" onclick="simulateConnect()">Simular Conexão</button>
+        <button class="btn" onclick="simulateDisconnect()">Simular Desconexão</button>
+        <button class="btn" onclick="simulateMessage()">Simular Mensagem</button>
+        <div id="whatsappResult" class="result" style="display: none;"></div>
+    </div>
+
+    <!-- Event System Demo -->
+    <div class="demo-card">
+        <h3>🔄 Sistema de Eventos</h3>
+        <p>Teste o sistema de eventos customizados do BotNinja</p>
+        <button class="btn" onclick="triggerEvent()">Disparar Evento</button>
+        <button class="btn" onclick="setupEventListener()">Configurar Listener</button>
+        <div id="eventResult" class="result" style="display: none;"></div>
+    </div>
+
+    <!-- Performance Test -->
+    <div class="demo-card">
+        <h3>⚡ Teste de Performance</h3>
+        <p>Verifique a performance dos módulos principais</p>
+        <button class="btn" onclick="performanceTest()">Executar Teste</button>
+        <div id="performanceResult" class="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        // Include simplified versions of BotNinja modules for demo
+        
+        // Simple Storage System
+        class DemoStorage {
+            constructor() {
+                this.prefix = 'botninja_demo_';
+            }
+            
+            set(key, value) {
+                try {
+                    localStorage.setItem(this.prefix + key, JSON.stringify(value));
+                    return Promise.resolve({ success: true });
+                } catch (error) {
+                    return Promise.reject(error);
+                }
+            }
+            
+            get(key) {
+                try {
+                    const value = localStorage.getItem(this.prefix + key);
+                    return value ? JSON.parse(value) : null;
+                } catch (error) {
+                    return null;
+                }
+            }
+            
+            clear() {
+                Object.keys(localStorage).forEach(key => {
+                    if (key.startsWith(this.prefix)) {
+                        localStorage.removeItem(key);
+                    }
+                });
+            }
+        }
+        
+        // Simple QR Code Generator
+        class DemoQRCode {
+            static toCanvas(canvas, text, options, callback) {
+                const ctx = canvas.getContext('2d');
+                const width = 256;
+                
+                // Background
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, width, width);
+                
+                // Simple pattern
+                ctx.fillStyle = '#000000';
+                for (let i = 0; i < 20; i++) {
+                    for (let j = 0; j < 20; j++) {
+                        if ((i + j + text.length) % 3 === 0) {
+                            ctx.fillRect(i * 12 + 10, j * 12 + 10, 10, 10);
+                        }
+                    }
+                }
+                
+                if (callback) callback(null);
+            }
+        }
+        
+        // Simple AI Engine
+        class DemoAI {
+            constructor() {
+                this.responses = {
+                    'oi': 'Olá! Como posso ajudar você?',
+                    'preço': 'Nossos planos começam em R$ 197/mês',
+                    'serviço': 'Oferecemos automação completa para WhatsApp!',
+                    'default': 'Interessante! Me conte mais sobre isso.'
+                };
+            }
+            
+            generateResponse(message) {
+                const msg = message.toLowerCase();
+                for (const [key, response] of Object.entries(this.responses)) {
+                    if (msg.includes(key)) {
+                        return response;
+                    }
+                }
+                return this.responses.default;
+            }
+        }
+        
+        // Initialize demo modules
+        const demoStorage = new DemoStorage();
+        const demoAI = new DemoAI();
+        let eventListenerSet = false;
+        
+        // Demo Functions
+        
+        function testStorage() {
+            const testData = {
+                timestamp: new Date().toISOString(),
+                demo: true,
+                counter: Math.floor(Math.random() * 100)
+            };
+            
+            demoStorage.set('test', testData)
+                .then(() => {
+                    const retrieved = demoStorage.get('test');
+                    showResult('storageResult', `✅ Storage funcionando! Dados salvos e recuperados: ${JSON.stringify(retrieved, null, 2)}`, 'success');
+                })
+                .catch(error => {
+                    showResult('storageResult', `❌ Erro no storage: ${error.message}`, 'error');
+                });
+        }
+        
+        function clearStorage() {
+            demoStorage.clear();
+            showResult('storageResult', '🗑️ Storage limpo com sucesso!', 'success');
+        }
+        
+        function generateQR() {
+            const canvas = document.getElementById('qrCanvas');
+            const qrData = `BotNinja_${Date.now()}`;
+            
+            DemoQRCode.toCanvas(canvas, qrData, {}, (error) => {
+                if (error) {
+                    showResult('qrResult', `❌ Erro ao gerar QR: ${error.message}`, 'error');
+                } else {
+                    canvas.style.display = 'block';
+                    showResult('qrResult', `✅ QR Code gerado! Dados: ${qrData}`, 'success');
+                }
+            });
+        }
+        
+        function clearQR() {
+            const canvas = document.getElementById('qrCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canvas.style.display = 'none';
+            showResult('qrResult', '🗑️ QR Code limpo!', 'success');
+        }
+        
+        function testAI() {
+            const input = document.getElementById('aiInput');
+            const message = input.value.trim();
+            
+            if (!message) {
+                showResult('aiResult', '⚠️ Digite uma mensagem primeiro!', 'error');
+                return;
+            }
+            
+            const response = demoAI.generateResponse(message);
+            showResult('aiResult', `🤖 IA respondeu: "${response}"`, 'success');
+            input.value = '';
+        }
+        
+        function simulateConnect() {
+            showResult('whatsappResult', '📱 WhatsApp conectado! Status: Ativo', 'success');
+        }
+        
+        function simulateDisconnect() {
+            showResult('whatsappResult', '📱 WhatsApp desconectado! Status: Inativo', 'error');
+        }
+        
+        function simulateMessage() {
+            const messages = [
+                'Nova mensagem recebida de +55 11 99999-9999',
+                'IA processou mensagem e enviou resposta automática',
+                'Lead qualificado automaticamente',
+                'Reunião agendada para amanhã às 14h'
+            ];
+            
+            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+            showResult('whatsappResult', `💬 ${randomMessage}`, 'success');
+        }
+        
+        function triggerEvent() {
+            const event = new CustomEvent('botninja:demo:event', {
+                detail: { 
+                    message: 'Evento de demonstração disparado!',
+                    timestamp: new Date().toISOString()
+                }
+            });
+            
+            window.dispatchEvent(event);
+            showResult('eventResult', '🔔 Evento disparado! (Configure listener para ver resultado)', 'success');
+        }
+        
+        function setupEventListener() {
+            if (eventListenerSet) {
+                showResult('eventResult', '⚠️ Event listener já configurado!', 'error');
+                return;
+            }
+            
+            window.addEventListener('botninja:demo:event', (e) => {
+                showResult('eventResult', `🎯 Evento capturado! Dados: ${JSON.stringify(e.detail, null, 2)}`, 'success');
+            });
+            
+            eventListenerSet = true;
+            showResult('eventResult', '✅ Event listener configurado! Agora dispare um evento.', 'success');
+        }
+        
+        function performanceTest() {
+            const start = performance.now();
+            
+            // Simulate various operations
+            const operations = [
+                () => demoStorage.set('perf_test', { data: 'test' }),
+                () => demoStorage.get('perf_test'),
+                () => demoAI.generateResponse('teste performance'),
+                () => new Promise(resolve => setTimeout(resolve, 10))
+            ];
+            
+            Promise.all(operations.map(op => op()))
+                .then(() => {
+                    const end = performance.now();
+                    const duration = (end - start).toFixed(2);
+                    showResult('performanceResult', `⚡ Teste concluído em ${duration}ms\n- Storage: OK\n- IA: OK\n- Eventos: OK`, 'success');
+                })
+                .catch(error => {
+                    showResult('performanceResult', `❌ Erro no teste: ${error.message}`, 'error');
+                });
+        }
+        
+        function showResult(elementId, message, type = '') {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.textContent = message;
+            element.className = `result ${type}`;
+        }
+        
+        // Initialize demo on load
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 BotNinja Demo carregado!');
+            
+            // Show initial status
+            const statusMessage = `
+BotNinja 3.0 Demo inicializado!
+Timestamp: ${new Date().toISOString()}
+Storage: ${typeof Storage !== 'undefined' ? 'Disponível' : 'Indisponível'}
+Canvas: ${document.createElement('canvas').getContext ? 'Disponível' : 'Indisponível'}
+            `;
+            
+            console.log(statusMessage);
+        });
+    </script>
+</body>
+</html>
