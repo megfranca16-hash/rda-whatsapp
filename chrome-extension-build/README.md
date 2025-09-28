@@ -27,6 +27,7 @@
 ## 🔧 Requisitos
 - Google Chrome versão 88 ou superior
 - WhatsApp Web ativo
+- Conta no BotNinja (opcional para recursos avançados)
 
 ## 📁 Estrutura de Arquivos Necessária
 ```
