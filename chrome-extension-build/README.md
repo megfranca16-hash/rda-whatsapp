@@ -1,4 +1,4 @@
-# Empresas Web - Chrome Extension CRM
+# BotNinja 3.0 - Chrome Extension IA WhatsApp
 
 ## 📋 Instruções de Instalação
 
