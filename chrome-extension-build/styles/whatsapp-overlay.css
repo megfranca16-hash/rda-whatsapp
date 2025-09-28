@@ -32,19 +32,29 @@
   animation: aiAppear 0.4s ease-out;
 }
 
-.ew-crm-overlay.minimized {
+.bn-ai-overlay.minimized {
   transform: translateY(-80%);
-  transition: transform 0.3s ease-out;
+  transition: transform 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
-@keyframes fadeIn {
+@keyframes aiAppear {
   from {
     opacity: 0;
-    transform: scale(0.95);
+    transform: scale(0.9) translateY(20px);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Animação para elementos de IA */
+@keyframes aiPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 20px rgba(99, 102, 241, 0);
   }
 }
 
