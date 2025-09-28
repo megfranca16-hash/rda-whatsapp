@@ -22,7 +22,7 @@ class BotNinjaCRM {
   }
 
   async initialize() {
-    console.log('🚀 Inicializando Empresas Web CRM...');
+    console.log('🚀 Inicializando BotNinja 3.0...');
     
     // Aguardar elementos do WhatsApp carregarem
     await this.waitForWhatsApp();
