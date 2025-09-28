@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico - Empresas Web Chrome Extension</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status-ok { color: #10b981; }
+        .status-error { color: #ef4444; }
+        .file-check {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .instructions {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Diagnóstico da Extensão Chrome</h1>
+        <p>Este diagnóstico verifica se todos os arquivos necessários estão presentes para a instalação da extensão.</p>
+        
+        <h2>📁 Verificação de Arquivos</h2>
+        <div id="fileResults">
+            <p>Clique em "Executar Diagnóstico" para verificar os arquivos.</p>
+        </div>
+        
+        <button onclick="runDiagnostic()">🔍 Executar Diagnóstico</button>
+        <button onclick="showInstructions()">📋 Ver Instruções</button>
+        
+        <div id="instructionsPanel" style="display: none;">
+            <div class="instructions">
+                <h3>📋 Instruções de Instalação</h3>
+                <ol>
+                    <li><strong>Abra o Chrome</strong> e vá para <code>chrome://extensions/</code></li>
+                    <li><strong>Ative o Modo do Desenvolvedor</strong> (toggle no canto superior direito)</li>
+                    <li><strong>Clique em "Carregar sem compactação"</strong></li>
+                    <li><strong>Selecione esta pasta</strong> (que contém o arquivo manifest.json)</li>
+                    <li><strong>Verifique se não há erros</strong> na lista de extensões</li>
+                </ol>
+                
+                <h4>❌ Se houver erros:</h4>
+                <ul>
+                    <li>Certifique-se de que todos os arquivos mostram ✅ no diagnóstico</li>
+                    <li>Verifique se você selecionou a pasta correta (que contém manifest.json)</li>
+                    <li>Tente recarregar a extensão depois de corrigir os problemas</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div id="diagnosticResults" style="display: none;">
+            <h3>📊 Resultados do Diagnóstico</h3>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script>
+        const requiredFiles = [
+            'manifest.json',
+            'background.js',
+            'main-content.js',
+            'api-integration.js',
+            'popup/popup.html',
+            'popup/popup.js',
+            'popup/popup.css',
+            'styles/whatsapp-overlay.css',
+            'libs/jquery-3.6.0.min.js',
+            'content-scripts/whatsapp-injector.js',
+            'content-scripts/crm-kanban.js',
+            'content-scripts/mass-sender.js',
+            'content-scripts/auto-responder.js',
+            'content-scripts/interactive-buttons.js',
+            'content-scripts/contact-manager.js',
+            'icons/icon16.png',
+            'icons/icon32.png',
+            'icons/icon48.png',
+            'icons/icon128.png'
+        ];
+
+        async function checkFileExists(filename) {
+            try {
+                const response = await fetch(filename);
+                return response.ok;
+            } catch {
+                return false;
+            }
+        }
+
+        async function runDiagnostic() {
+            const resultsDiv = document.getElementById('results');
+            const diagnosticDiv = document.getElementById('diagnosticResults');
+            
+            resultsDiv.innerHTML = '<p>Verificando arquivos...</p>';
+            diagnosticDiv.style.display = 'block';
+            
+            let allFilesOk = true;
+            let resultsHtml = '';
+            
+            for (const file of requiredFiles) {
+                const exists = await checkFileExists(file);
+                const status = exists ? '✅' : '❌';
+                const statusClass = exists ? 'status-ok' : 'status-error';
+                
+                if (!exists) allFilesOk = false;
+                
+                resultsHtml += `
+                    <div class="file-check">
+                        <span>${file}</span>
+                        <span class="${statusClass}">${status}</span>
+                    </div>
+                `;
+            }
+            
+            const summary = allFilesOk 
+                ? '<p class="status-ok">🎉 Todos os arquivos estão presentes! A extensão deve instalar corretamente.</p>'
+                : '<p class="status-error">⚠️ Alguns arquivos estão faltando. Verifique a estrutura de pastas.</p>';
+            
+            resultsDiv.innerHTML = summary + resultsHtml;
+        }
+
+        function showInstructions() {
+            const panel = document.getElementById('instructionsPanel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Executar diagnóstico automaticamente
+        window.addEventListener('load', () => {
+            setTimeout(runDiagnostic, 500);
+        });
+    </script>
+</body>
+</html>
