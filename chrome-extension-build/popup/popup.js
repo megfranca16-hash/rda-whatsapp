@@ -466,6 +466,65 @@ class BotNinjaPopup {
     input.click();
   }
 
+  // Métodos específicos do BotNinja
+  showBotConfig() {
+    this.showNotification('Abrindo configurações da IA...', 'info');
+    // Implementar modal de configuração da IA
+  }
+
+  showTrainAI() {
+    this.showNotification('Abrindo treinamento da IA...', 'info');
+    // Implementar interface de treinamento
+  }
+
+  showKnowledgeBase() {
+    this.showNotification('Abrindo base de conhecimento...', 'info');
+    // Implementar gestão da base de conhecimento
+  }
+
+  showSimulate() {
+    this.showNotification('Iniciando simulação de conversas...', 'info');
+    // Implementar simulador de conversas
+  }
+
+  showReports() {
+    this.showNotification('Carregando relatórios da IA...', 'info');
+    // Implementar dashboard de relatórios
+  }
+
+  openAIChat() {
+    this.showNotification('Ativando IA de conversas...', 'info');
+    this.sendMessageToContent('activateAIChat');
+  }
+
+  openMassDispatch() {
+    this.showNotification('Abrindo disparo em massa...', 'info');
+    this.sendMessageToContent('openMassDispatch');
+  }
+
+  openCRMKanban() {
+    this.showNotification('Abrindo CRM Kanban...', 'info');
+    this.sendMessageToContent('openCRMKanban');
+  }
+
+  openAgenda() {
+    this.showNotification('Abrindo agenda automática...', 'info');
+    this.sendMessageToContent('openAgenda');
+  }
+
+  async sendMessageToContent(action, data = {}) {
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (tab && tab.url.includes('web.whatsapp.com')) {
+        chrome.tabs.sendMessage(tab.id, { action, ...data });
+      } else {
+        chrome.tabs.create({ url: 'https://web.whatsapp.com' });
+      }
+    } catch (error) {
+      console.error('Erro ao enviar mensagem para content script:', error);
+    }
+  }
+
   // Utilitários
   showModal(modalId) {
     document.getElementById(modalId).classList.add('active');
