@@ -31,7 +31,7 @@
 
 ## 📁 Estrutura de Arquivos Necessária
 ```
-chrome-extension/
+botninja-extension/
 ├── manifest.json         (OBRIGATÓRIO)
 ├── background.js
 ├── main-content.js
