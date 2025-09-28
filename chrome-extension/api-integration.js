@@ -3,7 +3,7 @@
 
 class EmpresasWebAPI {
   constructor() {
-    this.baseURL = 'https://f546f6c9-c5be-414d-9a23-02cc57245f15.preview.emergentagent.com/api'; // Backend URL
+    this.baseURL = 'https://crm-extension-1.preview.emergentagent.com/api'; // Backend URL
     this.authToken = null;
     this.isAuthenticated = false;
     
