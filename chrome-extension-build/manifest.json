@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Empresas Web - CRM WhatsApp Pro",
-  "version": "2.0.0",
-  "description": "Transforme seu WhatsApp Web em uma poderosa ferramenta de vendas e CRM multi-empresa",
+  "name": "BotNinja - IA WhatsApp Automação",
+  "version": "3.0.0",
+  "description": "Venda no piloto automático com Inteligência Artificial no WhatsApp. Atendimento 24/7, disparo em massa e CRM completo.",
   
   "permissions": [
     "storage",
