@@ -64,38 +64,43 @@ class BotNinjaPopup {
   }
 
   updateUI() {
+    this.updateBotInfo();
+    this.updateAIStats();
+    this.updateScheduledMessages();
+  }
+
+  updateBotInfo() {
     if (this.activeCompany) {
-      document.getElementById('companyName').textContent = this.activeCompany.name;
-      document.getElementById('companyPhone').textContent = this.activeCompany.phone;
-      this.updateStats();
+      document.getElementById('botName').textContent = `IA ${this.activeCompany.name}`;
+      document.getElementById('botStatus').textContent = 'Atendimento Automático 24/7';
+      this.updateAIStats();
       this.updateScheduledMessages();
     } else {
-      document.getElementById('companyName').textContent = 'Nenhuma empresa selecionada';
-      document.getElementById('companyPhone').textContent = 'Clique para criar uma empresa';
+      document.getElementById('botName').textContent = 'IA Personalizada';
+      document.getElementById('botStatus').textContent = 'Configure sua IA primeiro';
     }
   }
 
-  updateStats() {
-    if (!this.activeCompany) return;
-
-    const crmData = this.activeCompany.crmData;
+  updateAIStats() {
+    // Simulate AI metrics
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     
-    // Contatos
-    const totalContacts = Object.keys(crmData.contacts || {}).length;
-    document.getElementById('totalContacts').textContent = totalContacts;
+    // Respostas IA (mock com base em hora do dia)
+    const aiResponses = Math.floor(Math.random() * 200) + 50;
+    document.getElementById('aiResponses').textContent = aiResponses;
 
-    // Negócios ativos
-    const activeDeals = Object.values(crmData.deals || {}).filter(deal => 
-      deal.stage !== 'closed' && deal.stage !== 'lost'
-    ).length;
-    document.getElementById('activeDeals').textContent = activeDeals;
+    // Leads qualificados
+    const leadsQualified = Math.floor(aiResponses * 0.3);
+    document.getElementById('leadsQualified').textContent = leadsQualified;
 
-    // Mensagens hoje (mock)
-    document.getElementById('todayMessages').textContent = Math.floor(Math.random() * 50);
+    // Reuniões agendadas
+    const scheduledMeetings = Math.floor(leadsQualified * 0.4);
+    document.getElementById('scheduledMeetings').textContent = scheduledMeetings;
 
-    // Taxa de conversão (mock)
-    const conversionRate = activeDeals > 0 ? Math.floor((activeDeals / totalContacts) * 100) : 0;
-    document.getElementById('conversionRate').textContent = `${conversionRate}%`;
+    // Conversões hoje
+    const conversionsToday = Math.floor(scheduledMeetings * 0.6);
+    document.getElementById('conversionsToday').textContent = conversionsToday;
   }
 
   updateScheduledMessages() {
