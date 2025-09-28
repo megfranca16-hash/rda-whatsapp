@@ -1,7 +1,7 @@
 // BotNinja 3.0 - Popup Script
 // Interface principal da IA para WhatsApp
 
-class EmpresasWebPopup {
+class BotNinjaPopup {
   constructor() {
     this.currentConfig = null;
     this.activeCompany = null;
