@@ -1,7 +1,7 @@
-// Empresas Web - Chrome Extension Background Script
-// Sistema Multi-empresa com automação completa
+// BotNinja 3.0 - Chrome Extension Background Script
+// IA para WhatsApp com automação completa
 
-class EmpresasWebBackground {
+class BotNinjaBackground {
   constructor() {
     this.setupEventListeners();
     this.initializeStorage();
