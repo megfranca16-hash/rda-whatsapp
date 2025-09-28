@@ -21,8 +21,8 @@
 ### 4. Usar a Extensão
 1. Abra o WhatsApp Web (https://web.whatsapp.com)
 2. Clique no ícone da extensão para abrir o popup
-3. Configure sua primeira empresa
-4. Comece a usar o CRM integrado
+3. Configure sua IA personalizada
+4. Comece a vender no piloto automático com IA!
 
 ## 🔧 Requisitos
 - Google Chrome versão 88 ou superior
