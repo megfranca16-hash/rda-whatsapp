@@ -61,9 +61,7 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "styles/*",
-        "assets/*",
-        "templates/*"
+        "styles/*"
       ],
       "matches": ["https://web.whatsapp.com/*"]
     }
