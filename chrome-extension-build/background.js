@@ -307,4 +307,4 @@ class BotNinjaBackground {
 }
 
 // Inicializar background script
-new EmpresasWebBackground();
+new BotNinjaBackground();
