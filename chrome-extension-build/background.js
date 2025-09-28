@@ -75,13 +75,13 @@ class BotNinjaBackground {
     chrome.notifications.create({
       type: 'basic',
       iconUrl: 'icons/icon48.png',
-      title: 'Empresas Web CRM Instalado!',
-      message: 'Abra o WhatsApp Web para começar a usar seu novo CRM'
+      title: 'BotNinja 3.0 Instalado!',
+      message: 'Abra o WhatsApp Web para começar a vender no piloto automático com IA!'
     });
 
-    // Abrir tutorial
+    // Abrir página do BotNinja
     chrome.tabs.create({
-      url: chrome.runtime.getURL('tutorial/welcome.html')
+      url: 'https://botninja.com.br/'
     });
   }
 
