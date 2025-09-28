@@ -1,0 +1,23 @@
+# Placeholder Images Required
+
+Para completar o BotNinja Web App, você precisará adicionar as seguintes imagens:
+
+## Logos e Ícones
+- logo.png (48x48px) - Logo principal do BotNinja
+- favicon.ico (16x16px) - Favicon para o navegador
+- bot-avatar.png (48x48px) - Avatar do bot IA
+
+## Ícones PWA
+- icon-192.png (192x192px) - Ícone PWA padrão
+- icon-512.png (512x512px) - Ícone PWA grande
+
+## Placeholders para Development
+Você pode usar estas imagens temporárias:
+- data:image/svg+xml... para logos SVG
+- Gradientes CSS para fundos
+- Emojis Unicode para ícones temporários
+
+## Exemplo de Logo SVG Inline:
+```
+data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjQiIGN5PSIyNCIgcj0iMjQiIGZpbGw9InVybCgjZ3JhZGllbnQwKSIvPgo8dGV4dCB4PSIyNCIgeT0iMzAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IndoaXRlIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCI+Qk48L3RleHQ+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9ImdyYWRpZW50MCIgeDE9IjAiIHkxPSIwIiB4Mj0iNDgiIHkyPSI0OCI+CjxzdG9wIHN0b3AtY29sb3I9IiM2MzY2RjEiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjOEI1Q0Y2Ii8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPHN2Zz4K
+```
