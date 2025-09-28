@@ -29,17 +29,17 @@ class BotNinjaPopup {
 
   setupEventListeners() {
     // Botões principais
-    document.getElementById('switchCompanyBtn').addEventListener('click', () => this.showCompanySelector());
-    document.getElementById('newCompanyBtn').addEventListener('click', () => this.showNewCompanyModal());
-    document.getElementById('settingsBtn').addEventListener('click', () => this.showSettingsModal());
-    document.getElementById('exportDataBtn').addEventListener('click', () => this.exportData());
-    document.getElementById('importDataBtn').addEventListener('click', () => this.importData());
+    document.getElementById('configBotBtn').addEventListener('click', () => this.showBotConfig());
+    document.getElementById('trainAiBtn').addEventListener('click', () => this.showTrainAI());
+    document.getElementById('knowledgeBaseBtn').addEventListener('click', () => this.showKnowledgeBase());
+    document.getElementById('simulateBtn').addEventListener('click', () => this.showSimulate());
+    document.getElementById('reportsBtn').addEventListener('click', () => this.showReports());
 
     // Navegação rápida
-    document.getElementById('crmBtn').addEventListener('click', () => this.openCRM());
-    document.getElementById('automationBtn').addEventListener('click', () => this.openAutomation());
-    document.getElementById('massMessageBtn').addEventListener('click', () => this.openMassMessage());
-    document.getElementById('scheduleBtn').addEventListener('click', () => this.openSchedule());
+    document.getElementById('aiChatBtn').addEventListener('click', () => this.openAIChat());
+    document.getElementById('massDispatchBtn').addEventListener('click', () => this.openMassDispatch());
+    document.getElementById('crmKanbanBtn').addEventListener('click', () => this.openCRMKanban());
+    document.getElementById('agendaBtn').addEventListener('click', () => this.openAgenda());
 
     // Modal Nova Empresa
     document.getElementById('newCompanyForm').addEventListener('submit', (e) => this.handleNewCompany(e));
