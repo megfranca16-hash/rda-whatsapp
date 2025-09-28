@@ -51,16 +51,33 @@ body {
   align-items: center;
   gap: 10px;
   margin-bottom: 12px;
+  position: relative;
+  z-index: 1;
 }
 
 .logo img {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
 }
 
 .logo h1 {
-  font-size: 18px;
+  font-size: 20px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #10B981 0%, #06D6A0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.version {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10B981;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 10px;
   font-weight: 600;
+  margin-left: 8px;
 }
 
 .status-indicator {
