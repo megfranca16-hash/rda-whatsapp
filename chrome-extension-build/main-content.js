@@ -751,6 +751,6 @@ class BotNinjaCRM {
 }
 
 // Inicialização
-if (!window.empresasWebCRM) {
-  window.empresasWebCRM = new EmpresasWebCRM();
+if (!window.botNinjaAI) {
+  window.botNinjaAI = new BotNinjaCRM();
 }
